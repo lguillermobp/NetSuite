@@ -1,6 +1,6 @@
 define(['N/ui/dialog'], function (dialog) {
     /**
-     * Example 1; calc
+     * Example 1; click the button
      * @export suitelet-results
      *
      * @author Luis Barrios
@@ -40,10 +40,14 @@ define(['N/ui/dialog'], function (dialog) {
     }
 
     function printtagfg() {
+        dialog.alert({
+            title: "Hello",
+            message: "You clicked the button"
+        });
 
 
     }
-
+    exports.printtagfg = printtagfg;
     exports.pageInit = pageInit;
     return exports;
 
