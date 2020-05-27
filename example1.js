@@ -43,9 +43,12 @@ var exports= {};
     function renderList(results) {
         var list = ui.createList({title:"High Priority Cases"});
 
+        list.clientScriptModulePath = "./suitelet-result-cl.js";
+
         list.addButton({
             id: "Custpage btn nextcase",
-            label: "Go to Next Case"
+            label: "Go to Next Case",
+            functionName: "goToNextCase"
         });
 
         list.addColumn({
@@ -66,6 +69,7 @@ var exports= {};
             type: ui.FieldType.TEXT,
             label:'Subject'
         });
+
 
         list.addRows({rows:results});
         return list;
