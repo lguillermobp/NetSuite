@@ -1,4 +1,4 @@
-define(['N/ui/dialog'], function (dialog) {
+define(["N/ui/message"], function (message) {
     /**
      * Example 1; click the button
      * @export suitelet-results
@@ -11,7 +11,7 @@ define(['N/ui/dialog'], function (dialog) {
      *
      * @NApiVersion 2.0
      * @ModuleScope SameAccount
-     * @NScriptType Suitelet
+     * @NScriptType ClientScript
      *
      */
     var exports= {};
@@ -40,10 +40,14 @@ define(['N/ui/dialog'], function (dialog) {
     }
 
     function printtagfg() {
-        dialog.alert({
-            title: "Hello",
-            message: "You clicked the button"
-        });
+
+        message.create({
+            title: "You have clicked it",
+            message: "You are the best.",
+            type: message.Type.CONFIRMATION,
+            duration: 2000
+        }).show();
+        window.open("https://www.google.com")
 
 
     }
