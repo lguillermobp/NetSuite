@@ -1,7 +1,7 @@
 /**
-* @NApiVersion 2.0
-* @NScriptType Suitelet
-*/
+ * @NApiVersion 2.0
+ * @NScriptType Suitelet
+ */
 
 define(["N/file", "N/render", "N/search", "N/runtime", "N/record"], function(file, render, search, runtime, record) {
     function onRequest(context) {
