@@ -39,19 +39,18 @@ define(["N/ui/message"], function (message) {
 
     }
 
-    function printtagfg() {
+    function printpackinglist() {
 
         message.create({
-            title: "You have clicked it",
-            message: "You are the best.",
+            title: "Under Construction",
+            message: "this option will be done soon",
             type: message.Type.CONFIRMATION,
-            duration: 2000
+            duration: 5000
         }).show();
-        window.open("localhost")
 
 
     }
-    exports.printtagfg = printtagfg;
+    exports.printpackinglist = printpackinglist;
     exports.pageInit = pageInit;
     return exports;
 
