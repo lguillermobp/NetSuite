@@ -1,4 +1,4 @@
-define(["N/ui/message"], function (message) {
+define(['N/currentRecord',"N/ui/message"], function (currentRecord,message) {
     /**
      * Example 1; click the button
      * @export suitelet-results
@@ -40,13 +40,18 @@ define(["N/ui/message"], function (message) {
     }
 
     function printpackinglist() {
+        var currRec = currentRecord.get();
+        var currentId = currRec.getValue({  fieldId: 'id'   });
+        var currentReference = currRec.getValue({  fieldId: 'otherrefnum'   });
 
         message.create({
-            title: "Under Construction",
-            message: "this option will be done soon",
+            title: "Under Construction " + currentId ,
+            message: "this option will be done soon " + currentReference,
             type: message.Type.CONFIRMATION,
             duration: 5000
         }).show();
+
+
 
 
     }

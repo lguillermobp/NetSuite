@@ -6,7 +6,7 @@
  * @NScriptType Suitelet
  */
 
-define(["N/file", "N/render", "N/search", "N/runtime", "N/record"], function(file, render, search, runtime, record) {
+define(["N/file", "N/render", "N/record"], function(file, render,  record) {
     function onRequest(context) {
         var text = " <p> In Construction </p>";
 
