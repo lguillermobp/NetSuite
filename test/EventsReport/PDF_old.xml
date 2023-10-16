@@ -1,0 +1,61 @@
+<pdf>
+    <head>
+        <style>
+            body {
+            font-family: Arial, Helvetica, sans-serif;
+            }
+
+            table, tr, th, td {
+            border: thin solid black;
+            border-collapse: collapse;
+            }
+
+            table {
+            width: 100%;
+            }
+
+            th {
+            font-weight: bold;
+            }
+        </style>
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <th>Location</th>
+                <td>
+                    <barcode codetype="code128" height="1cm" value="[LOCATION]"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Document Number</th>
+                <td>
+                    <barcode codetype="code128" height="1cm" value="[DOCUMENT_NUMBER]"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Customer</th>
+                <td>[CUSTOMER]</td>
+            </tr>
+            <tr>
+                <th>Ship Via</th>
+                <td>[SHIP_VIA]</td>
+            </tr>
+            <tr>
+                <th>Memo</th>
+                <td>[MEMO_MAIN]</td>
+            </tr>
+        </table>
+
+        <br/>
+
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>QTY To Ship</th>
+            </tr>
+            [SALES_ORDER_LINES]
+        </table>
+    </body>
+</pdf>

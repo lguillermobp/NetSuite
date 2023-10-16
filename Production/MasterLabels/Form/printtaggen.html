@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://3374911.app.netsuite.com/core/media/media.nl?id=409625&c=3374911&h=sdBLTxqN2jgSLVrBrdIm-h7U_BoL1NEnbm-w2TqJPVQdMBWL&_xt=.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>List Count</title>
+    <style>
+        body {
+            background: rgb(204,204,204);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 132px;
+            text-align: center;
+        }
+        page[size="A4"] {
+            background: white;
+            width: 8.5in;
+            height: 11in;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5cm;
+            border-top-width: thin;
+            border-right-width: thin;
+            border-bottom-width: thin;
+            border-left-width: thin;
+            border-top-style: none;
+            border-right-style: none;
+            border-bottom-style: none;
+            border-left-style: none;
+        }
+        @media print {
+            body, page[size="A4"] {
+                margin: 0;
+                box-shadow: 0;
+            }
+        }
+        #maindiv {
+            margin-top: 0px;
+            padding-top: 15px;
+        }
+        .masterlabel {
+            border-collapse: collapse;
+        }
+        .masterlabel td {
+            border: 1px solid black;
+        }
+        .masterlabel tr:first-child td {
+            border-top: 0;
+        }
+        .masterlabel tr td:first-child {
+            border-left: 0;
+        }
+        .masterlabel tr:last-child td {
+            border-bottom: 0;
+        }
+        .masterlabel tr td:last-child {
+            border-right: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<page size="A4">
+
+    <table width="100%"  border="0">
+        <tr>
+            <td height="267"><div style="font-size:82px">[WH_DESCRIPTION]</div></td>
+        </tr>
+        <tr>
+            <td ><div style="font-size:152px"><strong>[SO_PALLETID]</strong> </div>
+
+        </tr>
+        <tr>
+            <td><img id="barcode2_[SO_PALLETID]"  height="100"/>
+                <script>
+                    JsBarcode("#barcode2_[SO_PALLETID]", "[SO_PALLETID1]", {
+                        format:"code128",
+                        displayValue:true,
+                        fontSize:14,
+                        lineColor: "#0cc"
+                    });
+                </script>
+
+
+
+            </td>
+        </tr>
+
+        <tr>
+            <td height="228">PO#<strong>
+                [PO_NUMBER]</strong>
+                <br />
+                <img id="barcode3"  height="100"/>
+                <script>
+                    JsBarcode("#barcode3", "[SO_NUMBER]", {
+                        format:"code128",
+                        displayValue:true,
+                        fontSize:14,
+                        lineColor: "#0cc"
+                    });
+                </script>
+
+            </td>
+        </tr>
+
+    </table>
+
+</page>
+
+</body>
+</html>

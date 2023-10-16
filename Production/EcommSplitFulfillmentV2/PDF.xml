@@ -1,0 +1,108 @@
+<pdf>
+
+    <head>
+        <style>
+            body {
+            font-family: Arial, Helvetica, sans-serif;
+            }
+
+            table, tr, th, td {
+            border: thin solid black;
+            border-collapse: collapse;
+            }
+            #cssTable td
+            {
+            text-align: center;
+            vertical-align: middle;
+            }
+            table {
+            width: 100%;
+            }
+
+            th {
+            font-weight: bold;
+            }
+        </style>
+        <macrolist>
+            <macro id="header">
+                <table>
+
+                    <tr>
+                        <td colspan="2" align="left">[STATUS]</td>
+                        <td align="right">[NROPAGE]</td>
+                    </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td>[LOCATION]</td>
+                        <td>[SO_DATE]</td>
+                    </tr>
+
+                    <tr>
+                        <th>Document Number</th>
+                        <td align='center' style="text-align: center; vertical-align: middle;">
+                            <strong style="font-size: 30px;">[DOCUMENT_NUMBER1]</strong><br/><strong style="font-size: 12px;">[DOCUMENT_NUMBERIF]</strong>
+                        </td>
+                        <td ><img src="https://webhooks.1802.io/barcode/qrcode/?data=[DOCUMENT_NUMBER]-[DOCUMENT_NUMBERIF]&size=1"/>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Customer</th>
+                        <td colspan="2">[CUSTOMER]</td>
+                    </tr>
+                    <tr>
+                        <th>Ship Via</th>
+                        <td colspan="2">[SHIP_VIA]</td>
+                    </tr>
+                    <tr>
+                        <th>Memo</th>
+                        <td colspan="2">[MEMO_MAIN]</td>
+                    </tr>
+                    <tr>
+                        <th>Customer's Address </th>
+                        <td colspan="2">[CUSTOMER_ADDRESS]</td>
+                    </tr>
+                </table>
+
+
+
+            </macro>
+            <macro id="footer">
+                <table>
+                <tr>
+                <td align="left">Page <pagenumber/> of <totalpages/></td>
+                <td align="center"><strong style="font-size: 20px;">[REPRINT]</strong></td>
+                <td align="right" style="font-size: 8px;">[BATCH_CODE]</td>
+                </tr>
+                </table>
+
+            </macro>
+        </macrolist>
+    </head>
+
+    <body header="header" header-height="65mm" footer="footer" footer-height="10mm">
+
+
+        <table>
+            <tr>
+                <th  align='center'  style="vertical-align: middle" colspan="4" >ShipJunction ONLY
+
+                    <img src="https://webhooks.1802.io/barcode/qrcode/?data=[ITEMSDATA1]&size=2"/>
+
+                </th>
+
+            </tr>
+            <tr>
+                <th style="width: 282px;">Item</th>
+                <th style="width: 127px;">Lot#</th>
+                <th style="width: 109px;">QTY To Ship</th>
+                <th style="width: 156px;">STATUS</th>
+            </tr>
+            [SALES_ORDER_LINES]
+
+
+        </table>
+    </body>
+
+
+</pdf>

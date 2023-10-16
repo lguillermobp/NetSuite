@@ -1,0 +1,134 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="../javascript/javascript.js" type="text/javascript"></script>
+    <script src="../system/javascript/javascript.js" type="text/javascript"></script>
+    <script src="../javascript/jquery-1.6.4.min.js" type="text/javascript"></script>
+    <title>List Count</title>
+    <style>
+        body {
+            background: rgb(204,204,204);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+        page[size="A4"] {
+            background: white;
+            width: 6in;
+            height: 4in;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5cm;
+            border-top-width: thin;
+            border-right-width: thin;
+            border-bottom-width: thin;
+            border-left-width: thin;
+            border-top-style: none;
+            border-right-style: none;
+            border-bottom-style: none;
+            border-left-style: none;
+        }
+        @media print {
+            body, page[size="A4"] {
+                margin: 0;
+                box-shadow: 0px 0px;
+            }
+        }
+        #maindiv {
+            margin-top: 0px;
+            padding-top: 15px;
+        }
+        .masterlabel {
+            border-collapse: collapse;
+        }
+        .masterlabel td {
+            border: 1px solid black;
+        }
+        .masterlabel tr:first-child td {
+            border-top: 0;
+        }
+        .masterlabel tr td:first-child {
+            border-left: 0;
+        }
+        .masterlabel tr:last-child td {
+            border-bottom: 0;
+        }
+        .masterlabel tr td:last-child {
+            border-right: 0;
+        }
+    </style>
+</head>
+
+<body>
+<page size="A4">
+    <div id="maindiv">
+
+        <table width="100%" border="0" class="masterlabel">
+            <tr>
+                <td><div align="left">CARTON<br>
+                    QUANTITY:<font size="+2">{CASES}</font></div>
+
+                    <div align="center">
+                        <img
+                                src="http://www.keepautomation.com/online_barcode_generator/linear.aspx?TYPE=98&DATA={CASES}&PROCESS-TILDE=true&UOM=0&X=1&Y=60&ROTATE=0&RESOLUTION=72&FORMAT=gif&LEFT-MARGIN=0&RIGHT-MARGIN=0&SHOW-TEXT=false&TEXT-FONT=Arial%7c9%7cRegular" alt="KeepAutomation Free Online Barcode Generator"   title=" Free Online Barcode Generator"  width="120" height="50" >
+                    </div></td>
+                <td colspan="2" rowspan="2"><div align="center">
+
+                    <img alt="my bar code" src="../system/barcodenew.php?f=png&s=upc-a&sx=2&ts=3&d={UPC}" />
+
+
+                </div></td>
+            </tr>
+            <tr>
+                <td>SHIP TO DC#:<br>
+                    {SHIPTO}</td>
+            </tr>
+            <tr>
+                <td width="35%"><div align="center">Vendor Item # and/or Description<br />
+                    <div align="center"> </div>
+                    <br />
+                    {ITEM_DESCRIPTION}</div></td>
+                <td width="38%" rowspan="2"><div align="center">PO. NUMBER: <br><font size="+1">
+                    {PONUMBER}</font><br />
+
+                </div></td>
+                <th width="27%" rowspan="2"> <br />
+                    <div align="center">COUNTRY OF ORIGIN</div>
+                    <br />
+                    <div align="center"><strong>USA</strong></div></th>
+            </tr>
+            <tr>
+                <td width="35%" rowspan="2"  valign="top">FROM / VNDOR CODE: 426156<br />
+                    BEEKMAN 1802, INC<br /></td>
+            </tr>
+            <tr>
+                <td height="50"><div align="center" >Expiration Date:<br />
+
+                    </br><font size="+2">
+                        {EXPIRATION_DATE}</font>
+    </div></td>
+    <td><div align="center">SHORT QTY. CODE:<strong><br>SHORT</strong></div>
+        <br />
+    </td>
+    </tr>
+    <tr>
+        <td height="102" colspan="2" id='fin'>Serialized Shipping Container Code
+            <div align="center">{SSCC}</div>
+            <div align="center">
+
+                <img
+                        src="http://www.keepautomation.com/online_barcode_generator/linear.aspx?TYPE=11&DATA={SSCC}&PROCESS-TILDE=true&UOM=0&X=1&Y=60&ROTATE=0&RESOLUTION=72&FORMAT=gif&LEFT-MARGIN=0&RIGHT-MARGIN=0&SHOW-TEXT=false&TEXT-FONT=Arial%7c9%7cRegular" alt="KeepAutomation Free Online Barcode Generator"   title=" Free Online Barcode Generator"  width="350" height="60" >
+
+
+
+            </div>    </td>
+        <td><div align="center">CARTON COUNT:</div>      <div align="center"><font size="+1">{CASE} OF {TOTALCASES}</font>
+        </div></td>
+    </tr>
+    </table>
+
+    </div>
+</page>
+</body>
+</html>

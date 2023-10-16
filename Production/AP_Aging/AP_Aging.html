@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/colreorder/1.5.2/css/colReorder.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/keytable/2.5.1/css/keyTable.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/rowgroup/1.1.1/css/rowGroup.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/searchpanes/1.0.1/css/searchPanes.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"/>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/colreorder/1.5.2/js/dataTables.colReorder.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/keytable/2.5.1/js/dataTables.keyTable.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/rowgroup/1.1.1/js/dataTables.rowGroup.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/searchpanes/1.0.1/js/dataTables.searchPanes.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/combine/npm/lodash@4.17.15,npm/lodash@4.17.15/groupBy.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+    <script type="text/javascript"
+            src="https://unpkg.com/jspdf-autotable@3.3.2/dist/jspdf.plugin.autotable.js"></script>
+
+    <style>
+        td.new {
+            background-color: #2079EE !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        td.overdue {
+            background-color: #EE204D !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        td.subtotal {
+            border-top: 1px solid #e0e0e0;
+            background-color: white !important;
+            font-weight: bold !important;
+        }
+    </style>
+</head>
+<body>
+
+<div id="reportDiv" style="opacity: 0.0">
+    <table id="report" class="compact" width="100%">
+        <tbody>
+        [HTML_AP_AGING]
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const pageLoadedDateTime = moment().format("MM/DD/YY h:m:s");
+
+    const currencyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+    });
+
+    moment.updateLocale('en', {
+        invalidDate: ""
+    });
+
+    let endOfCurrentWeek = moment().endOf("week").subtract(1, "days");
+
+    let dataReport = [];
+
+    function printReport() {
+        let pdfEndOfCurrentWeek = moment().endOf("week").subtract(1, "days");
+
+        const columns = [["Terms", "Date", "Number", "Age", "Due", "Balance",
+            pdfEndOfCurrentWeek.format("MM/DD/YY"),
+            pdfEndOfCurrentWeek.add(1, "week").format("MM/DD/YY"),
+            pdfEndOfCurrentWeek.add(1, "week").format("MM/DD/YY"),
+            pdfEndOfCurrentWeek.add(1, "week").format("MM/DD/YY"),
+            pdfEndOfCurrentWeek.add(1, "week").format("MM/DD/YY"),
+            pdfEndOfCurrentWeek.add(1, "week").format("MM/DD/YY")]];
+
+        var body = [];
+        var tempDataReport = _.groupBy(dataReport, "vendor");
+
+        for (var vendor in tempDataReport) {
+            var tempBalance = 0;
+            var tempWeek1 = 0;
+            var tempWeek2 = 0;
+            var tempWeek3 = 0;
+            var tempWeek4 = 0;
+            var tempWeek5 = 0;
+            var tempWeek6 = 0;
+
+            body.push([{colSpan: 12, content: String(vendor).replace("&amp;", "&"), styles: {fontStyle: "bold", fillColor: [224, 224, 224]}}]);
+
+            for (var i = 0; i < tempDataReport[vendor].length; i++) {
+                body.push([tempDataReport[vendor][i].terms,
+                    moment(tempDataReport[vendor][i].date).format("MM/DD/YY"),
+                    tempDataReport[vendor][i].number,
+                    tempDataReport[vendor][i].age,
+                    moment(tempDataReport[vendor][i].due).format("MM/DD/YY"),
+                    (tempDataReport[vendor][i].balance) ? currencyFormatter.format(tempDataReport[vendor][i].balance).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week1) ? currencyFormatter.format(tempDataReport[vendor][i].week1).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week2) ? currencyFormatter.format(tempDataReport[vendor][i].week2).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week3) ? currencyFormatter.format(tempDataReport[vendor][i].week3).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week4) ? currencyFormatter.format(tempDataReport[vendor][i].week4).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week5) ? currencyFormatter.format(tempDataReport[vendor][i].week5).replace("$", "") : "",
+                    (tempDataReport[vendor][i].week6) ? currencyFormatter.format(tempDataReport[vendor][i].week6).replace("$", "") : "",
+                ]);
+
+                tempBalance += Number(tempDataReport[vendor][i].balance);
+                tempWeek1 += Number(tempDataReport[vendor][i].week1);
+                tempWeek2 += Number(tempDataReport[vendor][i].week2);
+                tempWeek3 += Number(tempDataReport[vendor][i].week3);
+                tempWeek4 += Number(tempDataReport[vendor][i].week4);
+                tempWeek5 += Number(tempDataReport[vendor][i].week5);
+                tempWeek6 += Number(tempDataReport[vendor][i].week6);
+            }
+            body.push([{colSpan: 5, content: "Subtotal", styles: {fontStyle: "bold"}},
+                {
+                    content: currencyFormatter.format(tempBalance).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek1).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek2).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek3).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek4).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek5).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+                {
+                    content: currencyFormatter.format(tempWeek6).replace("$", ""),
+                    styles: {fontStyle: "bold"}
+                },
+            ]);
+        }
+
+        var doc = new jsPDF({orientation: "landscape"});
+        doc.autoTable({
+            head: columns,
+            body: body,
+            foot: columns,
+            theme: "grid",
+            styles: {
+                fontSize: 5,
+            }
+        });
+        doc.save(`Beekman 1802 AP Aging Report ${pageLoadedDateTime}.pdf`);
+    }
+
+    $(document).ready(function () {
+        var report = $("#report").DataTable({
+            scrollY: "75vh",
+            scrollCollapse: true,
+            paging: false,
+            rowGroup: {
+                endRender: function (rows, group) {
+                    var totalBalance = 0, totalWeek1 = 0, totalWeek2 = 0, totalWeek3 = 0, totalWeek4 = 0,
+                        totalWeek5 = 0, totalWeek6 = 0;
+                    rows.data().each(function (row) {
+                        dataReport.push({
+                            vendor: row[0],
+                            terms: row[1],
+                            date: row[2],
+                            number: row[3],
+                            age: row[4],
+                            due: row[5],
+                            balance: row[6],
+                            week1: row[7],
+                            week2: row[8],
+                            week3: row[9],
+                            week4: row[10],
+                            week5: row[11],
+                            week6: row[12],
+                            week6: row[12],
+                            amex: row[13],
+                            location: row[14]
+                        });
+
+                        totalBalance += Number(row[6]);
+                        totalWeek1 += Number(row[7]);
+                        totalWeek2 += Number(row[8]);
+                        totalWeek3 += Number(row[9]);
+                        totalWeek4 += Number(row[10]);
+                        totalWeek5 += Number(row[11]);
+                        totalWeek6 += Number(row[12]);
+                    });
+
+                    totalBalance = currencyFormatter.format(totalBalance).replace("$", "");
+                    totalWeek1 = currencyFormatter.format(totalWeek1).replace("$", "");
+                    totalWeek2 = currencyFormatter.format(totalWeek2).replace("$", "");
+                    totalWeek3 = currencyFormatter.format(totalWeek3).replace("$", "");
+                    totalWeek4 = currencyFormatter.format(totalWeek4).replace("$", "");
+                    totalWeek5 = currencyFormatter.format(totalWeek5).replace("$", "");
+                    totalWeek6 = currencyFormatter.format(totalWeek6).replace("$", "");
+
+                    return $('<tr/>')
+                        .append('<td colspan="5" class="subtotal">Sub Total</td>')
+                        .append('<td class="subtotal">' + totalBalance + '</td>')
+                        .append('<td class="subtotal">' + totalWeek1 + '</td>')
+                        .append('<td class="subtotal">' + totalWeek2 + '</td>')
+                        .append('<td class="subtotal">' + totalWeek3 + '</td>')
+                        .append('<td class="subtotal">' + totalWeek4 + '</td>')
+                        .append('<td class="subtotal">' + totalWeek5 + '</td>')
+                        .append('<td class="subtotal">' + totalWeek6 + '</td>')
+                },
+                dataSrc: 0
+            },
+            searchPanes: {
+                layout: "columns-4",
+                columns: [14, 13, 0, 1],
+                cascadePanes: true,
+                viewTotal: true
+            },
+            dom: "BPlfrtip",
+            buttons: [{
+                text: "Print",
+                action: function (e, dt, node, config) {
+                    printReport()
+                }
+            },
+                "excel"
+            ],
+            columns: [
+                {title: "Vendor", name: "Vendor"},
+                {title: "Terms", name: "Terms"},
+                {title: "Date", name: "Date"},
+                {title: "Number", name: "Number"},
+                {title: "Age", name: "Age"},
+                {title: "Due", name: "Due"},
+                {title: "Balance", name: "Balance"},
+                {title: endOfCurrentWeek.format("MM/DD/YY"), name: "Week1"},
+                {title: endOfCurrentWeek.add(1, "week").format("MM/DD/YY"), name: "Week2"},
+                {title: endOfCurrentWeek.add(1, "week").format("MM/DD/YY"), name: "Week3"},
+                {title: endOfCurrentWeek.add(1, "week").format("MM/DD/YY"), name: "Week4"},
+                {title: endOfCurrentWeek.add(1, "week").format("MM/DD/YY"), name: "Week5"},
+                {title: endOfCurrentWeek.add(1, "week").format("MM/DD/YY"), name: "Week6"},
+                {title: "AMEX", name: "Amex"},
+                {title: "Location", name: "Location"},
+            ],
+            columnDefs: [
+                {
+                    targets: [14, 13, 0],
+                    visible: false
+                }, {
+                    targets: [6, 7, 8, 9, 10, 11, 12],
+                    render: function (data, type, row, meta) {
+                        return type === "display" && !isNaN(parseFloat(data)) ?
+                            currencyFormatter.format(data).replace("$", "") :
+                            data;
+                    }
+                }, {
+                    targets: [2, 5],
+                    render: function (data, type, row, meta) {
+                        return moment(data).format("MM/DD/YY")
+                    }
+                }, {
+                    targets: [5],
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        if (moment(cellData).isSameOrBefore(moment().format("MM/DD/YY"))) {
+                            $(td).addClass("overdue")
+                        }
+                    }
+                }, {
+                    targets: [2],
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        if (moment(cellData).isBetween(moment().format("MM/DD/YY"),
+                            moment().add(2, "weeks").format("MM/DD/YY"), null, "[]")) {
+                            $(td).addClass("new")
+                        }
+                    }
+                }],
+            initComplete: function () {
+                $("#reportDiv").css({opacity: 1.0});
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+    <head>
+        <link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
+        <#if .locale == "zh_CN">
+        <link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
+        <#elseif .locale == "zh_TW">
+        <link name="NotoSansCJKtc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKtc_Regular}" src-bold="${nsfont.NotoSansCJKtc_Bold}" bytes="2" />
+        <#elseif .locale == "ja_JP">
+        <link name="NotoSansCJKjp" type="font" subtype="opentype" src="${nsfont.NotoSansCJKjp_Regular}" src-bold="${nsfont.NotoSansCJKjp_Bold}" bytes="2" />
+        <#elseif .locale == "ko_KR">
+        <link name="NotoSansCJKkr" type="font" subtype="opentype" src="${nsfont.NotoSansCJKkr_Regular}" src-bold="${nsfont.NotoSansCJKkr_Bold}" bytes="2" />
+        <#elseif .locale == "th_TH">
+        <link name="NotoSansThai" type="font" subtype="opentype" src="${nsfont.NotoSansThai_Regular}" src-bold="${nsfont.NotoSansThai_Bold}" bytes="2" />
+    </#if>
+
+    <macrolist>
+        <macro id="nlheader">
+            <table style="width: 100%; font-size: 10pt;"><tr>
+                <td rowspan="3" style="padding: 0px; "><#if companyInformation.logoUrl?length != 0><img src="${companyInformation.logoUrl}" style="float: left; margin: 7px" /><br /></#if></td>
+                <td align="right" style="padding: 0px;"><span style="font-size: 16pt;">Sale Order:# ${results[0].createdFrom.tranid} <br/>PO: ${results[0].createdFrom.otherrefnum} <br/>TO: ${results[0].createdFrom.shipaddressee}</span></td>
+            </tr>
+                <tr>
+                    <td align="right" style="padding: 0;">&nbsp;</td>
+                </tr></table>
+
+            <table style="width: 100%; margin-top: 10px;"><tr>
+                <th>Date</th>
+                <th>Ship Date</th>
+                <th>Total Boxes</th>
+                <th>Total Pallets</th>
+
+            </tr>
+                <tr>
+                    <td style="padding-top: 2px;">${results[0].createdFrom.trandate}</td>
+                    <td style="padding-top: 2px;">${results[0].createdFrom.shipdate}</td>
+                    <td style="padding-top: 2px;">${results[0].createdFrom.custbodytotalboxes}</td>
+                    <td style="padding-top: 2px;">${results[0].createdFrom.custbodytotalpallets}</td>
+
+                </tr></table>
+            <table>
+                <thead>
+                <tr>
+                    <th colspan="4">ITEM</th>
+                    <th width="4%">Quantity</th>
+                    <th width="12%">Special Condition</th>
+                    <th width="9%">Cases per Master Box</th>
+                    <th width="16%">Total Boxes</th>
+                    <th width="6%">Boxes per Pallet</th>
+                    <th width="15%">Total Pallets</th>
+
+                </tr>
+                </thead>
+            </table>
+        </macro>
+        <macro id="nlfooter">
+            <table style="width: 100%; font-size: 8pt;"><tr>
+                <td style="padding: 0;"><barcode codetype="code128" showtext="true" value="${results[0].createdFrom.tranid}"/></td>
+                <td align="right" style="padding: 0;"><pagenumber/> of <totalpages/></td>
+                <td align="right" style="padding: 0;">${.now}</td>
+            </tr></table>
+        </macro>
+    </macrolist>
+
+    <style type="text/css">
+        table { font-size: 9pt; table-layout: fixed; width: 100%; }
+        th { font-weight: bold; font-size: 8pt; vertical-align: middle; padding: 5px 6px 3px; background-color: #e3e3e3; color: #333333; padding-bottom: 10px; padding-top: 10px; }
+        td { padding: 4px 6px; }
+        td.bom { padding: 0px 0px; }
+        b { font-weight: bold; color: #333333; }
+    </style>
+    </head>
+    <body header="nlheader" header-height="27%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter-LANDSCAPE">
+    <#list results as result>
+
+    <table>
+
+        <tbody>
+        <#if result.mainline == "*">
+        <#assign qtybasic = result.quantity>
+        <tr>
+
+            <td colspan="4">${result.item}<br/>${result.item.salesdescription}</td>
+            <td>${result.quantity}</td>
+            <td>${result.custbody_spacialcondition}</td>
+            <td>${result.custbodycasespermasterbox}</td>
+            <td><#if result.custbodycasespermasterbox == 0>0 <#else>${(result.quantity/result.custbodycasespermasterbox)?ceiling}</#if></td>
+            <td>${result.custbodyboxesperpallet}</td>
+            <td><#if result.custbodyboxesperpallet == 0>0 <#else>${(result.quantity/result.custbodycasespermasterbox/result.custbodyboxesperpallet)?ceiling}</#if></td>
+
+        </tr>
+
+    </#if>
+
+    <#if result.mainline != "*">
+    <tr class="bom">
+
+        <td width="15%" class="bom" >${result.item} - (${(result.quantity/qtybasic)?ceiling})</td>
+        <td width="5%" align="right" class="bom" >${result.quantity}</td>
+        <td width="7%" align="right" class="bom" >BO:${result.formulanumeric} </td>
+        <td width="8%" align="center" class="bom" >${result.itemtype} </td>
+        <td class="bom" colspan="6"></td>
+    </tr>
+    </#if>
+    </tbody>
+    </table></#list>
+</body>
+</pdf>

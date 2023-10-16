@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+  <style>
+    body {
+      background: rgb(204,204,204);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+    }
+    page[size="A4"] {
+      background: white;
+      width: 6in;
+      height: 4in;
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 0.5cm;
+      border-top-width: thin;
+      border-right-width: thin;
+      border-bottom-width: thin;
+      border-left-width: thin;
+      border-top-style: none;
+      border-right-style: none;
+      border-bottom-style: none;
+      border-left-style: none;
+    }
+    @media print {
+      body, page[size="A4"] {
+        margin: 0;
+        box-shadow: 0;
+      }
+    }
+    #maindiv {
+      margin-top: 0px;
+      padding-top: 15px;
+    }
+    .masterlabel {
+      border-collapse: collapse;
+    }
+    .masterlabel td {
+      border: 1px solid black;
+    }
+    .masterlabel tr:first-child td {
+      border-top: 0;
+    }
+    .masterlabel tr td:first-child {
+      border-left: 0;
+    }
+    .masterlabel tr:last-child td {
+      border-bottom: 0;
+    }
+    .masterlabel tr td:last-child {
+      border-right: 0;
+    }
+  </style>
+
+</head>
+
+<body>
+<table width="100%" border="0" class="masterlabel">
+  <tr>
+    <td colspan="4" valign="top"><font size="+3">
+      TVSN Channel</font></td>
+
+  </tr>
+  <tr>
+    <td colspan="4"><br /><div align="center"> <font size="+1">SKU :<?php echo $list[$g]["AOPPRT"]; ?></font><br />
+      <img alt="my bar code" src="../system/barcode.php?text=<?php echo $list[$g]["AOPPRT"]; ?> &codetype=Code128&orientation=Horizontal&size=50&print=false" width="400" height="50"/>
+    </div><br /></td>
+  </tr>
+  <tr>
+    <td width="50%" colspan="3" valign="top"><div align="left">
+      <font size="+2">QTY: <?php echo $list[$g]["AOPCASQ"]; ?></font></div><br />
+
+    </td>
+
+    <td><div align="left"><?php if($list[$g]["AOPCASQ"]<$list[$g]["AOPCAS"]) 		{echo "PARTIAL<br>CARTON";}?></div>
+      <br /></td>
+  </tr>
+
+  <tr>
+    <td colspan="4" id='fin'><div align="left"><font size="+2">C/NO : <?php
+		 $tcases=$list[$g]["AOPTBX"];
+
+		  echo  $list[$g]["AOPCAS"].' OF '.$tcases; ?></font>
+    </div><br /></td>
+
+  </tr>
+  <tr>
+    <td colspan="4" id='fin'><div align="left"><font size="+2">Weight:</font></div> <br />     </td>
+
+  </tr>
+  <tr>
+    <td colspan="2" id='fin'><div align="left"><font size="+3">PO# : <?php echo $list[$g]["APONRO"]; ?></font></div></td> <td colspan="2" id='fin'>
+    <div align="right">
+      <img alt="my bar code"  width="100px" height="60px" src="../system/barcode.php?text=<?php echo (000000000 +($list[$g]["ASSCCNR"]).($list[$g]["ASSCCCD"])); ?>&codetype=Code128&orientation=Horizontal&size=20&print=true" />
+
+    </div>    </td>
+
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<pdf>
+
+    <head>
+        <style>
+            body {
+            font-family: Arial, Helvetica, sans-serif;
+            }
+
+            table, tr, th, td {
+            border: thin solid black;
+            border-collapse: collapse;
+            }
+            #cssTable td
+            {
+            text-align: center;
+            vertical-align: middle;
+            }
+            table {
+            width: 100%;
+            }
+
+            th {
+            font-weight: bold;
+            }
+        </style>
+        <macrolist>
+            <macro id="header">
+                <table>
+                    <tr>
+
+
+                        <td colspan="3" align='right'>[NROPAGE]</td>
+                    </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td>[LOCATION]</td>
+                        <td>[SO_DATE]</td>
+                    </tr>
+
+                    <tr>
+                        <th>Document Number</th>
+                        <td align='center' style="text-align: center; vertical-align: middle;">
+                            <strong style="font-size: 30px;">[DOCUMENT_NUMBER1]</strong>
+                        </td>
+                        <td >
+                            <barcode codetype="code128" height="1 cm" showtext="false" value="0[DOCUMENT_NUMBER]"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Customer</th>
+                        <td colspan="2">[CUSTOMER]</td>
+                    </tr>
+                    <tr>
+                        <th>Ship Via</th>
+                        <td colspan="2">[SHIP_VIA]</td>
+                    </tr>
+                    <tr>
+                        <th>Memo</th>
+                        <td colspan="2">[MEMO_MAIN]</td>
+                    </tr>
+                    <tr>
+                        <th>Customer's Address </th>
+                        <td colspan="2">[CUSTOMER_ADDRESS]</td>
+                    </tr>
+                </table>
+
+
+
+            </macro>
+            <macro id="footer">
+            <p align='left'>Page <pagenumber/> of <totalpages/></p>
+            </macro>
+        </macrolist>
+    </head>
+
+    <body header="header" header-height="65mm" footer="footer" footer-height="10mm">
+
+
+        <table>
+            <tr>
+                <th  align='right'  style="vertical-align: middle" colspan="2" >ShipJunction ONLY-->
+                </th>
+
+                <th  align='left'>
+
+                    <img src="https://image-charts.com/chart?cht=qr&chl=[ITEMSDATA1]&chs=45x45&choe=UTF-8&chld=L&alt=%27%27"/>
+
+                </th>
+
+            </tr>
+            <tr>
+                <th width="60%">Item</th>
+                <th width="21%">QTY To Ship</th>
+                <th width="19%">STATUS</th>
+            </tr>
+            [SALES_ORDER_LINES]
+
+
+        </table>
+    </body>
+
+
+</pdf>

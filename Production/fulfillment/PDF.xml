@@ -1,0 +1,114 @@
+<pdf>
+
+    <head>
+        <style>
+            body {
+            background: rgb(204,204,204);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            }
+
+            page[size="A4"] {
+            background: white;
+            width: 6in;
+            height: 4in;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5cm;
+            border-top-width: thin;
+            border-right-width: thin;
+            border-bottom-width: thin;
+            border-left-width: thin;
+            border-top-style: none;
+            border-right-style: none;
+            border-bottom-style: none;
+            border-left-style: none;
+            }
+
+            @media print {
+            body, page[size="A4"] {
+            margin: 0;
+            box-shadow: 0;
+            }
+            }
+
+            #maindiv {
+            margin-top: 0px;
+            padding-top: 15px;
+            }
+
+            .masterlabel {
+            border-collapse: collapse;
+            }
+            .masterlabel td {
+            border: 1px solid black;
+            }
+            .masterlabel tr:first-child td {
+            border-top: 0;
+            }
+            .masterlabel tr td:first-child {
+            border-left: 0;
+            }
+            .masterlabel tr:last-child td {
+            border-bottom: 0;
+            }
+            .masterlabel tr td:last-child {
+            border-right: 0;
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <page size="A4">
+            <div id="maindiv">
+
+
+
+                <table width="100%" border="0" class="masterlabel">
+                    <tr>
+                        <td colspan="2" valign="top">SHIP TO:<br/>
+                            THE SHOPPING CHANNEL<br />
+                            6885 KENNEDY RD<br />
+                            MISSISSAUGA, ON L5T 2Z2, CANADA</td>
+                        <td >FROM:<br />BEEKMAN 1802
+                            </td>
+                        <td ><div align="center">PO. NUMBER<br /><font size="+1">
+                            [PO_NUMBER]</font><br />
+                            <barcode codetype="code128" height="1 cm" showtext="false" value="[PO_NUMBER1]"/>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><div align="center">ITEM<br /><font size="+1">[ITEM]</font><br />
+                            <barcode codetype="code128" height="1 cm" showtext="false" value="[ITEM1]"/>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td width="17%" rowspan="2" valign="top"><div align="left">CARTON<br/>
+                            QUANTITY:<font size="+2">[CASES]</font></div>
+
+                            </td>
+                        <td colspan="2"><div align="center">VENDOR ITEM NO.<br />[ITEM_UPC]</div></td>
+                        <td rowspan="2"><div align="center">[PARTIAL]</div>
+                            <br /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><div align="center">DESCRIPTION<br />[ITEM_DESCRIPTION]</div></td>
+                    </tr>
+                    <tr>
+                        <td  colspan="3" id='fin'><div align="center">[SSCC_CODE_F]</div>
+                            <div align="center">
+                                <img src="http://www.keepautomation.com/online_barcode_generator/linear.aspx?TYPE=11&DATA=[SSCC_CODE_F1]&PROCESS-TILDE=true&UOM=0&X=1&Y=60&ROTATE=0&RESOLUTION=72&FORMAT=gif&LEFT-MARGIN=0&RIGHT-MARGIN=0&SHOW-TEXT=false&TEXT-FONT=Arial%7c9%7cRegular" alt="KeepAutomation Free Online Barcode Generator"   title=" Free Online Barcode Generator"  width="350" height="60" />
+
+                            </div>    </td>
+                        <td id='fin'><div align="center">CARTON COUNT:</div>      <div align="center"><font size="+1">[CASENO]  OF [CASE_TOTAL]</font>
+                        </div></td>
+                    </tr>
+                </table>
+
+            </div>
+        </page>
+    </body>
+
+
+</pdf>

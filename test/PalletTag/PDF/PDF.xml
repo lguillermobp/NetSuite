@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+
+<pdf>
+    <head>
+        <style>
+            * { font-family: Arial, Helvetica, sans-serif; }
+            td { border: 1px solid black; }
+            .end { margin-bottom: 35px; }
+            .center { align: center; }
+
+            table {
+            width: 100%;
+            table-layout: fixed;
+            }
+
+            .header {
+            font-size: 50px;
+            font-weight: bold;
+            align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <td class="header">[ITEM]</td>
+            </tr>
+            <tr class="end">
+                <td class="center">
+                    <barcode value="[ITEM]" showtext="false" codetype="code128" height="100px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="header">[BIN]</td>
+            </tr>
+            <tr class="end">
+                <td class="center">
+                    <barcode value="[BIN]" showtext="false" codetype="code128" height="100px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="header">[LOT]</td>
+            </tr>
+            <tr class="end">
+                <td class="center">
+                    <barcode value="[LOT]" showtext="false" codetype="code128" height="100px"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="header">[QTY]</td>
+            </tr>
+            <tr>
+                <td class="center">
+                    <barcode value="[QTY]" showtext="false" codetype="code128" height="100px"/>
+                </td>
+            </tr>
+        </table>
+        <p>Printed by [USER] at [DATETIME].</p>
+        <p>[COMMENTS]</p>
+    </body>
+</pdf>
