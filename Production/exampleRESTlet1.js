@@ -544,7 +544,8 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                     });
                 }
                 log.debug("aftershipid",aftershipid.length);
-                if (aftershipid==0)
+                itemid=rec.getSublistValue({sublistId: "item", fieldId: "item", line: i})
+                if (aftershipid==0 && itemid!="13852")
                 {
 
 
