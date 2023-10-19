@@ -32,6 +32,7 @@ define(["N/error", "N/search", "N/file", "N/log", "/SuiteScripts/Modules/general
             enddate= paramWO.data.getValue({fieldId: "enddate"});
             startdate= paramWO.data.getValue({fieldId: "startdate"});
             custbody_bkmn_wo_cust_po_num= paramWO.data.getValue({fieldId: "custbody_bkmn_wo_cust_po_num"});
+            expirationdate= paramWO.data.getValue({fieldId: "custbody_dateofexpiry"});
 
             woquantity= paramWO.data.getValue({fieldId: "quantity"});
 
@@ -110,6 +111,7 @@ define(["N/error", "N/search", "N/file", "N/log", "/SuiteScripts/Modules/general
                         "City": shipcity,
                         "State": shipstate,
                         "partialbox": partialbox,
+                        "expirationdate": expirationdate,
                         "custrecordml_status": fresult.getText({name: "custrecordml_status"})
                     }
                     log.debug("pagedatas[i]",pagedatas[i]);

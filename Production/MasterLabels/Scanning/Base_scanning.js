@@ -570,7 +570,12 @@
              xmlString = xmlString.replace("[AWHPOS1]", MasterLabelsData[i]["Zip"]);
              xmlString = xmlString.replace("[AWHPOS_B]", MasterLabelsData[i]["Zip"]);
 
-             xmlString = xmlString.replace("[EXPIRATION_DATE]", " ");
+             paramWO = GENERALTOOLS.get_WO_value(MasterLabelsData[i]["custrecordml_workorder"]);
+             custbodytotalboxes= paramWO.data.getValue({fieldId: "custbodytotalboxes"});
+             expirationdate= new Date(paramWO.data.getValue({fieldId: "custbody_dateofexpiry"}));
+             dataexp= (expirationdate.getMonth()+1)+"/"+expirationdate.getDate()+"/"+expirationdate.getFullYear();
+
+             xmlString = xmlString.replace("[EXPIRATION_DATE]", dataexp);
              xmlString = xmlString.replace("[SHORT]", " ");
 
 
@@ -607,9 +612,6 @@
              xmlString = xmlString.replace("[SSCC_CODE_F]", ssccformated);
              xmlString = xmlString.replace("[SSCC_CODE]", MasterLabelsData[i]["custrecordml_ssccnumber"]);
              xmlString = xmlString.replace("[CASENO]", MasterLabelsData[i]["custrecordml_casenumber"]);
-
-             paramWO = GENERALTOOLS.get_WO_value(MasterLabelsData[i]["custrecordml_workorder"]);
-             custbodytotalboxes= paramWO.data.getValue({fieldId: "custbodytotalboxes"});
              
              xmlString = xmlString.replace("[CASE_TOTALSO]", custbodytotalboxesso);
              xmlString = xmlString.replace("[CASE_TOTAL]", custbodytotalboxes);

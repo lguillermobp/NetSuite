@@ -287,6 +287,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
         {
             var lineCount = rec.getLineCount('item');
             var itemskub;
+            var itemdisc;
             for(let i = 0; i < lineCount; i++) {
                 log.debug("sku",rec.getSublistText({sublistId: "item", fieldId: "item", line: i}));
                 if (rec.getSublistValue({sublistId: "item", fieldId: "item", line: i})=='13852')
@@ -298,6 +299,26 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
 
                     try {
 
+                        itemdiscr=rec.getSublistValue({sublistId: "item", fieldId: "amount", line: i});
+                        log.debug("itemdiscr",itemdiscr);
+                        log.debug("itemdisc",itemdisc);
+
+                        if (itemdiscr!=itemdisc && itemdisc<0) {
+                            log.debug("itemdisc111",itemdisc);
+                            rec.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'amount',
+                                value: itemdisc,
+                                ignoreFieldChange: true
+                            });
+                            rec.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'rate',
+                                value: itemdisc,
+                                ignoreFieldChange: true
+                            });
+
+                        }
 
                         rec.setCurrentSublistValue({
                             sublistId: 'item',
@@ -317,6 +338,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                 }
                 log.debug("itemskub",itemskub);
                 itemskub = rec.getSublistText({sublistId: "item", fieldId: "item", line: i});
+                itemdisc = rec.getSublistValue({sublistId: "item", fieldId: "custcol_amountdiscount", line: i})*-1;
 
 
             }
