@@ -153,13 +153,13 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             ReturningRecord.setValue('custbody_bkm_ra_trx_num', trackingRMA);
 
             items.forEach(function(resultado) {
-                log.debug("items.sku",  resultado.sku);
+
                 var lineNumber = ReturningRecord.findSublistLineWithValue({
                     sublistId: 'item',
                     fieldId: 'item_display',
                     value: resultado.sku
                 });
-                log.debug("resultado.return_reason",  resultado.return_reason);
+
                 if (resultado.return_reason)
                 {
 
@@ -192,6 +192,22 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                         line: lineNumber
                     });
                 }
+                var lineNumberd = ReturningRecord.findSublistLineWithValue({
+                    sublistId: 'item',
+                    fieldId: 'custcol_discountappliedsku',
+                    value: resultado.sku
+                });
+
+                if (lineNumberd!=-1) {
+                    ReturningRecord.setSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'custcol_aftershipexternalid',
+                        value: resultado.external_id,
+                        line: lineNumberd
+                    });
+
+                }
+
                 log.debug("lineNumber",lineNumber);
 
 
@@ -201,10 +217,10 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
 
 
             deletelinera(ReturningRecord);
-
+            var ReturningRecordId = ReturningRecord.save();
             try {
 
-                var ReturningRecordId = ReturningRecord.save();
+
                 log.debug("ReturningRecordId",ReturningRecordId);
 
             } catch (e) {
@@ -225,11 +241,13 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var status=context.data.status;
             var event=context.event;
             var trackingRMA=context.data.tracking_number;
+            var returnamount=context.data.return_method.cost_of_return.amount;
             shopifyord=shopifyord.replace("#", "");
             log.debug("items",  items);
             log.debug("event",  event);
             log.debug("Shopify Order",  shopifyord);
             log.debug("status", status);
+            log.debug("returnamount", returnamount);
 
 
             var fsearch = search.create({
@@ -280,7 +298,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var RA = record.load({
                 type: "returnauthorization",
                 id: internalidRA,
-                isDynamic: false,
+                isDynamic: true,
                 defaultValues: null
             });
 
@@ -289,6 +307,15 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 fieldId: "orderstatus",
                 value: "B"
             });
+            if (returnamount>0) {
+
+                RA.selectNewLine({sublistId: "item"});
+                RA.setCurrentSublistValue({sublistId: "item", fieldId: "item", value: "13871"});
+                RA.setCurrentSublistValue({sublistId: "item", fieldId: "quantity", value: 1});
+                //RA.setCurrentSublistValue({sublistId: "item", fieldId: "location", value: location});
+                RA.setCurrentSublistValue({sublistId: "item", fieldId: "amount", value: -returnamount});
+                RA.commitLine({sublistId: "item"});
+            }
             /*
             RA.setValue({
                 fieldId: "status",
@@ -412,126 +439,13 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
         }
 
 
-        function receiverefund(context) {
-
-            var shopifyord=context.data.order.order_number;
-            var items= context.data.return_items;
-            var status=context.data.status;
-            var event=context.event;
-            shopifyord=shopifyord.replace("#", "");
-            log.debug("items",  items);
-            log.debug("event",  event);
-            log.debug("Shopify Order",  shopifyord);
-            log.debug("status", status);
-
-
-            var fsearch = search.create({
-                type: "returnauthorization",
-                filters:
-                    [
-                        ["type","anyof","RtnAuth"],
-                        "AND",
-                        ["otherrefnum","equalto",shopifyord],
-                        "AND",
-                        ["mainline","is","T"]
-                    ],
-                columns:
-                    [
-                        "internalid",
-                        "trandate",
-                        "type",
-                        "tranid",
-                        "entity",
-                        "memo",
-                        "amount",
-                        "cseg_saleschann_new"
-                    ]
-            });
-
-            var pagedData = fsearch.runPaged({
-                "pageSize" : 1000
-            });
-
-            var internalidRA;
-            pagedData.pageRanges.forEach(function (pageRange) {
-
-                var page = pagedData.fetch({index: pageRange.index});
-
-
-                page.data.forEach(function (fresult1) {
-
-                    internalidRA = fresult1.getValue({
-                        name: "internalid"
-                    })
-
-                })
-            });
-            log.debug("internalidRA",  internalidRA);
-
-            // Create Receive Item for RA
-            try {
-                var ReturningRecord = transformCSToRARecord(internalidRA,"returnauthorization","itemreceipt");
-            } catch (e) {
-                log.audit("error: " + String(e.message))
-
-                return("error: " + String(e.message));
-            }
-            const qty = ReturningRecord.getSublistValue({
-                sublistId: 'item',
-                fieldId: 'quantity',
-                line: 1
-            });
-
-            ReturningRecord.setSublistValue({
-                sublistId: 'item',
-                fieldId: 'quantity',
-                line: 1,
-                value: qty
-            });
-            var ReturningRecordId = ReturningRecord.save();
-            try {
-
-
-                log.debug("ReturningRecordId",ReturningRecordId);
-
-            } catch (e) {
-
-                return("ERROR when try to do Receive RA: " + String(e.message));
-
-            }
-
-            // Create Refund for RA
-            try {
-                var ReturningRecord = transformCSToRARecord(internalidRA,"returnauthorization","cashrefund");
-            } catch (e) {
-                log.audit("error: " + String(e.message))
-
-                return("error: " + String(e.message));
-            }
-
-
-            try {
-
-                var ReturningRecordId = ReturningRecord.save();
-                log.debug("ReturningRecordId",ReturningRecordId);
-
-            } catch (e) {
-
-                return("ERROR when try to do Receive RA: " + String(e.message));
-
-            }
-
-
-            return ReturningRecordId;
-        }
-
 
         function deletelinera(rec)
         {
             var lineCount = rec.getLineCount('item');
-            log.debug("lineCount",lineCount);
-            for(var i = 0; i < lineCount; i++) {
-                log.debug("i",i);
+
+            for(var i = (lineCount-1); i > -1; i--) {
+
                 if (!rec.getSublistValue({sublistId: "item", fieldId: "custcol_aftershipexternalid", line: i}))
                 {
                     var aftershipid=0;
@@ -543,24 +457,33 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                         line: i
                     });
                 }
-                log.debug("aftershipid",aftershipid.length);
+
                 itemid=rec.getSublistValue({sublistId: "item", fieldId: "item", line: i})
-                if (aftershipid==0 && itemid!="13852")
+                discountappliedsku=rec.getSublistValue({sublistId: "item", fieldId: "custcol_discountappliedsku", line: i})
+                amount=rec.getSublistValue({sublistId: "item", fieldId: "amount", line: i})
+
+                //log.debug("itemid",itemid);
+                //log.debug("discountappliedsku",discountappliedsku);
+                log.debug("amount",amount);
+                //log.debug("i",i);
+                //log.debug("aftershipid",aftershipid);
+
+                if (aftershipid==0 && itemid)
                 {
-
-
+                    log.debug("removeditemid",itemid);
                     try {
                         rec.removeLine({
                             sublistId: 'item',
-                            line: i,
-                            ignoreRecalc: true
+                            line: i
                         });
-                        log.debug("sku",rec.getSublistValue({sublistId: "item", fieldId: "item", line: i}));
+
                     } catch (e) {
                         log.debug({  title: "error.save: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
 
                     }
+
                 }
+
 
             }
         }
