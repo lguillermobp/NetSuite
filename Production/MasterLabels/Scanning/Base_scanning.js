@@ -573,7 +573,12 @@
              paramWO = GENERALTOOLS.get_WO_value(MasterLabelsData[i]["custrecordml_workorder"]);
              custbodytotalboxes= paramWO.data.getValue({fieldId: "custbodytotalboxes"});
              expirationdate= new Date(paramWO.data.getValue({fieldId: "custbody_dateofexpiry"}));
-             dataexp= (expirationdate.getMonth()+1)+"/"+expirationdate.getDate()+"/"+expirationdate.getFullYear();
+             if (paramWO.data.getValue({fieldId: "custbody_dateofexpiry"})) { 
+                dataexp= (expirationdate.getMonth()+1)+"/"+expirationdate.getDate()+"/"+expirationdate.getFullYear();
+             }
+             else {
+                dataexp= "";
+             }
 
              xmlString = xmlString.replace("[EXPIRATION_DATE]", dataexp);
              xmlString = xmlString.replace("[SHORT]", " ");

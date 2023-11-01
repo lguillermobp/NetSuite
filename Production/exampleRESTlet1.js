@@ -160,38 +160,46 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                     value: resultado.sku
                 });
 
+                ReturningRecord.selectLine({
+                    sublistId: 'item',
+                    line: lineNumber
+                });
+
                 if (resultado.return_reason)
                 {
 
                     reasonb=resultado.return_reason.description;
-                    
+
                     if (resultado.return_reason.additional_notes) {reasonb+= " , " + resultado.return_reason.additional_notes;}
-                    
-                    ReturningRecord.setSublistValue({
+
+
+                    ReturningRecord.setCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_atlas_hb_mm_return_reason',
                         value: "3",
-                        line: lineNumber
+                        ignoreFieldChange: true
                     });
-                    ReturningRecord.setSublistValue({
+
+                    ReturningRecord.setCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_reasonreturn',
                         value: reasonb,
-                        line: lineNumber
+                        ignoreFieldChange: true
                     });
-                    ReturningRecord.setSublistValue({
+                }
+                    ReturningRecord.setCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_aftershipexternalid',
                         value: resultado.external_id,
-                        line: lineNumber
+                        ignoreFieldChange: true
                     });
-                    ReturningRecord.setSublistValue({
+                    ReturningRecord.setCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'quantity',
                         value: resultado.return_quantity,
-                        line: lineNumber
+                        ignoreFieldChange: true
                     });
-                }
+
                 var lineNumberd = ReturningRecord.findSublistLineWithValue({
                     sublistId: 'item',
                     fieldId: 'custcol_discountappliedsku',
@@ -199,23 +207,84 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 });
 
                 if (lineNumberd!=-1) {
-                    ReturningRecord.setSublistValue({
+                    ReturningRecord.selectLine({
+                        sublistId: 'item',
+                        line: lineNumber
+                    });
+
+                    ReturningRecord.setCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_aftershipexternalid',
                         value: resultado.external_id,
-                        line: lineNumberd
+                        ignoreFieldChange: true
                     });
 
                 }
-
+                ReturningRecord.commitLine({
+                    sublistId: 'item'
+                });
                 log.debug("lineNumber",lineNumber);
+                /*
+                                var invdet=ReturningRecord.getSublistValue({
+                                    sublistId: 'item',
+                                    fieldId: 'inventorydetail',
+                                  line: lineNumber
+                                });
+                                /*
+
+                                                var featureRecord = record.delete({
+                                                    type: 'inventorydetail',
+                                                  id: invdet,
+                                                });
+
+                                                /*
+
+                                                var inventorydetailRec = ReturningRecord.getSublistSubrecord({
+                                                    sublistId: 'item',
+                                                    fieldId: 'inventorydetail',
+                                                    line: lineNumber
+                                                });
+                                                log.debug("inventorydetailRec",inventorydetailRec);
+                                                var line = inventorydetailRec.getLineCount({
+                                                    sublistId: 'inventoryassignment'
+                                                });
+                                                log.debug("line",line);
+                                                for (var i=0; i<line; i++){
+                                                    lot= inventorydetailRec.setSublistValue({
+                                                        sublistId:'inventoryassignment',
+                                                        fieldId: 'quantity',
+                                                        line: i,
+                                                        value: resultado.return_quantity
+                                                    });
+                                                    log.debug("lot",lot);
+
+                                                    inventorydetailRec.removeLine({
+                                                        sublistId:'inventoryassignment',
+                                                        line:i,
+                                                        ignoreRecalc:false
+                                                    });
+
+                                                };
+
+
+                                                var line = ReturningRecord.getLineCount({
+                                                    sublistId: 'inventorydetail'
+                                                });
+                                                log.debug("line1",line);
+                                                for (var i=0; i<line; i++) {
+                                                    ReturningRecord.removeLine({
+                                                        sublistId:'inventoryassignment',
+                                                        line:i,
+                                                        ignoreRecalc:false
+                                                    });
+                                                }
 
 
 
 
-            })
+                                                 */
 
-
+        })
             deletelinera(ReturningRecord);
             var ReturningRecordId = ReturningRecord.save();
             try {
@@ -488,13 +557,15 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             }
         }
 
+
+
         var transformCSToRARecord = function transformCSToRARecord(csId,fromtype,totype) {
 
             return record.transform({
                 fromType: fromtype,
                 fromId: parseInt(csId, 10),
                 toType: totype,
-                isDynamic: false,
+                isDynamic: true,
                 defaultValues: {
                 },
 
@@ -508,4 +579,3 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
         };
     });
 
-     
