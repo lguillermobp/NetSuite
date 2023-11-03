@@ -27,8 +27,6 @@ define(['N/record','N/log'],
             
         }
 
-
-
         return {
             each: each
         };
