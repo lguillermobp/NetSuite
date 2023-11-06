@@ -376,7 +376,9 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 fieldId: "orderstatus",
                 value: "B"
             });
-            if (returnamount>0) {
+
+            var indexso = RA.findSublistLineWithValue({"sublistId": "item", "fieldId": "item", "value": 13871});
+            if (returnamount>0 && indexso==-1) {
 
                 RA.selectNewLine({sublistId: "item"});
                 RA.setCurrentSublistValue({sublistId: "item", fieldId: "item", value: "13871"});
