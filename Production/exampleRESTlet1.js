@@ -224,65 +224,6 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                     sublistId: 'item'
                 });
                 log.debug("lineNumber",lineNumber);
-                /*
-                                var invdet=ReturningRecord.getSublistValue({
-                                    sublistId: 'item',
-                                    fieldId: 'inventorydetail',
-                                  line: lineNumber
-                                });
-                                /*
-
-                                                var featureRecord = record.delete({
-                                                    type: 'inventorydetail',
-                                                  id: invdet,
-                                                });
-
-                                                /*
-
-                                                var inventorydetailRec = ReturningRecord.getSublistSubrecord({
-                                                    sublistId: 'item',
-                                                    fieldId: 'inventorydetail',
-                                                    line: lineNumber
-                                                });
-                                                log.debug("inventorydetailRec",inventorydetailRec);
-                                                var line = inventorydetailRec.getLineCount({
-                                                    sublistId: 'inventoryassignment'
-                                                });
-                                                log.debug("line",line);
-                                                for (var i=0; i<line; i++){
-                                                    lot= inventorydetailRec.setSublistValue({
-                                                        sublistId:'inventoryassignment',
-                                                        fieldId: 'quantity',
-                                                        line: i,
-                                                        value: resultado.return_quantity
-                                                    });
-                                                    log.debug("lot",lot);
-
-                                                    inventorydetailRec.removeLine({
-                                                        sublistId:'inventoryassignment',
-                                                        line:i,
-                                                        ignoreRecalc:false
-                                                    });
-
-                                                };
-
-
-                                                var line = ReturningRecord.getLineCount({
-                                                    sublistId: 'inventorydetail'
-                                                });
-                                                log.debug("line1",line);
-                                                for (var i=0; i<line; i++) {
-                                                    ReturningRecord.removeLine({
-                                                        sublistId:'inventoryassignment',
-                                                        line:i,
-                                                        ignoreRecalc:false
-                                                    });
-                                                }
-
-
-
-
-                                                 */
 
         })
             deletelinera(ReturningRecord);
