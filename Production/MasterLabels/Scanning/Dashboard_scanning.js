@@ -68,6 +68,7 @@ define(["N/runtime",'N/search','N/ui/serverWidget','N/log', 'N/file', "/SuiteScr
 		entityname= paramSO.data.getValue({fieldId: "entityname"});
 		palletidl= paramSO.data.getValue({fieldId: "custbodypalletletter"});
 		palletidp= paramSO.data.getValue({fieldId: "custbody_prefixidpallet"});
+		boxespd= paramSO.data.getValue({fieldId: "custbody_boxesperpallet"});
 		ponumberSO= paramSO.data.getValue({fieldId: "otherrefnum"});
 		SONo= paramSO.data.getValue({fieldId: "tranid"});
 		var shippingAddressSubrecord = paramSO.data.getSubrecord({fieldId : 'shippingaddress'});
@@ -286,7 +287,7 @@ define(["N/runtime",'N/search','N/ui/serverWidget','N/log', 'N/file', "/SuiteScr
 			layoutType: ui.FieldLayoutType.MIDROW
 		});
 
-		if (ponumberSO=='418235-96') {tboxesinpallet.defaultValue = 24;}
+		if (boxespd) {tboxesinpallet.defaultValue = boxespd;}
 		else {tboxesinpallet.defaultValue = 12;}
 
 
