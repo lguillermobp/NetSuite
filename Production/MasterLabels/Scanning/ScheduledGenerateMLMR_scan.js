@@ -1,20 +1,29 @@
 /**
  * @NApiVersion 2.1
- * @NScriptType ScheduledScript
+ * @NScriptType MapReduceScript
  * @NModuleScope SameAccount
  */
-define(['N/log','N/record', 'N/runtime',"/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Modules/generaltoolsv1.js"],
+    function (runtime,log, search, record,email, GENERALTOOLS) {
 
-    function(log, record, runtime, GENERALTOOLS) {
+        var y=0;
+        var irec=0;
+        var getInputData = function getInputData(context) {
 
-        /**
-         * Definition of the Scheduled script trigger point.
-         *
-         * @param {Object} scriptContext
-         * @param {string} scriptContext.type - The context in which the script is executed. It is one of the values from the scriptContext.InvocationType enum.
-         * @Since 2015.2
-         */
-        function execute(context) {
+
+            return fsearch;
+        };
+
+        var map = function map(context) {
+
+            log.debug('context.map', context);
+
+            var customFulfillRecordId = context.key;
+            var customFulfillRecord = JSON.parse(context.value);
+            context.write(customFulfillRecordId, customFulfillRecord);
+        };
+
+        var reduce = function reduce(context) {
 
             var script = runtime.getCurrentScript();
             log.debug("script",script);
@@ -126,18 +135,20 @@ define(['N/log','N/record', 'N/runtime',"/SuiteScripts/Modules/generaltoolsv1.js
             }
 
 
-        }
+        };
 
-        var cont=0;
-
-        function generateML() {
-
-
-            log.debug("custbody_bkmn_wo_cust_po_num",custbody_bkmn_wo_cust_po_num);
-
-        }
+        var summarize = function summarize(context) {
+        };
 
 
-        return {    execute: execute };
 
+        return {
+            getInputData: getInputData,
+            map: map,
+            reduce: reduce,
+            summarize: summarize
+
+        };
     });
+
+
