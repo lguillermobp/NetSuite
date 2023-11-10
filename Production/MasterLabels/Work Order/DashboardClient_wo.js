@@ -52,7 +52,7 @@ define(['N/url',"N/currentRecord", "N/error",'N/log'],
                 value: parseInt(startsscc) + parseInt(totalboxes1) - 1
             });
 
-            var script = 'customscript_generatemasterlabels_wo';
+            var script = 'customscript_generatemasterlabelsmr_wo';
             var deployment = 'customdeploy1';
             var parameters = "";
             log.debug("script",script);

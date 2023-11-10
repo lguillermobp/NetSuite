@@ -11,7 +11,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
         var getInputData = function getInputData(context) {
 
 
-            return fsearch;
+            return context;
         };
 
         var map = function map(context) {
