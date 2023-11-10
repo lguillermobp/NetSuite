@@ -23,11 +23,11 @@ define(["N/log", "N/task","N/http", 'N/redirect'],
                 const startcases = Number(context.request.parameters.startcases);
                 log.debug("WOID",WOID);
 
-                var scriptTask = task.create({taskType: task.TaskType.SCHEDULED_SCRIPT});
-                // call ScheduledGenerateMasterLabels.js (2341)
-                scriptTask.scriptId = "customscript_ScheduledGenerateML_wo";
+                var scriptTask = task.create({taskType: task.TaskType.MAP_REDUCE});
+                // call customscript_generatemasterlabelsmr_wo.js (2341)
+                scriptTask.scriptId = "customscript_generatemasterlabelsmr_wo";
                 scriptTask.deploymentId = 'customdeploy1';
-                scriptTask.params = {custscriptwoid: WOID, custscriptstartsscc:startsscc, custscriptstartcases:startcases};
+                scriptTask.params = {custscript_mrwoid: WOID, custscript_mrstartsscc:startsscc, custscript_mrstartcases:startcases};
                 var scriptTaskId = scriptTask.submit();
 
 

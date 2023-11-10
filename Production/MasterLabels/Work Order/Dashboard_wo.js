@@ -129,7 +129,7 @@ define(['N/search','N/ui/serverWidget','N/log', 'N/file', 'N/record', "/SuiteScr
 
 		if (validinf=="T") {
 
-			if (results.length == 0) {
+			if (results.length != -888) {
 				var bdelete = list.addButton({
 
 					id: 'custpage_buttongenerate', //always prefix with 'custpage_'
