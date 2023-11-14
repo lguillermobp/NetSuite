@@ -35,26 +35,26 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
             SOID = currRec.getValue({fieldId: "createdfrom"});
             log.debug("SOID",SOID);
-            var paramso = GENERALTOOLS.get_SO_value(SOID);
-            var itembo=searchboitems(paramso.data);
-            log.debug("itembo",itembo);
-            if (itembo.length>0) {
-                if (itembo.length==1) {
-                    var msgbo = "Please note the following item is on back order: " + itembo.toString();
+            if (SOID) {
+                var paramso = GENERALTOOLS.get_SO_value(SOID);
+                var itembo = searchboitems(paramso.data);
+                log.debug("itembo", itembo);
+                if (itembo.length > 0) {
+                    if (itembo.length == 1) {
+                        var msgbo = "Please note the following item is on back order: " + itembo.toString();
+                    } else {
+                        var msgbo = "Please note the following items are on back order: " + itembo.toString();
+                    }
+                    log.debug("msgbo", msgbo);
+                    currRec.setValue({fieldId: "message", value: msgbo});
+                    message.create({
+                        title: "Items in Back Order",
+                        message: "Customer Message (Comunication) field has been changed to: " + msgbo,
+                        type: message.Type.WARNING,
+                        duration: 10000
+                    }).show();
                 }
-                else {
-                    var msgbo = "Please note the following items are on back order: " + itembo.toString();
-                }
-                log.debug("msgbo",msgbo);
-                currRec.setValue({fieldId: "message", value: msgbo});
-                message.create({
-                    title: "Items in Back Order",
-                    message: "Customer Message (Comunication) field has been changed to: " +msgbo,
-                    type: message.Type.WARNING,
-                    duration: 10000
-                }).show();
             }
-
 
             balance = currRec.getValue({fieldId: "balance"});
 
