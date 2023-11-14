@@ -149,13 +149,14 @@ define(['N/log','N/record', 'N/runtime',"/SuiteScripts/Modules/generaltoolsv1.js
                     type: "customrecord_formsscc",
                     id: formsscc,
                     values: {
-                        custrecord_sscc_last: lastml
+                        custrecord_sscc_last: lastml,
                     },
                     options: {
                         enableSourcing: false,
                         ignoreMandatoryFields: true
                     }
                 });
+
             }
             generateML();
         }

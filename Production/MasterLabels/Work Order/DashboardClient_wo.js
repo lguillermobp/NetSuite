@@ -57,7 +57,7 @@ define(['N/url',"N/currentRecord", "N/error",'N/log'],
             var parameters = "";
             log.debug("script",script);
 
-                currRec.getField("custpage_buttongenerate").isDisabled = true;
+                //currRec.getField("custpage_buttongenerate").isDisabled = true;
 
                 // call GenerateMasterLabels_wo.js (2342)
                 var url = "/app/site/hosting/scriptlet.nl?script=2342&deploy=1";
