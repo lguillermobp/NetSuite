@@ -660,7 +660,7 @@ define(['N/search','N/ui/serverWidget','N/log', 'N/file', 'N/record', "/SuiteScr
 
 			page.data.forEach(function (fresult) {
 				if (fresult.getValue({name: "custrecordml_status"})!="1")
-					{	nodelete=true;
+					{	// nodelete=true;
 						log.debug("ustrecordml_ssccnumber",fresult.getValue({name: "custrecordml_ssccnumber"}));
 					}
 				 pagedatas[i] = {
