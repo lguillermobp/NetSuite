@@ -53,5 +53,5 @@ define(['N/search'], (search) => {
     }
     return {
       fieldChanged: fieldChanged
-    };
+    };  
   }); 

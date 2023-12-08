@@ -30,7 +30,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var event=context.event;
             shopifyord=shopifyord.replace("#", "");
             log.debug("items",  items);
-            log.debug("event",  event);
+            log.debug("event",  event); 
             log.debug("Shopify Order",  shopifyord);
             log.debug("status", status);
 
@@ -86,11 +86,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var memo="RMA: " + RMA;
 
             shopifyord=shopifyord.replace("#", "");
-            log.debug("items",  items);
-            log.debug("event",  event);
-            log.debug("Shopify Order",  shopifyord);
-            log.debug("status", status);
-
+        
 
             var fsearch = search.create({
                 type: "salesorder",
@@ -199,6 +195,10 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                         value: resultado.return_quantity,
                         ignoreFieldChange: true
                     });
+                    ReturningRecord.commitLine({
+                        sublistId: 'item'
+                    });
+                   
 
                 var lineNumberd = ReturningRecord.findSublistLineWithValue({
                     sublistId: 'item',
@@ -209,7 +209,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 if (lineNumberd!=-1) {
                     ReturningRecord.selectLine({
                         sublistId: 'item',
-                        line: lineNumber
+                        line: lineNumberd
                     });
 
                     ReturningRecord.setCurrentSublistValue({
@@ -219,11 +219,13 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                         ignoreFieldChange: true
                     });
 
+                    
+                    ReturningRecord.commitLine({
+                        sublistId: 'item'
+                    });
+
                 }
-                ReturningRecord.commitLine({
-                    sublistId: 'item'
-                });
-                log.debug("lineNumber",lineNumber);
+               
 
         })
             deletelinera(ReturningRecord);
@@ -253,11 +255,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var trackingRMA=context.data.tracking_number;
             var returnamount=context.data.return_method.cost_of_return.amount;
             shopifyord=shopifyord.replace("#", "");
-            log.debug("items",  items);
-            log.debug("event",  event);
-            log.debug("Shopify Order",  shopifyord);
-            log.debug("status", status);
-            log.debug("returnamount", returnamount);
+            
 
 
             var fsearch = search.create({
@@ -304,6 +302,9 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 })
             });
             log.debug("internalidRA",  internalidRA);
+
+            if (!internalidRA) {log.error("Shopify RMA not found in NetSuite ",  shopifyord);
+                return;}
 
             var RA = record.load({
                 type: "returnauthorization",
@@ -354,10 +355,7 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
             var status=context.data.status;
             var event=context.event;
             shopifyord=shopifyord.replace("#", "");
-            log.debug("items",  items);
-            log.debug("event",  event);
-            log.debug("Shopify Order",  shopifyord);
-            log.debug("status", status);
+           
 
 
             var fsearch = search.create({
@@ -474,15 +472,10 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                 discountappliedsku=rec.getSublistValue({sublistId: "item", fieldId: "custcol_discountappliedsku", line: i})
                 amount=rec.getSublistValue({sublistId: "item", fieldId: "amount", line: i})
 
-                //log.debug("itemid",itemid);
-                //log.debug("discountappliedsku",discountappliedsku);
-                log.debug("amount",amount);
-                //log.debug("i",i);
-                //log.debug("aftershipid",aftershipid);
 
                 if (aftershipid==0 && itemid)
                 {
-                    log.debug("removeditemid",itemid);
+                
                     try {
                         rec.removeLine({
                             sublistId: 'item',

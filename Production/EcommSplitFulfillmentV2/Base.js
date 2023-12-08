@@ -143,6 +143,8 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                     let shipVia = result.getText({name: "shipmethod"}) || " ";
                     let tiktok = result.getValue({name: "custbody_payment_gateway_name",
                     join: "createdFrom"});
+                    let neighbororder = result.getValue({name: "custbody_priority_order",
+                    join: "createdFrom"});
                     let shipViaPriority;
 
                     switch (shipVia) {
@@ -153,13 +155,17 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                             shipViaPriority = 2;
                             break;
                         default:
-                            shipViaPriority = 4;
+                            shipViaPriority = 5;
                             break;
                     }
                     var itistiktok = 0;
                     if (tiktok=="tiktok_shop") {
-                        shipViaPriority = 3;
+                        shipViaPriority = 4;
                         itistiktok = 1;}
+
+                    if (neighbororder==true) {
+                        shipViaPriority = 3;
+                        }
 
                     salesOrders.push({
                         "documentNumber": Number(result.getValue({
@@ -173,6 +179,7 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                             join: "createdFrom" }),
                         "customer": result.getText({name: "entity"}),
                         "shipViaPriority": shipViaPriority,
+                        "neighbororder": neighbororder,
                         "itistiktok": itistiktok,
                         "shipVia": result.getText({
                             name: "shipmethod"
@@ -239,6 +246,7 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                     "documentNumberif": salesOrderData[0]["documentNumberif"],
                     "customer": salesOrderData[0]["customer"],
                     "itistiktok": salesOrderData[0]["itistiktok"],
+                    "neighbororder": salesOrderData[0]["neighbororder"],
                     "date": salesOrderData[0]["date"],
                     "memoMain": salesOrderData[0]["memoMain"],
                     "custbody_ffstatus": salesOrderData[0]["custbody_ffstatus"],
@@ -290,6 +298,7 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                             "custbodyprintbatchcode": salesOrderData[i]["custbodyprintbatchcode"],
                             "customer": salesOrderData[i]["customer"],
                             "itistiktok": salesOrderData[i]["itistiktok"],
+                            "neighbororder": salesOrderData[i]["neighbororder"],
                             "date": salesOrderData[i]["date"],
                             "memoMain": salesOrderData[i]["memoMain"],
                             "statusref": salesOrderData[i]["statusref"],
@@ -345,6 +354,7 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                 else                                                     {var dessts = "INTERNACIONAL ORDER (" + salesOrderData[i]["shipcountry"] + ")";}
                 
                 if (salesOrderData[i]["itistiktok"]==1)          {var dessts = "***** TIK-TOK ORDER *****";}
+                if (salesOrderData[i]["neighbororder"]==true)          {var dessts = "***** RESHIPPING, NEIGHBOR SERVICES *****";}
                 
                 if (salesOrderData[i]["internalid"]>internarlidmax)          {
                     internarlidmax=salesOrderData[i]["internalid"]
