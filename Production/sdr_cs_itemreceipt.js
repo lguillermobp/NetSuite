@@ -47,79 +47,7 @@ define(["N/ui/message","N/log","N/record"],
          * @since 2015.2
          */
         function fieldChanged(context) {
-            log.debug("fieldChanged",context);
-            currentRecord = context.currentRecord;
-            log.debug("context.fieldId",context.fieldId);
-
-            var rec;
-            if (context.sublistId == "inventory") {
-
-            var location = currentRecord.getValue({
-                fieldId: 'location'
-            });
-
-                var itemid = currentRecord.getCurrentSublistValue({
-                    sublistId: 'item',
-                    fieldId: 'item',
-                });
-
-                var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
-                    sublistId: 'item',
-                    fieldId: 'inventorydetail'
-                });
-                log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
-
-                if (subRecordInventoryDetail) {
-                    var srLineCount = subRecordInventoryDetail.getLineCount({
-                        sublistId: 'inventoryassignment'
-                    });
-                    log.debug("srLineCount",srLineCount);
-                    
-                    if (srLineCount > 0) {
-                        
-                            subRecordInventoryDetail.selectLine({
-                                sublistId: 'inventoryassignment',
-                                line: 0
-                            });
-                            var binNumber = subRecordInventoryDetail.getCurrentSublistValue({
-                                sublistId: 'inventoryassignment',
-                                fieldId: 'binnumber'
-                            });
-                            log.debug("binName",binNumber);
-
-                            if (binNumber) {
-
-                                rec = record.load({
-                                    type: "inventoryitem",
-                                    id: itemid,
-                                    isDynamic: true
-                                })
-                          
-                                
-                                  var lineNumber = rec.findSublistLineWithValue({
-                                    sublistId: 'binnumber',
-                                    fieldId: 'preferredbin',
-                                    value: true
-                                });
-                
-                                if (lineNumber!=-1) {
-                                    
-                                    rec.selectNewLine({sublistId: "binnumber"});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binNumber", value: binNumber});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: location});
-                                    rec.commitLine({sublistId: "binnumber"});
-                                    var saverec = rec.save();
-                                }
-
-
-                            }
-                        
-
-                    }
-                }
-            }
-
+           
         }
 
         /**
@@ -346,12 +274,12 @@ define(["N/ui/message","N/log","N/record"],
 
         return {
             pageInit: pageInit,
-            fieldChanged: fieldChanged,
+            //fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
-            sublistChanged: sublistChanged,
+            //sublistChanged: sublistChanged,
             //lineInit: lineInit,
-            validateField: validateField,
-            validateLine: validateLine,
+            //validateField: validateField,
+            //validateLine: validateLine,
             //validateInsert: validateInsert,
             //validateDelete: validateDelete,
             saveRecord: saveRecord
