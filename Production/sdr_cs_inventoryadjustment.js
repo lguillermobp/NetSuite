@@ -310,7 +310,14 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                 });
 
                 var paramItem = GENERALTOOLS.get_item_value(itemid);
-                var item= paramItem.data.getValue({fieldId: "itemid"});
+                try {
+                    var item= paramItem.data.getValue({fieldId: "itemid"});
+                }
+                catch (e) {
+                    log.debug({  title: "error.save: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+
+                }
+
 
                 log.debug("item",item);
 
