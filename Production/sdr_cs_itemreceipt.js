@@ -4,9 +4,9 @@
  * @NModuleScope SameAccount
  */
 var country;
-define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/ui/message","N/log","N/record"],
 
-    function(message, log, r, https, GENERALTOOLS) {
+    function(message, log, record) {
 
         /**
          * Function to be executed after page is initialized.
@@ -22,6 +22,15 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
         function pageInit(context) {
 
 
+            log.debug("context.mode",context.mode);
+
+            datarec=context.currentRecord;
+
+            createdfrom = datarec.getValue({fieldId: "createdfrom"});
+            log.debug("createdfrom",  createdfrom);
+
+           
+           
 
         }
 
@@ -38,7 +47,78 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          * @since 2015.2
          */
         function fieldChanged(context) {
+            log.debug("fieldChanged",context);
+            currentRecord = context.currentRecord;
+            log.debug("context.fieldId",context.fieldId);
 
+            var rec;
+            if (context.sublistId == "inventory") {
+
+            var location = currentRecord.getValue({
+                fieldId: 'location'
+            });
+
+                var itemid = currentRecord.getCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'item',
+                });
+
+                var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
+                    sublistId: 'item',
+                    fieldId: 'inventorydetail'
+                });
+                log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
+
+                if (subRecordInventoryDetail) {
+                    var srLineCount = subRecordInventoryDetail.getLineCount({
+                        sublistId: 'inventoryassignment'
+                    });
+                    log.debug("srLineCount",srLineCount);
+                    
+                    if (srLineCount > 0) {
+                        
+                            subRecordInventoryDetail.selectLine({
+                                sublistId: 'inventoryassignment',
+                                line: 0
+                            });
+                            var binNumber = subRecordInventoryDetail.getCurrentSublistValue({
+                                sublistId: 'inventoryassignment',
+                                fieldId: 'binnumber'
+                            });
+                            log.debug("binName",binNumber);
+
+                            if (binNumber) {
+
+                                rec = record.load({
+                                    type: "inventoryitem",
+                                    id: itemid,
+                                    isDynamic: true
+                                })
+                          
+                                
+                                  var lineNumber = rec.findSublistLineWithValue({
+                                    sublistId: 'binnumber',
+                                    fieldId: 'preferredbin',
+                                    value: true
+                                });
+                
+                                if (lineNumber!=-1) {
+                                    
+                                    rec.selectNewLine({sublistId: "binnumber"});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binNumber", value: binNumber});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: location});
+                                    rec.commitLine({sublistId: "binnumber"});
+                                    var saverec = rec.save();
+                                }
+
+
+                            }
+                        
+
+                    }
+                }
+            }
 
         }
 
@@ -54,7 +134,6 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          */
         function postSourcing(scriptContext) {
 
-
         }
 
         /**
@@ -67,6 +146,7 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          * @since 2015.2
          */
         function sublistChanged(context) {
+            log.debug("sublistChanged",context);
 
 
         }
@@ -99,6 +179,7 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          * @since 2015.2
          */
         function validateField(scriptContext) {
+            log.debug("validateField",scriptContext);
 
         }
 
@@ -113,8 +194,11 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          *
          * @since 2015.2
          */
-        function validateLine(context) {
+        function validateLine(currentRecord) {
 
+            log.debug("currentRecord",currentRecord);
+
+           
 
             return true;
         }
@@ -163,135 +247,111 @@ define(["N/ui/message","N/log","N/record",'N/https', "/SuiteScripts/Modules/gene
          */
         function saveRecord(context) {
 
-            log.debug("context.mode",context.mode);
+            log.debug("fieldChanged",context);
+            currentRecord = context.currentRecord;
+            log.debug("context.fieldId",context.fieldId);
+            var location = currentRecord.getValue({
+                fieldId: 'location'
+            });
 
-            datarec=context.currentRecord;
+            var itemIndex = 0;
+            var itemCount = currentRecord.getLineCount({
+                "sublistId": "item"
+            });
 
-            createdfrom = datarec.getValue({fieldId: "createdfrom"});
-            ordertype = datarec.getValue({fieldId: "ordertype"});
-            log.debug("createdfrom.length", createdfrom.length);
 
-            if (ordertype=="RtnAuth") {
+            var rec;
 
-                var RA = r.load({
-                    type: "returnauthorization",
-                    id: createdfrom,
-                    isDynamic: false,
-                    defaultValues: null
+            while (itemIndex < itemCount) {
+                currentRecord.selectLine({
+                    "sublistId": "item",
+                    "line": itemIndex
                 });
 
-                memo = RA.getValue({fieldId: "memo"});
-                ifrma = memo.substring(0, 4);
-                rma = memo.replace("RMA: ", "");
 
-                log.debug("rma", rma);
-                log.debug("ifrma", ifrma);
-
-                log.debug("createdfrom", createdfrom);
-                log.debug("ordertype", ordertype);
-
-                var itemIndex = 0;
-                var itemCount = datarec.getLineCount({
-                    "sublistId": "item"
+                var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
+                    sublistId: 'item',
+                    fieldId: 'inventorydetail'
                 });
-                log.debug("itemCount", itemCount);
 
-                while (itemIndex < itemCount) {
-                    datarec.selectLine({
-                        "sublistId": "item",
-                        "line": itemIndex
-                    });
+                log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
 
-                    var externalid = datarec.getCurrentSublistValue({
-                        sublistId: 'item',
-                        fieldId: 'custcol_aftershipexternalid'
-                    });
-                    log.debug("bsexternalid", externalid);
-                    var quantityreceived = datarec.getCurrentSublistValue({
-                        sublistId: 'item',
-                        fieldId: 'quantity'
-                    });
-                    log.debug("bsquantityreceived", quantityreceived);
+                var itemid = subRecordInventoryDetail.getValue({
+                    fieldId: 'item'
+                });
 
-                    if (ifrma == "RMA:") {
-                        postAftership1(rma, externalid, quantityreceived)
+                log.debug("itemid",itemid);
+
+
+                if (subRecordInventoryDetail) {
+                    var srLineCount = subRecordInventoryDetail.getLineCount({
+                        sublistId: 'inventoryassignment'
+                    });
+                    log.debug("srLineCount",srLineCount);
+                    
+                    if (srLineCount > 0) {
+                        
+                            subRecordInventoryDetail.selectLine({
+                                sublistId: 'inventoryassignment',
+                                line: 0
+                            });
+
+                            log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
+
+                            var binNumber = subRecordInventoryDetail.getCurrentSublistValue({
+                                sublistId: 'inventoryassignment',
+                                fieldId: 'binnumber'
+                            });
+                            
+                            log.debug("binName",binNumber);
+                            log.debug("location",location);
+                            
+                            if (binNumber) {
+
+                                rec = record.load({
+                                    type: "inventoryitem",
+                                    id: itemid,
+                                    isDynamic: true
+                                })
+                          
+                                
+                                  var lineNumber = rec.findSublistLineWithValue({
+                                    sublistId: 'binnumber',
+                                    fieldId: 'preferredbin',
+                                    value: true
+                                });
+                                log.debug("lineNumber",lineNumber);
+                                if (lineNumber==-1) {
+                                    
+                                    rec.selectNewLine({sublistId: "binnumber"});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: location});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binnumber", value: binNumber});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
+                                    rec.commitLine({sublistId: "binnumber"});
+                                    var saverec = rec.save();
+                                }
+
+
+                            }
+                        
+
                     }
-                    itemIndex++
                 }
+                itemIndex++;
             }
 
-
             return true;
-
-        }
-
-        function postAftership(rma, externalid, qty) {
-
-
-            const data = JSON.stringify({
-                "items": [
-                    {
-                        "external_id": externalid,
-                        "quantity": qty
-                    }
-                ],
-                "send_notification": true
-            });
-
-            const xhr = new XMLHttpRequest();
-            xhr.withCredentials = true;
-
-            xhr.addEventListener("readystatechange", function () {
-                if (this.readyState === this.DONE) {
-                    console.log(this.responseText);
-                }
-            });
-
-            xhr.open("POST", "https://api.aftership.com/returnscenter/v2/returns/rma/" + rma + "/item-receive-batch");
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.setRequestHeader("as-api-key", "asat_10477bd142bc4e678e169f9897d2eef1");
-
-            valback=xhr.send(data);
-            log.debug("valback",  valback);
-        }
-
-        function postAftership1(rma, externalid, qty) {
-
-
-
-            var headerObj = {
-                    "Content-Type": "application/json",
-                    "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
-                };
-
-            const bodyObj = JSON.stringify({
-                "items": [
-                    {
-                        "external_id": externalid,
-                        "quantity": qty
-                    }
-                ],
-                "send_notification": true
-            });
-
-
-            var response = https.post({
-                url: "https://api.aftership.com/returnscenter/v2/returns/rma/" + rma + "/item-receive-batch",
-                body: bodyObj,
-                headers: headerObj
-            });
-            log.debug("response",  response);
-
+            
         }
 
         return {
             pageInit: pageInit,
-            //fieldChanged: fieldChanged,
+            fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
-            //sublistChanged: sublistChanged,
+            sublistChanged: sublistChanged,
             //lineInit: lineInit,
-            //validateField: validateField,
-            //validateLine: validateLine,
+            validateField: validateField,
+            validateLine: validateLine,
             //validateInsert: validateInsert,
             //validateDelete: validateDelete,
             saveRecord: saveRecord
