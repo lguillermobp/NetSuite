@@ -195,6 +195,22 @@ define(["N/search",'N/record', 'N/error',"N/log","/SuiteScripts/Modules/generalt
                         value: resultado.return_quantity,
                         ignoreFieldChange: true
                     });
+
+
+                    var inventoryDetailSubRecord = ReturningRecord.getCurrentSublistSubrecord({
+                        sublistId: 'item',
+                        fieldId: 'inventorydetail'
+                    });
+
+                    var invAssignmentLineCount = inventoryDetailSubRecord.getLineCount('inventoryassignment');
+                
+                    if (invAssignmentLineCount) {
+                        requiredQuantity = 0; 
+                        return false;
+                    }
+
+
+
                     ReturningRecord.commitLine({
                         sublistId: 'item'
                     });

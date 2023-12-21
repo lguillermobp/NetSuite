@@ -74,7 +74,6 @@ define(["N/ui/message","N/log","N/record"],
          * @since 2015.2
          */
         function sublistChanged(context) {
-            log.debug("sublistChanged",context);
 
 
         }
@@ -107,7 +106,6 @@ define(["N/ui/message","N/log","N/record"],
          * @since 2015.2
          */
         function validateField(scriptContext) {
-            log.debug("validateField",scriptContext);
 
         }
 
@@ -124,9 +122,6 @@ define(["N/ui/message","N/log","N/record"],
          */
         function validateLine(currentRecord) {
 
-            log.debug("currentRecord",currentRecord);
-
-           
 
             return true;
         }
@@ -162,8 +157,6 @@ define(["N/ui/message","N/log","N/record"],
         }
 
 
-
-
         /**
          * Validation function to be executed when record is saved.
          *
@@ -175,9 +168,9 @@ define(["N/ui/message","N/log","N/record"],
          */
         function saveRecord(context) {
 
-            log.debug("fieldChanged",context);
+            
             currentRecord = context.currentRecord;
-            log.debug("context.fieldId",context.fieldId);
+
             var location = currentRecord.getValue({
                 fieldId: 'location'
             });
@@ -202,67 +195,55 @@ define(["N/ui/message","N/log","N/record"],
                     fieldId: 'inventorydetail'
                 });
 
-                log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
 
                 var itemid = subRecordInventoryDetail.getValue({
                     fieldId: 'item'
                 });
-
-                log.debug("itemid",itemid);
 
 
                 if (subRecordInventoryDetail) {
                     var srLineCount = subRecordInventoryDetail.getLineCount({
                         sublistId: 'inventoryassignment'
                     });
-                    log.debug("srLineCount",srLineCount);
                     
-                    if (srLineCount > 0) {
+                    if (srLineCount > 0) 
+                    {
                         
-                            subRecordInventoryDetail.selectLine({
-                                sublistId: 'inventoryassignment',
-                                line: 0
-                            });
+                        subRecordInventoryDetail.selectLine({
+                            sublistId: 'inventoryassignment',
+                            line: 0
+                        });
 
-                            log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
+                        var binNumber = subRecordInventoryDetail.getCurrentSublistValue({
+                            sublistId: 'inventoryassignment',
+                            fieldId: 'binnumber'
+                        });
+                        
+                        if (binNumber) {
 
-                            var binNumber = subRecordInventoryDetail.getCurrentSublistValue({
-                                sublistId: 'inventoryassignment',
-                                fieldId: 'binnumber'
-                            });
+                            rec = record.load({
+                                type: "inventoryitem",
+                                id: itemid,
+                                isDynamic: true
+                            })
+                        
                             
-                            log.debug("binName",binNumber);
-                            log.debug("location",location);
-                            
-                            if (binNumber) {
-
-                                rec = record.load({
-                                    type: "inventoryitem",
-                                    id: itemid,
-                                    isDynamic: true
-                                })
-                          
+                                var lineNumber = rec.findSublistLineWithValue({
+                                sublistId: 'binnumber',
+                                fieldId: 'preferredbin',
+                                value: true
+                            });
+                        
+                            if (lineNumber==-1) {
                                 
-                                  var lineNumber = rec.findSublistLineWithValue({
-                                    sublistId: 'binnumber',
-                                    fieldId: 'preferredbin',
-                                    value: true
-                                });
-                                log.debug("lineNumber",lineNumber);
-                                if (lineNumber==-1) {
-                                    
-                                    rec.selectNewLine({sublistId: "binnumber"});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: location});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binnumber", value: binNumber});
-                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
-                                    rec.commitLine({sublistId: "binnumber"});
-                                    var saverec = rec.save();
-                                }
-
-
+                                rec.selectNewLine({sublistId: "binnumber"});
+                                rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: location});
+                                rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binnumber", value: binNumber});
+                                rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
+                                rec.commitLine({sublistId: "binnumber"});
+                                var saverec = rec.save();
                             }
-                        
-
+                        }
                     }
                 }
                 itemIndex++;
