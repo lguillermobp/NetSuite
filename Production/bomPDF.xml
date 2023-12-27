@@ -1,0 +1,107 @@
+<?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+    <head>
+<macrolist>
+        <macro id="nlheader">
+            <table style="width: 100%; font-size: 10pt;"><tr>
+                <td rowspan="3" style="padding: 0px; height: 118px;font-size: 20pt;"><img src="https://5896209.app.netsuite.com/core/media/media.nl?id=6295&c=5896209&h=qiSHiPhnCNppeL_ZbFyrH_z1_9FJd6e_PvfTPDTiB5DRP3mw" style="margin: 7px;" /></td>
+                <td align="right" style="padding: 0px; height: 49px;"><span style="font-size: 20pt;">BOM Picking</span></td>
+            </tr>
+            </table>
+            <table style="width: 100%;">
+            <tr>
+                <th>WO</th>
+                <td><barcode codetype="code128" value="[WORK_ORDER]"/>
+                  
+                </td>
+                <th>Location</th>
+                <td>[LOCATION]</td>
+            </tr>
+            <tr>
+                <th>Printed By</th>
+                <td>[PRINTED_BY]</td>
+                <th>Date/Time</th>
+                <td>[DATE_TIME]</td>
+            </tr>
+            <tr>
+                <th>Finished Good</th>
+                <td>[FINISHED_GOOD]</td>
+                <th>Finished Quantity</th>
+                <td>[FINISHED_QUANTITY]</td>
+            </tr>
+            <tr>
+                <th>Customer</th>
+                <td>[NEIGHBOR]</td>
+                <th>Customer PO</th>
+                <td>[NEIGHBOR_PO]</td>
+            </tr>
+            <tr>
+                <th>SO</th>
+                <td>[SALES_ORDER]</td>
+                <th>SO Req. Ship Date</th>
+                <td>[SALES_ORDER_REQ_SHIP_DATE]</td>
+            </tr>
+        </table>
+    </macro>
+    <macro id="nlfooter">
+        <table style="width: 100%; font-size: 8pt;"><tr>
+            <td style="padding: 0;"></td>
+            <td align="right" style="padding: 0;"><pagenumber/> of <totalpages/></td>
+        </tr></table>
+    </macro>
+</macrolist>
+        <style>
+         
+           table {
+        font-size: 9pt;
+        table-layout: fixed;
+        }
+        th {
+        font-weight: bold;
+        font-size: 8pt;
+        vertical-align: middle;
+        padding: 2px 2px 2px;
+        background-color: #e3e3e3;
+        color: #333333;
+        }
+        td {
+        padding: 2px 2px;
+        vertical-align: middle;
+        }
+        td p { align:left }
+        
+        .pagebreak { page-break-before: always; } /* page-break-after works, as well */
+        
+        </style>
+    </head>
+
+    <body header="nlheader" header-height="25%" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+        
+
+        <table style="width: 100%; margin-top: 10px;">
+            <tr>
+                <th width="6%">Line</th>
+                <th width="18%">Item</th>
+                <th width="43%">Desc.</th>
+                <th width="15%">QTY</th>
+                <th width="18%">QTY COMMITTED</th>
+            </tr>
+            [WORK_ORDER_LINES]
+        </table>
+
+        <br/>
+        <div class="pagebreak"> </div>
+        <table style="width: 100%; margin-top: 10px;">
+            <tr>
+                <th>Line</th>
+                <th>Item</th>
+                <th>Loc.</th>
+                <th>Bin</th>
+                <th>On Hand</th>
+                <th>Avail.</th>
+                <th># Picked</th>
+            </tr>
+            [INVENTORY_BALANCE]
+        </table>
+    </body>
+</pdf>

@@ -39,7 +39,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             
             var vendorShipMethodRecord = record.load({
                 type: 'customrecord_vendorshipmethod',
-                id: idcarrier, 
+                id: idcarrier,  
                 isDynamic: false
             });
 
