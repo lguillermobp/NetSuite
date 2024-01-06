@@ -29,6 +29,102 @@ define(["N/ui/message","N/log","N/record"],
             createdfrom = datarec.getValue({fieldId: "createdfrom"});
             log.debug("createdfrom",  createdfrom);
 
+
+            var itemIndex = 0;
+            var itemCount = datarec.getLineCount({
+                "sublistId": "item"
+            });
+            log.debug("itemCount",itemCount);
+
+            while (itemIndex < itemCount) {
+                datarec.selectLine({
+                    "sublistId": "item",
+                    "line": itemIndex
+                });
+
+                var varbin="";
+
+                var subRecordInventoryDetail = datarec.getCurrentSublistSubrecord({
+                    sublistId: 'item',
+                    fieldId: 'inventorydetail'
+                });
+                log.debug("subRecordInventoryDetail",subRecordInventoryDetail);
+
+                var itemid = subRecordInventoryDetail.getValue({
+                    fieldId: 'item'
+                });
+
+
+                if (subRecordInventoryDetail) {
+                    var srLineCount = subRecordInventoryDetail.getLineCount({
+                        sublistId: 'inventoryassignment'
+                    });
+                    log.debug("srLineCount",srLineCount);
+                    if (srLineCount > 0) 
+                    {
+                        
+                        subRecordInventoryDetail.selectLine({
+                            sublistId: 'inventoryassignment',
+                            line: 0
+                        });
+
+                        var binNumber = subRecordInventoryDetail.getCurrentSublistText({
+                            sublistId: 'inventoryassignment',
+                            fieldId: 'binnumber'
+                        });
+                        var quantity = subRecordInventoryDetail.getCurrentSublistValue({
+                            sublistId: 'inventoryassignment',
+                            fieldId: 'quantity'
+                        });
+                        
+                        if (binNumber) {
+                            
+                        var binRecord = record.load({
+                            type: 'bin',
+                            id: binNumber 
+                        });
+
+                        var binNumbertxt = binRecord.getText({
+                            fieldId: 'binnumber'
+                        });
+
+                        log.debug("binNumber", binNumber);
+
+                            varbin+= binNumbertxt + " (" + quantity + ") ";
+                            log.debug("varbin",varbin);
+                        }
+                    }
+                    else
+                    {
+
+                    rec1 = record.load({
+                        type: "inventoryitem",
+                        id: itemid,
+                        isDynamic: true
+                    })
+                    
+                    binNumbertxt = rec1.getSublistText({sublistId: "binnumber", fieldId: "binnumber", line: 0});
+                    
+                
+                    if (binNumbertxt) {
+
+                        varbin= binNumbertxt;
+                       
+                    }
+
+                }
+
+                }
+                        datarec.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'custcol_binlocationbydefault',
+                            value: varbin,
+                            ignoreFieldChange: true
+                        });
+                itemIndex++;
+            }
+
+
            
            
 

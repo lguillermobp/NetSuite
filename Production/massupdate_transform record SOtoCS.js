@@ -21,7 +21,7 @@ define(['N/record','N/log'],
                 log.debug({  title: String(e.name), details:String(e.message)});
                 return;
             }
-            var d = new Date('07/26/2023');
+            var d = new Date('12/10/2023');
             cashsalerecord.setValue('trandate', d);
             try {
                 var cashsalerecordId = cashsalerecord.save();
