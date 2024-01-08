@@ -4,6 +4,7 @@
  * @NModuleScope SameAccount
  */
 var ecddays = [];
+var ecdholydays = [];
 define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function(s, currentRecord, log, record,dialog) {
     function pageInit(context) {
 
@@ -457,13 +458,38 @@ function lookcdsc(sc, cd) {
                 custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
                 custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
 
-                ecddays[i]=custrecord_blockdate;
+                ecdholydays[i]=custrecord_blockdate;
                 i++;
                 
             });
+            
         });
-       
 
+
+        const td = new Date();
+        log.debug("td",td);
+
+        var newstartdate=new Date(td);
+        newstartdate.setDate(td.getDate()-50);
+        log.debug("newstartdate",newstartdate);
+
+        for (i=1;i<300;i++)
+        {
+            newstartdate.setDate(newstartdate.getDate()+1);
+            if (newstartdate.getDay() == 0) {i--;continue;}
+            if (newstartdate.getDay() == 6) {i--;continue;}
+
+            var y = newstartdate.getFullYear();
+            var m = newstartdate.getMonth() + 1;
+            var d = newstartdate.getDate();
+            datetofind = m + "/" + d + "/" + y;
+            initial = parseInt(ecdholydays.indexOf(datetofind));
+            if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
+            log.debug("datetofind",datetofind)
+            ecddays[i]=datetofind;
+        }
+        
+       
     }
     return {
         pageInit: pageInit,
