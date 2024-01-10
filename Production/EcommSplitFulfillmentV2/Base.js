@@ -143,6 +143,11 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                     let shipVia = result.getText({name: "shipmethod"}) || " ";
                     let tiktok = result.getValue({name: "custbody_payment_gateway_name",
                     join: "createdFrom"});
+                    let pdq = result.getValue({name: "custbody9",
+                    join: "createdFrom"});
+                    let resultpdq = pdq.includes("Prioritized Delivery");
+                    let tagsshopify = result.getValue({name: "custbody_shopifytags",
+                    join: "createdFrom"});
                     let neighbororder = result.getValue({name: "custbody_priority_order",
                     join: "createdFrom"});
                     let shipViaPriority;
@@ -155,15 +160,18 @@ define(["N/error",'N/record', "N/search", "N/file", "N/log", "/SuiteScripts/Modu
                             shipViaPriority = 2;
                             break;
                         default:
-                            shipViaPriority = 5;
+                            shipViaPriority = 6;
                             break;
                     }
                     var itistiktok = 0;
                     if (tiktok=="tiktok_shop") {
-                        shipViaPriority = 4;
+                        shipViaPriority = 5;
                         itistiktok = 1;}
 
                     if (neighbororder==true) {
+                        shipViaPriority = 4;
+                        }
+                    if (resultpdq==true) {
                         shipViaPriority = 3;
                         }
 

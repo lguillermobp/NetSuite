@@ -57,27 +57,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/search", "N/fi
         
                 });
         
-				var fileObj = file.load({
-					id: '458763'
-				});
-
-
-				//get the # of lines
-				var arrLines = fileObj.getContents().split(/\n|\n\r/);
-				// loop through each line, skipping the header
-				for (var i = 1; i < arrLines.length - 1; i++) {
-					//split the 1 line of data into an array.  If the file was a csv file, each array position holds a value from the columns of the 1 line of data
-					var content = arrLines[i].split(',');
-
-					// get values from the columns of a CSV file 
-					var column1 = content[0]; //first column
-					var column2 = content[1]; //second column
-					//can use the column data above to i.e. create new record and set default value, update existing records, write the data elsewhere
-					log.debug("content",content);
-				}
-
-
-
+        
                 sublistpm.addField({
                     id: "custrecordml_internalid",
                     type: serverWidget.FieldType.TEXT,

@@ -23,14 +23,14 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
             
             form.clientScriptModulePath = "./sdr_cs_saleorder.js";
 
-            sublist = form.getSublist({id: 'customsublist420'});
+            sublist = form.getSublist({id: 'recmachcustrecord_salecontract'});
             
             sublist.addButton({
                 id: 'custpage_refresh1',
                 label: 'Create Schedule',
                 functionName: 'refreshSchedule()'
             });
-
+            
             sublist1 = form.getSublist({id: 'recmachcustrecord_cd_sc'});
             log.debug("sublist1.type",sublist1.type);
             

@@ -3,13 +3,13 @@
  * @NApiVersion 2.x
  */
 
-define(["N/runtime","N/currentRecord", "N/error", "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/runtime","N/currentRecord", "N/error",'N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (runtime,currentRecord, error, GENERALTOOLS) {
+    function (runtime,currentRecord, error,log, GENERALTOOLS) {
         function pageInit() {
         }
 
@@ -27,6 +27,8 @@ define(["N/runtime","N/currentRecord", "N/error", "/SuiteScripts/Modules/general
             //window.open(url, "_blank")
         }
 
+
+        
         return {
             pageInit: pageInit,
             process: process
