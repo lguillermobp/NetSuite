@@ -3,13 +3,13 @@
  * @NApiVersion 2.x
  */
 
-define(["N/runtime","N/currentRecord", "N/error",'N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search", "/SuiteScripts/Modules/generaltoolsv1.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (runtime,currentRecord, error,log, GENERALTOOLS) {
+    function (runtime,currentRecord, error,log,record, s, GENERALTOOLS) {
         function pageInit() {
         }
 
@@ -27,10 +27,63 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "/SuiteScripts/Modules
             //window.open(url, "_blank")
         }
 
+        function clear() {
+    
+            var fsearch = s.create({
+                type: "customrecord_interface",
+                filters:
+                [
+                ],
+                columns:
+                [
+                    s.createColumn({
+                        name: "name",
+                        sort: s.Sort.ASC
+                    }),
+                    "created",
+                    "custrecord_dateprocessed",
+                    "custrecord_expirationdate",
+                    "custrecord_itemid",
+                    "custrecord_locationid",
+                    "custrecord_lot",
+                    "custrecord_note",
+                    "custrecord_qty",
+                    "custrecord_recordtype",
+                    "custrecord_recstatus",
+                    "custrecord_transformrecord",
+                    "custrecord_internalid",
+                    "custrecord_binid",
+                    "internalid"
+                ]
+            });
+    
+            var pagedData = fsearch.runPaged({
+                "pageSize" : 1000
+            });
+    
+            pagedData.pageRanges.forEach(function (pageRange) {
+    
+                var page = pagedData.fetch({index: pageRange.index});
+    
+                page.data.forEach(function (fresult) {
+                            
+                        var fresultid = fresult.getValue({name: "internalid"});
+        
+                        record.delete({
+                            type: "customrecord_interface",
+                            id: fresultid
+                        });
 
+    
+                })
+            });
+            window.location.reload();
+            return true;
+        }
         
         return {
             pageInit: pageInit,
-            process: process
+            process: process,
+            clear: clear
         }
     })
