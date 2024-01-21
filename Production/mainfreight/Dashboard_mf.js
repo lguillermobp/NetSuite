@@ -63,6 +63,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Internal ID'
                 });
+
+                sublistpm.addField({
+                    id: "custrecordml_documentnumber",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Document Number'
+                });
     
                 sublistpm.addField({
                     id: "custrecordml_recordtype",
@@ -73,6 +79,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: "custrecordml_transformto",
                     type: serverWidget.FieldType.TEXT,
                     label:'Transform TO'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_typeitem",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Type Item'
                 });
                 sublistpm.addField({
                     id: "custrecordml_item",
@@ -129,7 +140,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.custrecord_internalid+" "
                         
                     });
-
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_documentnumber',
+                        line: counter,
+                        value: result1.custrecord_documentnumber +" "
+                    });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_recordtype',
                         line: counter,
@@ -139,6 +154,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_transformto',
                         line: counter,
                         value: result1.custrecord_transformrecord+" "
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_typeitem',
+                        line: counter,
+                        value: result1.custrecord_typeitem +" "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_item',
@@ -237,11 +257,20 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
 
 
-                    if (content[headersfile["Internal ID"]]) {
-                        var internalid = content[headersfile["Internal ID"]];
+                    if (content[headersfile["Internal ID"]] || content[headersfile["Document Number"]]) {
+                        
+                        
                         var recordtype = content[headersfile["Record Type"]];
                         var transformto = content[headersfile["Transform Record"]].trim();
                         var item = content[headersfile["Item"]];
+                        var typeitem = content[headersfile["Type Item"]];
+                        var documentnumber = content[headersfile["Document Number"]];
+
+                        if (!content[headersfile["Internal ID"]] ) 
+                            { internalid=get_internalID(documentnumber,recordtype)}
+                            else 
+                            {internalid = content[headersfile["Internal ID"]];}
+                        
                         var qty = content[headersfile["Qty"]];
                         var lot = content[headersfile["Lot"]];
                         var location = content[headersfile["Location"]];
@@ -264,7 +293,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         });
                     }catch(e){notes += " ; error with this Bin Id"+ String(e.message); var status = "error";}
 
-                    if (transformto.length==0) {notes += " ; error with this Transform Record to "; var status = "error";}
+                    
+                    if (typeitem!="FG" && typeitem!="CO") {notes += " ; Type Item must be FG or CO "; var status = "error";}
+
+                    if (transformto=="") {notes += " ; Transform Record is empty "; var status = "error";}
+                    if (documentnumber=="") {notes += " ; Document Number is empty "; var status = "error";}
+
                     var rec = record.create({
                         type: "customrecord_interface",
                         isDynamic: false,
@@ -283,6 +317,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         rec.setValue({
                             fieldId: "custrecord_itemid",
                             value: item
+                        });
+                        rec.setValue({
+                            fieldId: "custrecord_typeitem",
+                            value: typeitem
+                        });
+                        rec.setValue({
+                            fieldId: "custrecord_documentnumber",
+                            value: documentnumber
                         });
                         rec.setValue({
                             fieldId: "custrecord_recordtype",
@@ -359,7 +401,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "custrecord_recstatus",
                 "custrecord_transformrecord",
                 "custrecord_internalid",
-                "custrecord_binid"
+                "custrecord_binid",
+                "custrecord_documentnumber",
+                "custrecord_typeitem"
             ]
 		});
 
@@ -379,7 +423,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 				pagedatas[i] = {
 					"custrecord_dateprocessed": fresult.getValue({name: "custrecord_dateprocessed"}),
 					"custrecord_expirationdate": fresult.getValue({name: "custrecord_expirationdate"}),
-					"custrecord_itemid": fresult.getValue({name: "custrecord_itemid"}),
+					"custrecord_typeitem": fresult.getValue({name: "custrecord_typeitem"}),
+                    "custrecord_documentnumber": fresult.getValue({name: "custrecord_documentnumber"}),
+                    "custrecord_itemid": fresult.getValue({name: "custrecord_itemid"}),
 					"custrecord_locationid": fresult.getValue({name: "custrecord_locationid"}),
 					"custrecord_lot": fresult.getValue({name: "custrecord_lot"}),
 					"custrecord_note": fresult.getValue({name: "custrecord_note"}),
@@ -399,6 +445,47 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
 		return pagedatas;
 	}
+    function get_internalID(docum,typer) {
+
+        var internalid;
+
+        var fsearch = s.create({
+            type: typer,
+            filters:
+                [
+                    ["number","equalto",docum],
+                    "AND",
+                    ["mainline","is","T"]
+                ],
+            columns:
+                [
+                    "mainline",
+                    "tranid",
+                    "internalid"
+                ]
+        });
+
+
+
+        var pagedData = fsearch.runPaged({
+            "pageSize": 1000
+        });
+
+        var pinternalid;
+        pagedData.pageRanges.forEach(function (pageRange) {
+
+           var page = pagedData.fetch({index: pageRange.index});
+
+           page.data.forEach(function (fresult) {
+
+                pinternalid = fresult.getValue({name: "internalid"});
+
+            });
+
+        })
+
+        return pinternalid;
+    }
     return {
         onRequest: onRequest
     };
