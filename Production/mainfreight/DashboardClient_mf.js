@@ -16,6 +16,26 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         function process() {
             var currRec = currentRecord.get();
 
+            var sublistCount = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+            console.log("sublistCount",sublistCount);
+            
+            var isfirst= true;
+
+            log.debug("custpageDate",custpageDate);
+            log.debug("sublistCount",sublistCount);
+            var totpo = 0;
+
+            for (var i = 0; i < sublistCount; i++) {
+
+                
+
+
+
+            }
+
+
             var fieldfilename = currRec.getText({
                 fieldId: "custpage_file_name"
             });

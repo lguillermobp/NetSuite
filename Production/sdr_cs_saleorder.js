@@ -34,7 +34,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
             fieldId: "custbody_productionline"
         });
         var shipdate = currRec.getValue({
-            fieldId: "shipdate"
+            fieldId: "custbody_invoicedate"
         });
         log.debug("sc",sc);
         log.debug("pl",pl);

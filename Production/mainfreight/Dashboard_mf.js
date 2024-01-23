@@ -262,7 +262,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         
                         var recordtype = content[headersfile["Record Type"]];
                         var transformto = content[headersfile["Transform Record"]].trim();
-                        var item = content[headersfile["Item"]];
+                        var item = content[headersfile["Item Id"]];
                         var typeitem = content[headersfile["Type Item"]];
                         var documentnumber = content[headersfile["Document Number"]];
 
@@ -271,7 +271,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                             else 
                             {internalid = content[headersfile["Internal ID"]];}
                         
-                        var qty = content[headersfile["Qty"]];
+                        var qty = content[headersfile["Quantity"]];
                         var lot = content[headersfile["Lot"]];
                         var location = content[headersfile["Location"]];
                         var bin = content[headersfile["Binlocation ID"]];
@@ -385,10 +385,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             ],
             columns:
             [
-                s.createColumn({
-                    name: "name",
-                    sort: s.Sort.ASC
-                }),
+                "name",
                 "created",
                 "custrecord_dateprocessed",
                 "custrecord_expirationdate",
@@ -400,7 +397,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "custrecord_recordtype",
                 "custrecord_recstatus",
                 "custrecord_transformrecord",
-                "custrecord_internalid",
+                s.createColumn({
+                    name: "custrecord_internalid",
+                    sort: s.Sort.ASC
+                }),
                 "custrecord_binid",
                 "custrecord_documentnumber",
                 "custrecord_typeitem"
