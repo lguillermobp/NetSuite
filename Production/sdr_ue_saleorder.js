@@ -14,6 +14,20 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
      */
     function beforeLoad(context) {
         log.debug("context",context);
+
+        if (context.type === context.UserEventType.VIEW) {
+            var entity = context.newRecord.getValue({fieldId: 'entity'});
+
+            const printSuitelet = "/app/site/hosting/scriptlet.nl?script=1618&deploy=1&customer=" + entity;
+
+            context.form.addButton({
+                id: "custpage_gml",
+                label: "Customer Statement",
+                functionName: "window.open('" + printSuitelet + "');"
+            })
+        }
+
+
         if(context.type == "edit") {
             var record1 = context.oldRecord;
             log.debug("record1",record1);

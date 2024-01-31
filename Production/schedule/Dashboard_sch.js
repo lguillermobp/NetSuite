@@ -4,6 +4,7 @@
  */
 var ecddays = [];
 var ecdholydays = [];
+var shstartdate = "";
 define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log'],
 	/**
 	 *
@@ -30,11 +31,20 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 form.addButton({
                     id: 'custpage_process',
-                    label: 'Refresh',
+                    label: 'Refresh Schedule',
                     functionName: "process()"
                 });
 
-                
+                var productionline = form.addField({
+                    id : 'custpage_productionline',
+                    type : serverWidget.FieldType.SELECT,
+                    label : 'Production Line',
+                    source: 'customrecord_productionline'
+                    });
+
+                    productionline.updateLayoutType({
+                        layoutType: serverWidget.FieldLayoutType.ENDROW
+                    });
     
                 let htmlField = form.addField({
                     id: "custpage_html",
@@ -57,10 +67,19 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         pecddays();
 
         var tabla=  " <style> " + 
+                   // " .tb tbody, .tb thead  { display: block; } " +
+                    " .tb thead, .tb th {position:sticky} " +
+                    " .tb thead { top: 0; z-index: 2; } " +
+                    " .tb th { left: 0; z-index: 1; } " +
+                    " .tb tbody { height: 500px; width: 800px; overflow-y: auto; overflow-x: hidden;} " +
+                    " .tb tbody td, .tb thead th {width: 100%; border-right: 1px solid black; }" +
                     " .tb th, .tb td { padding:5px; border: solid 1px #777; text-align: center; } " +
                     " .tb th { border-collapse: collapse; background-color: lightblue}"  +
                     " #tbdaysr, #tbdays, #tbdaysm {writing-mode: vertical-rl;  text-orientation: mixed} " +
-                    " #tbdaysr { background-color: red} " +
+                    " #tbdaysr { background-color: red} #tbdayse { background-color: #DADADA}" +
+                    " #taskwot { background-color: #ffff00} #taskwlate { background-color: #ff9900}" +
+                    " #tasknots { background-color: #ff0000} #taskdone { background-color: #00e600} " +
+                    " #months {bgcolor: '#757575';  color: #FAFAFA; background-color: #6D6D6D; font-style: italic; font-size: medium; } " +
                     "  </style> ";
 
         //tabla = "<style> .tb th { border-collapse: collapse; background-color: lightblue}   #tbdaysr, #tbdays, #tbdaysm {writing-mode: vertical-rl;  text-orientation: mixed;}   #tbdaysr { background-color: red}   .tb  { padding:1px; border: solid 1px #777; }    #tbdays  { writing-mode: vertical-rl;  text-orientation: mixed; } </style> ";
@@ -68,11 +87,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         tabla +="<table class='tb'  width='100%'> ";
 
         //days
-
+        tabla += "<thead>";
         tabla += "<tr>";
-        tabla += "<th>TASKS</th>";
+        tabla += "<th>__________________TASKS____________________</th>";
+        var mes=[];
 
-
+        datelist=new Date(ecddays[0]);
+        mesp=datelist.getMonth();
+        var colspan=0;
         for (let i = 0; i < ecddays.length; i++) {
             datelist=new Date(ecddays[i]);
             if (datelist.getDay() == 1) {
@@ -81,30 +103,59 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             else {
                 tabla += "<th id='tbdays'>"+ ecddays[i] + "</th>";
             }
+            if (datelist.getMonth() != mesp) 
+            {
+                mes.push(mesp +";" +colspan);
+                mesp=datelist.getMonth();
+                colspan=0;
+            }
+            colspan++;
         }
+        mes.push(mesp +";" +colspan);
+        mesp=datelist.getMonth();
         tabla += "</tr>";
 
         //months
-        
+        log.debug("mes",mes);
         tabla += "<tr>";
-        tabla += "<th>TASK 1 </th>";
+        tabla += "<th>MONTHS</th>";
         var duration=4;
+        var months = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ];
 
-        for (let m = 1; m < 14; m++) {
-        tabla += "<td colspan='"+ duration +"'>"+ m + "</td>";
+        for (let m = 0; m < mes.length; m++) {
+        var mesp=mes[m].split(";")[0];
+        var duration=mes[m].split(";")[1];
+        
+        tabla += "<th id='months' colspan='"+ duration +"'>"+ months[mesp] + "</th>";
         }
-        var resto=ecddays.length-(duration*13);
-        tabla += "<th colspan='"+ resto +"'></th>";
         tabla += "</tr>";
+        tabla += "</thead>";
+        tabla += "<tbody>";
+
+        //tasks
+        
+        tabla =findCases(tabla);
+        tabla += "</tbody>";
         tabla += "</table>";
 
     return tabla;
     }
 
-        function findCases1() {
+        function findCases(tabla) {
 
-
-		var pagedatas=[];
 
 		var fsearch = search.create({
 			type: "customrecord_so_scheduletasks",
@@ -141,6 +192,15 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 search.createColumn({
                     name: "entity",
                     join: "CUSTRECORD_SALECONTRACT"
+                }),
+                "custrecord_sc_soduration",
+                search.createColumn({
+                   name: "custbody_appf_make_ecd",
+                   join: "CUSTRECORD_SALECONTRACT"
+                }),
+                search.createColumn({
+                   name: "custbody_appf_veh_model",
+                   join: "CUSTRECORD_SALECONTRACT"
                 })
             ]
 });
@@ -154,44 +214,85 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		pagedData.pageRanges.forEach(function (pageRange) {
 
 			var page = pagedData.fetch({index: pageRange.index});
-            var prod="";
+            var task="";
             var isfirsttime=true;
-            var qtytot=0;
-            var memo="";
-
+            
 			page.data.forEach(function (fresult) {
 
-                if (isfirsttime) {prod=fresult.getText({name: "item",summary: "GROUP"});isfirsttime=false}
-                
-                if (prod!=fresult.getText({name: "item",summary: "GROUP"}))
-                {  
-                    prod=fresult.getText({name: "item",summary: "GROUP"});
-
-				    pagedatas[i] = {
-					"preferredvendor": preferredvendor,
-                    "preferredvendorid": preferredvendorid,
-					"item": item,
-                    "itemid": itemid,
-					"price": price,
-					"qty": qtytot,
-                    "memo": memo
-				    }
-                    qtytot=0;
-                    memo="";
+                if (isfirsttime) 
+                {   columtotal=0;
+                    startdate= new Date(fresult.getValue({name: "custrecord_so_sc_startdate"}));
+                    log.debug("startdate",startdate);
+                    var y = startdate.getFullYear();
+                    var m = startdate.getMonth() + 1;
+                    var d = startdate.getDate();
+                    datetofind = m + "/" + d + "/" + y;
+                    initial = parseInt(ecddays.indexOf(datetofind));
+                    log.debug("initial",initial);
+                    if (initial==-1)      {colspan=0;}
+                    else {colspan=initial;}
+                    tabla += "<tr>";
+                    tabla += "<th style='text-align: left;'>"+ fresult.getValue({name: "custrecord_sc_task",join: "CUSTRECORD_SO_SC_TASK"}) +"</th>";
+                    tabla += "<td id='tbdayse' colspan='"+ initial +"'></td>";
+                    columtotal+=colspan;
+                    log.debug("colspan",colspan);
                     
-    				i++;
+                    task=fresult.getValue({name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
+                    isfirsttime=false;
                 }
-            preferredvendor=fresult.getText({name: "vendor",join: "item",summary: "GROUP"});
-            preferredvendorid=fresult.getValue({name: "vendor",join: "item",summary: "GROUP"});
-            item=fresult.getText({name: "item",summary: "GROUP"});
-            itemid=fresult.getValue({name: "item",summary: "GROUP"});
-            price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
-            qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
-            memo+=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"})+"; ";
+                
+                if (task!=fresult.getValue({name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"}))
+                {   
+                    
+                    startdate= new Date(fresult.getValue({name: "custrecord_so_sc_startdate"}));
+                    var y = startdate.getFullYear();
+                    var m = startdate.getMonth() + 1;
+                    var d = startdate.getDate();
+                    datetofind = m + "/" + d + "/" + y;
+                    initial = parseInt(ecddays.indexOf(datetofind));
+                    if (initial==-1)      {colspan=0;}
+                    else {colspan=initial;}
+                    resto=ecddays.length-columtotal;
+                    tabla += "<td id='tbdayse' colspan='"+ resto +"'></td>";
+                    tabla += "</tr>";
+                    tabla += "<tr>";
+                    tabla += "<th style='text-align: left;'>"+ fresult.getValue({name: "custrecord_sc_task",join: "CUSTRECORD_SO_SC_TASK"}) +"</th>";
+                    tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
+                    columtotal=colspan;
+
+                    task=fresult.getValue({name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
+                }
+                classtask="";
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="1") {classtask="taskwot";}
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="2") {classtask="taskwlate";}
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="3") {classtask="tasknots";}
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="4") {classtask="taskdone";}
+
+                startdate= new Date(fresult.getValue({name: "custrecord_so_sc_startdate"}));
+                var y = startdate.getFullYear();
+                var m = startdate.getMonth() + 1;
+                var d = startdate.getDate();
+                datetofind = m + "/" + d + "/" + y;
+                initial = parseInt(ecddays.indexOf(datetofind));
+                if (initial==-1)      {colspan=0;}
+                else {colspan=initial-columtotal;}
+                if (colspan!=0) 
+                {
+                    columtotal+=colspan;
+                    tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
+                }
+                
+                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a></td>";
+                columtotal+=parseInt(fresult.getValue({name: "custrecord_sc_soduration"}));
+            
 			})
+            resto=ecddays.length-columtotal;
+            tabla += "<td id='tbdayse' colspan='"+ resto +"'></td>";
+            tabla += "</tr>";
+            tabla += "</table>";
 		});
 
-		return pagedatas;
+		return tabla;
 	}
 
     
@@ -238,6 +339,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
         var newstartdate=new Date(td);
         newstartdate.setDate(td.getDate()-30);
+
+        shstartdate=new Date(td);
+        shstartdate.setDate(td.getDate()-30);
+
         log.debug("newstartdate",newstartdate);
 
         for (i=0;i<270;i++)
@@ -252,7 +357,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             datetofind = m + "/" + d + "/" + y;
             initial = parseInt(ecdholydays.indexOf(datetofind));
             if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
-            log.debug("datetofind",datetofind)
+            
             ecddays[i]=datetofind;
         }
         

@@ -96,7 +96,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 sublistpm.addField({
                     id: "custrecordml_memo",
                     type: serverWidget.FieldType.TEXT,
-                    label:'memo'
+                    label:'Project'
                 });
                 sublistpm.addField({
                     id: 'custrecordml_omit',
