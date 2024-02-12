@@ -1,5 +1,5 @@
 <?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
-<pdf>
+<html>
     <head>
 <macrolist>
         <macro id="nlheader">
@@ -51,7 +51,7 @@
     </macro>
 </macrolist>
         <style>
-         
+         body {width:100%; height:100%;}
            table {
         font-size: 9pt;
         table-layout: fixed;
@@ -93,15 +93,18 @@
         <div class="pagebreak"> </div>
         <table style="width: 100%; margin-top: 10px;">
             <tr>
-                <th>Line</th>
-                <th>Item</th>
-                <th>Loc.</th>
-                <th>Bin</th>
-                <th>On Hand</th>
-                <th>Avail.</th>
-                <th># Picked</th>
+                <th width="6%">Line</th>
+                <th width="45%">Item</th>
+                
+                <th width="13%">Bin</th>
+                <th width="14%">QTY</th>
+                <th width="8%">On Hand</th>
             </tr>
             [INVENTORY_BALANCE]
         </table>
+
+        <script>
+         [SCRIPT_JS]
+        </script>
     </body>
-</pdf>
+</html>

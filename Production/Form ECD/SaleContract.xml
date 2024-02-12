@@ -1,0 +1,353 @@
+<?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+<head>
+	<link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
+	<#if .locale == "zh_CN">
+		<link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
+	<#elseif .locale == "zh_TW">
+		<link name="NotoSansCJKtc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKtc_Regular}" src-bold="${nsfont.NotoSansCJKtc_Bold}" bytes="2" />
+	<#elseif .locale == "ja_JP">
+		<link name="NotoSansCJKjp" type="font" subtype="opentype" src="${nsfont.NotoSansCJKjp_Regular}" src-bold="${nsfont.NotoSansCJKjp_Bold}" bytes="2" />
+	<#elseif .locale == "ko_KR">
+		<link name="NotoSansCJKkr" type="font" subtype="opentype" src="${nsfont.NotoSansCJKkr_Regular}" src-bold="${nsfont.NotoSansCJKkr_Bold}" bytes="2" />
+	<#elseif .locale == "th_TH">
+		<link name="NotoSansThai" type="font" subtype="opentype" src="${nsfont.NotoSansThai_Regular}" src-bold="${nsfont.NotoSansThai_Bold}" bytes="2" />
+	</#if>
+    <macrolist>
+        <macro id="nlheader">
+            <table class="header" style="width: 100%;"><tr>
+	<td align="center"><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="float: left; margin: 2px" /></#if></td>
+	
+	</tr>
+	
+	</table>
+        </macro>
+        <macro id="nlfooter">
+            <table class="footer" style="width: 100%;"><tr>
+           <td width="90%" align="center"> E.C.D. Automotive Design Build/Sales Contract </td>
+	<td width="10%" align="right"><pagenumber/> of <totalpages/></td>
+	</tr></table>
+        </macro>
+    </macrolist>
+    <style type="text/css">* {
+			
+            font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+		}
+		table {
+			font-size: 9pt;
+			table-layout: fixed;
+		}
+         th {
+             font-weight: bold;
+             font-size: 8pt;
+             vertical-align: middle;
+             padding: 5px 6px 3px;
+             background-color: #e3e3e3;
+             color: #333333;
+         }
+         td {
+             padding: 4px 6px;
+         }
+		 td p { align:left }
+         b {
+             font-weight: bold;
+             color: #333333;
+         }
+         table.header td {
+             padding: 0;
+             font-size: 10pt;
+         }
+         table.footer td {
+             padding: 0;
+             font-size: 8pt;
+         }
+         table.itemtable th {
+             padding-bottom: 10px;
+             padding-top: 10px;
+         }
+         table.body td {
+             padding-top: 2px;
+         }
+         td.addressheader {
+             font-weight: bold;
+             font-size: 8pt;
+             padding-top: 6px;
+             padding-bottom: 2px;
+         }
+         td.address {
+             padding-top: 0;
+         }
+         span.name {
+             font-size: 22pt;
+         }
+      	span.title {
+             font-size: 20pt;
+         }
+         span.number {
+             font-size: 16pt;
+         }
+         div.remittanceSlip {
+             width: 100%;
+             /* To ensure minimal height of remittance slip */
+             height: 200pt;
+             page-break-inside: avoid;
+             page-break-after: avoid;
+         }
+         hr {
+             border-top: 1px dashed #d3d3d3;
+             width: 100%;
+             color: #ffffff;
+             background-color: #ffffff;
+             height: 1px;
+         }
+         .titulo {
+            font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            font-weight: bold
+        }
+</style>
+</head>
+<#assign totalw = 0>
+<body header="nlheader" header-height="10%" footer="nlfooter" footer-height="20pt" padding="1.0in 1.0in 1.0in 1.0in" size="Letter">
+    <br/>
+<h1 align="center" class="titulo"><u>BUILD/SALES  CONTRACT</u></h1>
+<p><span class="titulo">Date:</span> ${results[0].trandate} </p>
+<p><span class="titulo">Buyer Name: </span> ${results[0].entity} </p>
+<p><span class="titulo">Buyer Address: </span><br/>${results[0].billaddress}</p>
+<p><span class="titulo">Vehicle Information:</span>  ${results[0].custbody_appf_make_ecd} - ${results[0].custbody_appf_veh_model} </p>
+<p><span class="titulo">Sale Amount: </span>${results[0].amount} </p>
+<p><span class="titulo">Project Specifics: </span> Custom design process will determine cosmetic appearance and final  balance due</p>
+
+
+<p><strong><u>Mechanical</u></strong></p>
+<ul>
+<#list results as result>
+  <li>${result.memo} </li>
+</#list>
+  
+</ul>
+
+<p><strong><u>Exterior</u></strong></p>
+<ul>
+  <li>16-18&rdquo; wheel from ECD Land Rover range</li>
+  <li>BF Goodrich All Terrain Tires</li>
+  <li>Tailgate Mounted Spare Wheel</li>
+  <li>Tubular side step and NAS rear step with tow hitch</li>
+  <li>ECD Black Checker Plates on Fender Tops</li>
+  <li>ECD slimline front bumper </li>
+  <li>Tow hitch w/receiver</li>
+  <li>Stainless Steel External Body Hardware&nbsp;</li>
+  <li>Classic Grill and Headlamp Surrounds</li>
+  <li>Choice of any OEM color in gloss finish </li>
+</ul>
+<p><strong><u>Interior</u></strong></p>
+<ul>
+  <li>Puma dashboard with leather trim finish</li>
+  <li>Momo steering wheel (choice of two)</li>
+  <li>ECD Heat and Sound insulation</li>
+  <li>Hand Stitched Leather Trim Seats in a Choice of Colors with  Seating for 8 including;</li>
+  <li>2 Corbeau front seats</li>
+  <li>2 Corbeau mid row seats</li>
+  <li>4 jump seats in rear</li>
+  <li>Front AC</li>
+  <li>ECD Custom Center Console in Black</li>
+  <li>Leather door trim</li>
+  <li>Premium rubber matting throughout</li>
+</ul>
+<p><strong><u>Electronics</u></strong></p>
+<ul>
+  <li>ECD Premium sound system. Sony or Alpine head unit with 6 JL Audio  speakers</li>
+  <li>Back up camera</li>
+  <li>Trailer wiring</li>
+  <li>Bluetooth compatibility </li>
+  <li>Kenwood slimline subwoofer</li>
+  <li>Digital rear view mirror </li>
+  <li>4 USB charging points</li>
+  <li>LED front and rear Lighting Package</li>
+  <li>Remote Central Locking with Viper Alarm System</li>
+</ul>
+<p><strong><u>&nbsp;</u></strong></p>
+<p><strong><u>Choices Included in Spec</u></strong></p>
+<ul>
+  <li>Paint color in full gloss OEM color palette </li>
+  <li>Leather color choice from Cadence or Torino range </li>
+  <li>Choice of wheel from Land Rover  range (Sawtooth, Boost, Tornado, Steel) </li>
+  <li>Stitch pattern (lines, bars,  diamonds) </li>
+  <li>Headliner color - Black, grey,  beige </li>
+  <li>Additional storage and charging  points through vehicle up to 4 USB </li>
+</ul>
+<p></p>
+<p><strong><u>Example  Upgrades - non exhaustive</u></strong><strong><u> </u></strong></p>
+<ul>
+  <li>Alligator leather or other non  standard seat finish not mentioned above </li>
+  <li>Upgraded engine over selection  noted in specification </li>
+  <li>19&rdquo; plus or custom wheels </li>
+  <li>Some sound system choices if  none of our brands are acceptable </li>
+  <li>Custom paneling or any exterior  detail that requires E.C.D. Automotive Design  to obtain quotes for outsourced work, for example the checker roof paneling to  be fitted to roll cage </li>
+</ul>
+
+<p></p>
+<p><strong><u>Delivery Timing</u></strong></p>
+<ul>
+  <li>The build completion timing from order is 10-12  months. This timing factors in all our current clients on our production  schedule and is dependent on the pace of the buyer signing off designs <strong> </strong></li>
+  <li>The commencement date is when we receive the signed  document and initial deposit.<strong> </strong></li>
+  <li>When your vehicle is complete, your final balance is  due. Following this there is a QC process which takes approximately 8 weeks. We  recommend in this time you visit ECD to see the vehicle in person prior to  shipping, or arrange a virtual walk around with one of our team.<strong> </strong></li>
+</ul>
+<p></p>
+<p><strong><u>Delivery Time</u></strong>: </p>
+<p>The aforementioned delivery  time is an estimate and not a guaranteed date of delivery<strong></strong>as delays to delivery  time can result from back-order of parts, over run, acts  of God, third   party  actions  or inactions. Seller will communicate delivery date delays in  writing to Buyer. Seller&rsquo;s delay to the anticipated delivery date shall not  result in Seller&rsquo;s breach of this Build/Sales Contract. Additionally, all  delays to the delivery date shall not be grounds for Buyer&rsquo;s cancellation of  this Build/Sales Contract. </p>
+<p></p>
+<p><strong><u>Parties</u></strong>: The &ldquo;Seller&rdquo; is  Humble Imports, Inc., a Florida corporation doing business as &ldquo;E.C.D. Automotive Design&rdquo; with an address at 5286  Giron Circle, Kissimmee, Florida 34758 and the &ldquo;Buyer&rdquo; is the Buyer referenced above. <br/>
+  <strong><u>Sale Amount &amp;  Billing Terms</u></strong>. The Sale Amount is ${results[0].amount}. Buyer shall remit the  aforementioned Sale Amount to the Seller as  follows: </p>
+<ul>
+  
+    <li>Upon execution of this Build/Sale Contract, Buyer shall  remit to Seller the following payments; </li>
+    <li>$10,000.00 on acceptance of the build spec </li>
+    <li>$10,000.00 each month thereafter until balance is paid in  full. (Buyer can pay more if they wish to speed up the completion of the  balance payment) </li>
+    <li>Upon any change orders to this Build/Sale Contract, Buyer  shall remit to Seller 100% of the value of the change order within 21 days of  the execution of the change order between  Buyer and Seller unless it is agreed in writing that the monies will be added  to the final balance payable on completion. </li>
+    <li>Seller acknowledges that this vehicle is built to reside  in Turks and Caicos, Seller guarantees entry to said country. In the unlikely  event the vehicle is not eligible for import, seller agrees to buy the vehicle  back for the full sales price paid to E.C.D. Auto Design. </li>  
+    <li>It is acknowledged that Buyer will be responsible for  remitting all applicable sales tax due and payable under this Build/Sale  Contract to Seller in accordance with state law. Buyer acknowledges the Sale  Amount set forth herein does not incorporate any sales tax. Sales tax is in  addition to the Sale Amount set forth in this  Build/Sale Contract. </li>
+  
+</ul>
+
+<ul>
+  
+    <li>Any alterations to this Build/Sale Contract must be in  writing setting forth the additional work, costs, if any, and signed by the Buyer and Seller  hereto. </li>
+    <li>Buyer shall remit all payments to Seller via wire  transfer. Seller&rsquo;s wire information is: 
+    <ul>
+    <li><strong>Routing Number: 121000248 </strong></li>
+    <li><strong>Bank: Wells  Fargo Bank N.A</strong></li>
+    <li><strong>Bank Address: 420 Montgomery, San Francisco,  CA, 94104 Bank Account # 7361760650</strong></li>
+    <li><strong>Bank Account  Name: Humble Imports Dba E.C.D. Automotive Design</strong></li>
+    </ul></li>
+</ul>
+<p>&nbsp;</p>
+<p>Payments may also be sent as a check, however please  use FedEx or UPS and provide ECD with the tracking number so that this can  be  traced if necessary. USPS  should be avoided when sending in check  payments for deposits of balances. </p>
+<h1>Limited  Warranty Terms &amp; Conditions. </h1>
+<ul>
+  <li>Seller offers a limited warranty for the work performed on  the vehicle under this Build/Sales Contract. Within thirty (30) calendar days  of Buyer&rsquo;s receipt of the vehicle from Seller, Buyer shall notify Seller in  writing of any and all complaints, issues or problems with the vehicle.  Thereafter, Seller shall evaluate the Buyer&rsquo;s claim and in Seller&rsquo;s sole  opinion and discretion make a determination if (a) the claim or issues are  within the scope of the limited warranty provided for in this Build/Sales  Contract or (b) Seller will directly perform any work under the limited  warranty claim or have the work performed by an authorized, third party agent  of Seller. Seller shall not be responsible to pay for any unauthorized work  performed to the vehicle without Seller&rsquo;s written authorization of same. </li>
+  <li>Seller grants Buyer a twenty four (24) month/50,000 mile  (whichever occurs sooner) bumper to bumper warranty. This covers all aspects of  the vehicle touched during the build. The warranty does not cover any items on  the vehicle damaged by mis-use, neglect, accidental damage or wear and tear.  The process set out below in section d. onwards must be followed for a valid  warranty claim. ECD will not cover items where we were not informed prior and  the vehicle has been taken to a non approved third party for repair. </li>
+</ul>
+<ul>
+      <li>The twenty four (24) month/50,000 mile limited warranty covers: 
+      <ul>
+        <li>The following in the engine: 
+        <ul>
+          <li>Cylinder head </li>
+          <li>Block </li>
+          <li>Timing gears </li>
+          <li>Timing chain </li>
+          <li>Timing cover </li>
+          <li>Oil pump/oil pump housing </li>
+          <li>OHC carriers </li>
+          <li>Valve covers </li>
+          <li>Oil pan and seals </li>
+          <li>Gaskets </li>
+          <li>Turbocharger </li>
+          <li>Supercharger and all internal lubricated parts as well as  manifolds, flywheel, water pump, harmonic balancer, and engine mount. </li>
+          <li>Timing Belts. </li>
+        </ul> </li>
+        <li>The following in the Transmission/Transaxle/Transfer Case: 
+        <ul>
+          <li>Case </li>
+          <li>All internal lubricated  parts </li>
+          <li>Torque converter </li>
+          <li>Transfer case </li>
+          <li>Transmission/transaxle mounts, seals, and gaskets </li>
+        </ul></li>
+        <li>The following in the drive Systems: 
+        <ul>
+          <li>Final drive housing </li>
+          <li>All internal lubricated  parts </li>
+          <li>Axle shafts and bearings </li>
+          <li>Constant velocity joints </li>
+          <li>Axle housing </li>
+          <li>Propeller shafts </li>
+          <li>Universal joints </li>
+          <li>Locking hubs </li>
+          <li>Front differential actuator </li>
+          <li>Supports </li>
+          <li>Seals and Gaskets </li>
+        </ul></li>
+        <li>All Electrical components in the vehicle </li>
+        <li>Suspension, steering and braking systems </li>
+        <li>All upholstered items including seats, headliners,  dashboards, carpets etc </li>
+        <li>Paint - Bubbling, peeling, corrosion not due to neglegt. </li>
+      </ul></li>
+      <li>The twenty four (24)  month/50,000 mile limited warranty does NOT cover anything listed in the above  twenty four (24) month/50,000 mile limited warranty which was due to accident,  misuse, alteration, insufficient or improper maintenance, or contaminated or  poor-quality fuel or anything not specifically listed as &ldquo;included&rdquo; in the twenty  four (24) month/50,000 mile limited warranty. </li>
+    </ul>
+
+<ul>
+  <li>Despite  the breadth of this warranty, damage resulting from intentional actions  (including intentionally abusing or destroying your vehicle or ignoring active  vehicle warnings or service notifications), a collision or accident or the  servicing or opening of the Battery or Drive Unit by non ECD or ECD approved  locations is not covered under this Battery and Drive Unit Limited Warranty. In  addition, the Drive Unit is subject to the exclusions and limitations described  in this Vehicle Limited Warranty. Damage to the Battery resulting from the  following activities is also not covered under this Battery and drive train Limited  Warranty: Damaging the Battery, or intentionally attempting, either by physical  means, programming, or other methods, to extend (other than as specified in  your owner manual and any documentation provided by ECD) or reduce the life of  the Battery; Exposing the Battery to direct flame (excluding from Battery fires  as specified above); or Flooding the Battery. The Battery, like all lithium-ion  batteries, will experience gradual energy or power loss with time and use. Loss  of Battery energy or power over time or due to or resulting from Battery usage  is NOT covered under this Battery and Drive Unit Limited Warranty, except to  the extent specified in this Battery and Drive Unit Limited Warranty. See your  owner documentation for important information (provided upon delivery) on how  to maximize the life and capacity of the Battery, failure to follow these  recommended battery maintenances and charging procedures shall void this  Battery and Drive Unit Limited</li>
+  <li>Buyer must contact Seller immediately of any limited  warranty issues with the vehicle. Within forty-eight (48) hours of Seller&rsquo;s  receipt of the aforementioned Buyer communication, Seller will evaluate and  make an assessment of the vehicle issue. Seller will reimburse Buyer up to  $350.00 in towing charges. </li>
+  <li>Seller will not negotiate the Sale Amount stated herein.  If Buyer disputes any work performed by Seller, then Seller will attempt to  remedy the work however, Seller shall not be required to discount the Sale  Amount stated herein. </li>
+  <li>The limited warranty is limited to any parts fitted to the  vehicle during the custom rebuild and no original  parts. Only work performed by Seller will be covered. </li>
+  <li>Only Seller or a written  authorized agent of Seller may perform any warranty work. </li>
+  <li>E.C.D. Automotive Design has a three-stage  warranty process where the customer does not  incur costs. Stage one is sourcing a local mechanic or tech to address  the vehicle at customers preferred location. Stage 2 is flying an E.C.D. Automotive Design representative out to address at the customers preferred location. Stage 3 is  E.C.D. Automotive Design shipping the  vehicle back to its HQ in Kissimmee to address on site.</li>
+  <li>If the vehicle  has an issue that cannot  be addressed by stage 1 (local technician) or stage 2 (ECD technician on site), E.C.D. Automotive Design shall ship at its expense  the vehicle back to its HQ in Kissimmee, FL and repair in house. No customer  cost shall be incurred unless  issue/damage is found to be neglect. This will  be discussed with buyer. </li>
+  <li>It may be necessary given the nature of the issue to move  straight to stage 3 of the warranty and return the vehicle to Kissimmee without  proceeding with stages 1 and 2. Only E.C.D.  Automotive Design can make this decision and will do so with the best  interests of the vehicle as intent. </li>
+  <li>Seller will not, without its written consent and approval,  pay for other workshops or service centers to perform any work. Any cost  associated with returning the vehicle to Seller for repairs will be paid for by Buyer. </li>
+  <li>If a new Chevrolet motor/transmission is selected, the  Buyer will receive an external two (2) year/50,000 mile warranty on the  powertrain through GM, serviceable at any GM dealership. </li>
+  <li>Buyer will be registering the vehicle in …CALIFORNIA…….. and Seller will build the  vehicle in compliance with the emission laws and regulations in this state and any applicable United States  federal laws. Seller is familiar with the emission laws and regulations of the  State stipulated above and applicable federal emission laws of the United States </li>
+</ul>
+
+
+  <h1>Buyer&rsquo;s Acknowledgements. </h1>
+  <ul>
+    <li>Other than the work being performed by Seller in the  rebuild of the vehicle, Buyer acknowledges that the vehicle is being sold &ldquo;AS  IS.&rdquo; Notwithstanding the forgoing, Seller  warrants and represents that it has no knowledge of any hidden defects in and  to the vehicle, and Seller believes to that the vehicle is being delivered in  good, operable condition. </li>
+    <li>Buyer will receive the vehicle only after all balances due  under this Build/Sales Contract have been remitted (including sales tax) to  Seller; at which time Seller shall transfer title to Buyer as more particularly set forth herein  this Build/Sales Contract </li>
+    <li>Buyer cannot opt out of build process upon execution of  this Build/Sales Contract and Buyer acknowledges there are no provisions to cancel this Build/Sales Contract. Notwithstanding the foregoing,  Buyer may cancel and terminate this Build/Sales Contract upon thirty (30) days  prior written notice if proceedings are commenced against the Seller under any  bankruptcy, insolvency, or debtor&rsquo;s relief law, and such proceedings have not  been vacated or set aside within ninety (90) days from the date of commencement  thereof. In the event Seller cancels or terminates this Build/Sales Contract as  a result of the foregoing, the Buyer shall become an unsecured creditor of the  Seller with respect to any amounts previously paid to Seller pursuant to this  Build/Sales Contract, and all such amounts shall be refunded to Buyer in connection  with such proceedings as permitted by applicable law. </li>
+    <li>Buyer acknowledges that if they are unable to remit the  final balance owed within 14 days, ECD (the seller) shall list the vehicle for  sale on the market, the sole objective will be to cover the outstanding balance  speedily, so the buyer may forgo their initial deposit. Any amount over the  outstanding balance will be returned to the buyer within 14 days of the sale. </li>
+  </ul>
+  <p>&nbsp;</p>
+  <h1>Representations of Seller. </h1>
+  <ul>
+    <li>Seller will furnish Buyer with photos and emails  throughout the build process. </li>
+    <li>Upon Seller&rsquo;s completion of the work under this  Build/Sales Contract and upon Seller&rsquo;s receipt of all monetary consideration  from Buyer, Seller agrees to transfer ownership of the vehicle listed in this  Build/Sales Contract to the Buyer, certify, that Seller has the requisite  authority to sell and warrant the vehicle, and that the vehicle is free of any  liens or encumbrances whatsoever. </li>
+    <li>When in the sellers facility, the vehicle is fully insured  under the dealers general liability policy and specifically our owned vehicle  section of the policy. </li>
+    <li>The seller confirms that the vehicle is a legally imported  vehicle that is refurbished in their Orlando HQ. The vehicle shall be set up  with the correct emissions equipment for the buyers state as noted above in  section 4i. Seller guarantees to the buyer that the vehicle will be able to be  legally registered in the state as noted above. The vehicle is titled and inspected in the sellers state of Florida and is delivered  to the buyer with a full clean and clear Florida title. Seller also  represents that the vehicle will be in compliance with all import, Department  of Transportation, and other applicable laws and regulations of the United  States. </li>
+  </ul>
+
+<p>&nbsp;</p>
+<h1>General  Provisions. </h1>
+<ul>
+  <li>This Build/Sales Contract shall be construed and enforced  in accordance with the laws of the State of  Florida. </li>
+  <li>Venue for any proceeding arising between the parties in  any manner pertaining or related to this Build/Sales Contract shall, to the  extent permitted by law, be held in Orange County, Florida. </li>
+  <li>The parties hereto agree that any dispute between the  parties hereto shall be subject to  and  settled by arbitration initiated and in accordance with the rules and  regulations of the American Arbitration Association. </li>
+  <li>This Build/Sales Contract shall supersede all prior  discussions and communications relating to the subject matter hereof and  constitutes the entire agreement between the parties hereto. </li>
+  <li>This Build/Sales Contract shall not be modified except in  writing and signed by all parties hereto. </li>
+  <li>If any provision(s) of this Build/Sales Contract are held  to be illegal, invalid, or unenforceable, the remainder of this Build/Sales  Contract shall remain in full force and effect. </li>
+</ul>
+<p>&nbsp;</p>
+<h1>Miscellaneous Provisions.</h1>
+<h1>&nbsp;</h1>
+<ul>
+  <li>Roll Cage - E.C.D. Automotive Design (Seller) always  recommends the addition of a roll cage as an additional safety measure in these  vehicles. By signing below and executing this contract you confirm that you have accepted our recommendation but ultimately will  make your own decision through the design phase. </li>
+</ul>
+<p><strong>IN WITNESS WHEREOF, the Buyer and Seller hereto have  affixed their signatures to this Build/Sales Contract on the date written  below.</strong><strong> </strong></p>
+<p>&nbsp;</p>
+<table width="80%" border="0" align="center">
+  <tbody>
+    <tr>
+      <td scope="col"><p><strong>Buyer</strong>: </p>
+        <p>&nbsp;</p></td>
+      <td scope="col"><p><strong>Seller</strong>: </p>
+        <p>Humble  Imports, Inc., <br/>
+          A  Florida corporation doing business as <br/>
+  &ldquo;E.C.D. Automotive Design&rdquo;</p>
+      <p>&nbsp;</p></td>
+    </tr>
+    <tr>
+      <td scope="row">____________________________________<br/>
+By: </td>
+      <td>___________________________________ <br/>
+By:  Thomas Humble <br/>
+Its:  Director </td>
+    </tr>
+  </tbody>
+</table>
+
+
+</body>
+</pdf>

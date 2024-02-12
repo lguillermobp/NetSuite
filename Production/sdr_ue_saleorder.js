@@ -17,6 +17,7 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
 
         if (context.type === context.UserEventType.VIEW) {
             var entity = context.newRecord.getValue({fieldId: 'entity'});
+            var id = context.newRecord.getValue({fieldId: 'id'});
 
             const printSuitelet = "/app/site/hosting/scriptlet.nl?script=1618&deploy=1&customer=" + entity;
 
@@ -24,6 +25,14 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
                 id: "custpage_gml",
                 label: "Customer Statement",
                 functionName: "window.open('" + printSuitelet + "');"
+            })
+
+            const printSuitelet1 = "/app/site/hosting/scriptlet.nl?script=1619&deploy=1&id=" + id;
+
+            context.form.addButton({
+                id: "custpage_scf",
+                label: "Sale Contract form",
+                functionName: "window.open('" + printSuitelet1 + "');"
             })
         }
 

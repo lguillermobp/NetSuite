@@ -1,0 +1,123 @@
+<?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<html>
+    <head>
+    <title>BOM Picking List</title>
+    <link href='https://fonts.googleapis.com/css?family=Libre Barcode 128 Text' rel='stylesheet'>
+  
+        <style>
+        @media screen {
+            .content {
+                max-width: 80%;
+                margin: auto;
+                background: white;
+                padding: 10px;
+                border-style: inset;
+                }
+        }
+        
+        table {
+        -fs-table-paginate: paginate;
+        font-size: 9pt;
+        table-layout: fixed;
+        }
+        th {
+        font-weight: bold;
+        font-size: 8pt;
+        vertical-align: left;
+        padding: 2px 2px 2px;
+        background-color: #e3e3e3;
+        color: #333333;
+        }
+        td {
+        padding: 2px 2px;
+        vertical-align: middle;
+        }
+        td p { align:left }
+        tr:nth-child(even) {
+        background-color: #f2f2f2;
+        }
+        @media print {
+        thead {display: table-header-group;}
+        }
+        #pageFooter:after {
+            counter-increment: page;
+            content: counter(page);
+        }
+        @page {
+            @bottom-left {
+                content: counter(page) ' of ' counter(pages);
+            }
+        }
+        
+
+        </style>
+
+    </head>
+
+    <body >
+    <div class="content">
+        <div id="cheader">  
+            <table style="width: 100%; font-size: 10pt;"><tr>
+                <td rowspan="3" style="padding: 0px; height: 118px;font-size: 20pt;"><img src="https://5896209.app.netsuite.com/core/media/media.nl?id=6295&c=5896209&h=qiSHiPhnCNppeL_ZbFyrH_z1_9FJd6e_PvfTPDTiB5DRP3mw" style="margin: 7px;" /></td>
+                <td align="right" style="padding: 0px; height: 49px;"><span style="font-size: 20pt;">BOM Picking</span></td>
+            </tr>
+            </table>
+            <table style="width: 100%;">
+            <tr>
+                <th align="left">WO</th>
+                <td style="font-family: 'Libre Barcode 128 Text';font-size: 28px;">[WORK_ORDER]
+                  
+                </td>
+                <th align="left">Location</th>
+                <td>[LOCATION]</td>
+            </tr>
+            <tr>
+                <th align="left">Printed By</th>
+                <td>[PRINTED_BY]</td>
+                <th align="left">Date/Time</th>
+                <td>[DATE_TIME]</td>
+            </tr>
+            <tr>
+                <th align="left">Finished Good</th>
+                <td>[FINISHED_GOOD]</td>
+                <th align="left">Finished Quantity</th>
+                <td>[FINISHED_QUANTITY]</td>
+            </tr>
+            <tr>
+                <th align="left">Customer</th>
+                <td>[NEIGHBOR]</td>
+                <th align="left">Customer PO</th>
+                <td>[NEIGHBOR_PO]</td>
+            </tr>
+            <tr>
+                <th align="left">SO</th>
+                <td>[SALES_ORDER]</td>
+                <th align="left">SO Req. Ship Date</th>
+                <td>[SALES_ORDER_REQ_SHIP_DATE]</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="cuerpo"> 
+
+        <table style="width: 100%">
+        <thead>
+            <tr>
+                <th width="6%">Line</th>
+                <th width="29%">Item</th>
+                <th width="50%">Desc.</th>
+                <th width="6%">QTY</th>
+                <th width="9%">QTY COMMITTED </th>
+            </tr>
+        </thead>
+            [WORK_ORDER_LINES]
+        </table>
+
+    </div>
+    
+        <script>
+         [SCRIPT_JS]
+        </script>
+    </div>
+    </body>
+</html>

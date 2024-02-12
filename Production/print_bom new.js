@@ -182,9 +182,13 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
                 workOrderLines += `<td> ${result.getText({name: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}<br/><img src="https://barcode.tec-it.com/barcode.ashx?data=${result.getText({name: "item"})}&code=&multiplebarcodes=false&translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0&hidehrt=True" height="30pt" /></td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantitycommitted"})}</td>`;
+                workOrderLines += "</tr>";
+                workOrderLines += "<tr>";
+                workOrderLines += `<td colspan="2"> </td>`;
+                workOrderLines += `<td colspan="3"><table style="width: 95%; margin-top: 10px;" id="detallbin${line}"><thead><tr><th>Bin Location</th><th>Quantity</th><th>Available</th></tr></thead> </table></td>`;
                 workOrderLines += "</tr>";
 
                 line += 1;
@@ -194,7 +198,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
 
             lineItemIds = _.uniq(lineItemIds);
             log.audit("lineItemIds " , lineItemIds);
-            pdf = pdf.replace("WORK_ORDER_LINES", workOrderLines);
+            pdf = pdf.replace("[WORK_ORDER_LINES]", workOrderLines);
             let balanceitem=0;
             let itembef;
             let inventoryBalanceLines = "";
@@ -212,7 +216,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     "rightparens": 0
                 }, {
                     "name": "location",
-                    "operator": "anyof",
+                    "operator": "noneof",
                     "values": [
                         workOrderLocationID
                     ],
@@ -299,8 +303,20 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
             });
 
             inventoryBalanceData = _.orderBy(inventoryBalanceData, ["lineNumber", "available","locationPriority"], ["asc", "asc", "asc"]);
-
+            var scripjs="";
             for (const result of inventoryBalanceData) {
+
+                scripjs += `
+                  var table = document.getElementById("detallbin${result.lineNumber}");
+                  var row = table.insertRow(-1);
+                  var cell1 = row.insertCell(0);
+                  var cell2 = row.insertCell(1);
+                  var cell3 = row.insertCell(2);
+                  cell1.innerHTML = "${result.binnumber}";
+                  cell2.innerHTML = "<strong>${result.qty}</strong>";
+                  cell3.innerHTML = "${result.onhand}";
+                `
+
                 inventoryBalanceLines += "<tr style='border: 1px solid black;  padding: 4px 6px;'>";
                 inventoryBalanceLines += `<td>${result.lineNumber}</td>`
                 inventoryBalanceLines += `<td  align="left"><barcode codetype="code128" value="${result.item}"/></td>`
@@ -312,13 +328,15 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 inventoryBalanceLines += "</tr>";
             }
 
-            pdf = pdf.replace("[INVENTORY_BALANCE]", inventoryBalanceLines)
+            pdf = pdf.replace("[INVENTORY_BALANCE]", inventoryBalanceLines);
+            pdf = pdf.replace("[SCRIPT_JS]", scripjs);
 
             // XML Escape Characters
             pdf = pdf.replace(/&/g, "&amp;")
 
             // context.response.write(String(pdf));
-            context.response.renderPdf({xmlString: pdf})
+            context.response.write({ output: pdf });
+            //context.response.renderPdf({xmlString: pdf})
         }
 
         return {
