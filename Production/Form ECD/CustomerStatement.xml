@@ -142,7 +142,7 @@
 	<td>${result.tranid}</td>
 	<td>${result.trandate}</td>
 	
-	<td>${result.memo}</td>
+	<td>${result.custcol_saledescription}</td>
 	<td>${result.quantity}</td>
 	<td align="right">${result.rate}</td>
 	<td align="right">${monto?string.currency}</td>

@@ -123,7 +123,7 @@
 <p><strong><u>Mechanical</u></strong></p>
 <ul>
 <#list results as result>
-  <li>${result.memo} </li>
+  <li>${result.custcol_saledescription} </li>
 </#list>
   
 </ul>

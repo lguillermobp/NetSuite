@@ -34,6 +34,19 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
                 label: "Sale Contract form",
                 functionName: "window.open('" + printSuitelet1 + "');"
             })
+
+            var form = context.form;
+            sublist1 = form.getSublist({id: 'recmachcustrecord_cd_sc'});
+            log.debug("sublist1.type",sublist1.type);
+
+            const printSuitelet2 = "/app/site/hosting/scriptlet.nl?script=1620&deploy=1&id=" + id;
+            
+            sublist1.addButton({
+                id: 'custpage_printcd',
+                label: 'Print Crib Design',
+                functionName: "window.open('" + printSuitelet2 + "');"
+            });
+
         }
 
 

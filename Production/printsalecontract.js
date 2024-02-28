@@ -48,7 +48,9 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                         "custbody_appf_make_ecd",
                         "custbody_appf_veh_model",
                         "billaddress",
-                        "amount"
+                        "amount",
+                        "custcol_saledescription"
+                  
                     ]
                     }).run();
 

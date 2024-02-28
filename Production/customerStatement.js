@@ -52,7 +52,8 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                        "amount",
                        "quantitybilled",
                        "createdfrom",
-                       "accounttype"
+                       "accounttype",
+                       "custcol_saledescription"
                     ]
                     }).run();
 

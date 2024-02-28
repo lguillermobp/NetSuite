@@ -1,0 +1,97 @@
+<?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+<head>
+	<link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
+	<#if .locale == "zh_CN">
+		<link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
+	<#elseif .locale == "zh_TW">
+		<link name="NotoSansCJKtc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKtc_Regular}" src-bold="${nsfont.NotoSansCJKtc_Bold}" bytes="2" />
+	<#elseif .locale == "ja_JP">
+		<link name="NotoSansCJKjp" type="font" subtype="opentype" src="${nsfont.NotoSansCJKjp_Regular}" src-bold="${nsfont.NotoSansCJKjp_Bold}" bytes="2" />
+	<#elseif .locale == "ko_KR">
+		<link name="NotoSansCJKkr" type="font" subtype="opentype" src="${nsfont.NotoSansCJKkr_Regular}" src-bold="${nsfont.NotoSansCJKkr_Bold}" bytes="2" />
+	<#elseif .locale == "th_TH">
+		<link name="NotoSansThai" type="font" subtype="opentype" src="${nsfont.NotoSansThai_Regular}" src-bold="${nsfont.NotoSansThai_Bold}" bytes="2" />
+	</#if>
+    <style type="text/css">
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 9pt; 
+  table-layout: fixed;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+th { font-weight: bold; font-size: 8pt; vertical-align: middle; padding: 5px 6px 3px; background-color: #e3e3e3; color: #333333; padding-bottom: 10px; padding-top: 10px; }
+th, td {
+  text-align: left;
+  padding: 4px 6px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+<macrolist>
+        <macro id="nlheader">     
+        <table>
+        <tr>
+		<td><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="float: left; margin: 2px" /></#if>
+		</td>
+        <td><h1>Crib Design Tamplate</h1>
+		</td>
+		</tr>
+		<tr>
+		<th>Model:
+		</th>
+		<td>${results[0].formulatext}-${results[0].formulatext_1}
+		</td>
+		</tr>
+		<tr>
+		<th>Crib Design:
+		</th>
+		<td>${results[0].formulatext_2}
+		</td>
+		</tr>
+		<tr>
+		<th>Sale Contract:
+		</th>
+		<td>${results[0].tranid}
+		</td>
+		</tr>
+	
+	</table>
+        </macro>
+        <macro id="nlfooter">
+            <table class="footer" style="width: 100%;"><tr>
+	<td align="right"><pagenumber/> of <totalpages/></td>
+	</tr></table>
+        </macro>
+</macrolist>
+</head>
+<body padding="0.5in 0.5in 0.5in 0.5in" size="Letter" header="nlheader" header-height="15%" footer="nlfooter">
+	
+	
+    <table><#list results as result><#if result_index == 0>
+<thead>
+	<tr>
+	
+    <th>Specification</th>
+	<th>Detail</th>
+	
+	</tr>
+</thead>
+<tbody>
+</#if>
+
+<tr>
+	
+    <td>${result.custrecord_cd_sc_specification}</td>
+	<td>${result.custrecord_cd_sc_detail}</td>
+	
+	</tr>
+    
+	</#list></tbody></table>
+</body>
+</pdf>
