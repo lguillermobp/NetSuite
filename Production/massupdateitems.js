@@ -7,9 +7,42 @@ define(['N/record','N/log'],
         function each(params) {
             var rec = record.load({
                 type: params.type,
-                id: params.id
+                id: params.id,
+                isDynamic: true
             });
 
+            var price = rec.getMatrixSublistValue ({
+                sublistId: 'price',
+                fieldId: 'price',
+                column: 0,
+                line: 0
+            }); 
+             
+            rec.setValue({
+                fieldId: 'custitem_ecdprice',
+                value: price
+            });
+            rec.setMatrixSublistValue ({
+                sublistId: 'price',
+                fieldId: 'price',
+                column: 0,
+                line: 0,
+                value: 0,
+                ignoreFieldChange: true,
+                fireSlavingSync: true
+            }); 
+
+            rec.commitLine({
+               sublistId: 'price'
+            });
+            
+            
+            
+            try {var saverec = rec.save();}
+            catch(e) {
+            log.debug('Error', e);log.debug('params.id', params.id);}
+
+            /*
            var lineCount = rec.getLineCount({
                 sublistId: 'itemvendor'
             });
@@ -31,17 +64,17 @@ define(['N/record','N/log'],
 
 
 
-            // try {var preferredvendor = rec.setSublistValue({
-            //     sublistId: 'itemvendor',
-            //     fieldId: 'preferredvendor',
-            //     line: 0,
-            //     value: true
-            // });
-            // var saverec = rec.save();
-            // }
-            // catch(e) {
-            //     log.debug('Error', e);}
-           
+             try {var preferredvendor = rec.setSublistValue({
+                 sublistId: 'itemvendor',
+                 fieldId: 'preferredvendor',
+                 line: 0,
+                 value: true
+             });
+             var saverec = rec.save();
+             }
+             catch(e) {
+                 log.debug('Error', e);}
+           */
              
             /*
 
@@ -56,12 +89,12 @@ define(['N/record','N/log'],
             }
             catch(e) {
                 log.debug('Error', e);}
-            */
-
-            // var descpo = rec.getValue({fieldId:"purchasedescription"})
-            // rec.setValue({fieldId:"salesdescription",value: descpo})
-            // var saverec = rec.save();
             
+
+             var descpo = rec.getValue({fieldId:"purchasedescription"})
+             rec.setValue({fieldId:"salesdescription",value: descpo})
+             var saverec = rec.save();
+            */
         }
         return {
             each: each

@@ -100,11 +100,17 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "label": "Sales Order Requested Ship Date",
                         "type": "date",
                         "sortdir": "NONE"
-                    }
+                    }, {
+                    "name": "custrecord_wipbin",
+                        "join": "department"
+                    },
+                    "department"
                 ]
             }).run().each(function (result) {
                 workOrderLocation = result.getText({name: "location"});
                 workOrderLocationID = result.getValue({name: "location"});
+                department =  result.getValue({name: "department"});
+                wip_bin =  result.getValue({name: "custrecord_wipbin", join: "department"});
 
                 pdf = pdf.replace("[WORK_ORDER]", result.getValue({name: "tranid"}));
                 pdf = pdf.replace("[LOCATION]", workOrderLocation);
@@ -114,6 +120,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 pdf = pdf.replace("[SALES_ORDER_REQ_SHIP_DATE]", result.getValue({name: "enddate",}));
                 pdf = pdf.replace("[FINISHED_GOOD]", result.getText({name: "item"}));
                 pdf = pdf.replace("[FINISHED_QUANTITY]", result.getValue({name: "quantity"}));
+                pdf = pdf.replace("[DEPARTMENT]", result.getText({name: "department"}));
+                pdf = pdf.replace("[WIP_BIN]", result.getText({name: "custrecord_wipbin", join: "department"}));
             });
 
 
@@ -182,7 +190,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
                 workOrderLines += `<td> ${result.getText({name: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}<br/><img src="https://barcode.tec-it.com/barcode.ashx?data=${result.getText({name: "item"})}&code=&multiplebarcodes=false&translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0&hidehrt=True" height="30pt" /></td>`;
+                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantitycommitted"})}</td>`;
                 workOrderLines += "</tr>";
@@ -198,6 +206,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
 
             lineItemIds = _.uniq(lineItemIds);
             log.audit("lineItemIds " , lineItemIds);
+            log.audit("workOrderLocationID " , workOrderLocationID);
             pdf = pdf.replace("[WORK_ORDER_LINES]", workOrderLines);
             let balanceitem=0;
             let itembef;

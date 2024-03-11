@@ -102,9 +102,11 @@ define(["N/ui/message","N/log","N/record"],
                         id: itemid,
                         isDynamic: true
                     })
-                    
+                    try {
                     binNumbertxt = rec1.getSublistText({sublistId: "binnumber", fieldId: "binnumber", line: 0});
-                    
+                } catch (e) {
+                    log.debug({  title: "error: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+                }
                 
                     if (binNumbertxt) {
 
@@ -115,12 +117,16 @@ define(["N/ui/message","N/log","N/record"],
                 }
 
                 }
+                try {
                         datarec.setCurrentSublistValue({
                             sublistId: 'item',
                             fieldId: 'custcol_binlocationbydefault',
                             value: varbin,
                             ignoreFieldChange: true
                         });
+                    } catch (e) {
+                        log.debug({  title: "error: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+                    }
                 itemIndex++;
             }
 

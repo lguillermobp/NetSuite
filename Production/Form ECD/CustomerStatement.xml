@@ -117,6 +117,7 @@
 <#assign totalw = 0>
 <body header="nlheader" header-height="10%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
     <table><#list results as result><#if result_index == 0>
+    <#assign proccess = 1>
 <thead>
 	<tr>
 	<th colspan="2">Type</th>
@@ -150,6 +151,7 @@
 	</tr>
 
 	</#list>
+    <#if proccess == 1>
 </tbody>
 <tfoot>
     <tr>
@@ -157,6 +159,7 @@
 	<td align="right" >${totalw?string.currency}</td>
 	</tr>
 </tfoot>
+</#if>
   </table>
 </body>
 </pdf>

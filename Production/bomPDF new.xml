@@ -95,6 +95,12 @@
                 <th align="left">SO Req. Ship Date</th>
                 <td>[SALES_ORDER_REQ_SHIP_DATE]</td>
             </tr>
+            <tr>
+                <th align="left">Department</th>
+                <td>[DEPARTMENT]</td>
+                <th align="left">WIP Bin Location</th>
+                <td>[WIP_BIN]</td>
+            </tr>
         </table>
     </div>
 

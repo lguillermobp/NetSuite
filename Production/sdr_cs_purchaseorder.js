@@ -30,12 +30,16 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     function fieldChanged(context) {
         // Code to execute when a field value changes
         var currentRecord = context.currentRecord;
+        var sublistId = context.sublistId
         var fieldId = context.fieldId;
-        
+
+        var entityname= currentRecord.getValue({ fieldId: 'entityname'});
+
         if (fieldId === 'custbody_vendorshipmethod') {
 
 
             var idcarrier= currentRecord.getValue({ fieldId: 'custbody_vendorshipmethod'});
+            var entityname= currentRecord.getValue({ fieldId: 'entity'});
             
             var vendorShipMethodRecord = record.load({
                 type: 'customrecord_vendorshipmethod',
@@ -47,9 +51,82 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 fieldId: 'custrecord_vendorshippcarrier'
             });
             currentRecord.setValue({ fieldId: 'custbody_vendorcurriership', value: carrierValue});
-            console.log(carrierValue);
+            
 }
+            
+
 }
+    function sublistChanged(context) {
+
+        var currentRecord = context.currentRecord;
+        var sublistId = context.sublistId;
+        var fieldId = context.fieldId;
+        var entity= currentRecord.getValue({ fieldId: 'entity'});
+        var entityname= currentRecord.getValue({ fieldId: 'entityname'});
+        var line = context.line;
+        log.debug('sublistId', sublistId);
+        if (sublistId === "item") {
+            
+            var itemId = currentRecord.getCurrentSublistValue({
+                sublistId: sublistId,
+                fieldId: "item"
+            });
+          
+            var rate = currentRecord.getCurrentSublistValue({
+                sublistId: sublistId,
+                fieldId: "rate"
+            });
+            log.debug('rate1', rate);
+            if (itemId && rate) {
+                var itemBodyFields = record.load({
+                    type: "inventoryitem",
+                    id: itemId,
+                    isDynamic: true
+                });
+
+                var lineNumber = itemBodyFields.findSublistLineWithValue({
+                    sublistId: 'itemvendor',
+                    fieldId: 'vendor_display',
+                    value: entityname
+                });
+                var lineCount = itemBodyFields.getLineCount({
+                    sublistId: 'itemvendor'
+                });
+                log.debug('lineCount', lineCount);
+
+                log.debug("lineNumber", lineNumber);
+                if (lineNumber === -1) {
+
+                    itemBodyFields.selectNewLine({sublistId: "itemvendor"});
+                    if (lineCount === 0) {
+                        itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
+                    }
+                    else { 
+                        itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: false});
+                    }
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
+                    itemBodyFields.commitLine({sublistId: "itemvendor"});
+                    itemBodyFields.save({enableSourcing: true});
+                }
+                else {
+                    itemBodyFields.removeLine({sublistId: 'itemvendor', line: lineNumber,ignoreRecalc: true});
+
+                    itemBodyFields.selectNewLine({sublistId: "itemvendor"});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: false});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
+                    itemBodyFields.commitLine({sublistId: "itemvendor"});
+                    itemBodyFields.save({enableSourcing: true});
+                    log.debug('rate2', rate);
+                }
+               
+            }
+
+           
+       }
+
+    }
 
     function saveRecord(context) {
         // Code to execute when the record is saved
@@ -58,6 +135,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     return {
         pageInit: pageInit,
         fieldChanged: fieldChanged,
+        sublistChanged: sublistChanged,
         // saveRecord: saveRecord
     };
 });
