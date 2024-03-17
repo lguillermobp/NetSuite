@@ -62,7 +62,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var sublistId = context.sublistId;
         var fieldId = context.fieldId;
         var entity= currentRecord.getValue({ fieldId: 'entity'});
-        var entityname= currentRecord.getValue({ fieldId: 'entityname'});
+        var entityname= currentRecord.getText({ fieldId: 'entity'});
+        log.debug('currentRecord', currentRecord);
+        console.log('currentRecord', currentRecord);
+        log.debug('entityname', entityname);
+        log.debug('entity', entity);
+        
         var line = context.line;
         log.debug('sublistId', sublistId);
         if (sublistId === "item") {
@@ -83,7 +88,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                     id: itemId,
                     isDynamic: true
                 });
-
+                
                 var lineNumber = itemBodyFields.findSublistLineWithValue({
                     sublistId: 'itemvendor',
                     fieldId: 'vendor_display',

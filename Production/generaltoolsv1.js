@@ -702,6 +702,38 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
     }
 
 
+
+    function get_department_value (value){
+
+
+        var paramrec = r.load({
+            type: "department",
+            id: value,
+            isDynamic: false,
+            defaultValues: null
+        });
+
+
+        if (paramrec)
+        {   var sts="Complated";
+            var records=1;
+        }
+        else
+        {
+            var sts="Error";
+            var records=0;
+        }
+        var retvar= {};
+
+        retvar = {
+            "sts": sts,
+            "date": "",
+            "records": records,
+            "data": paramrec
+        }
+        return retvar;
+    }
+
         function Item (item){
 
 
@@ -1490,6 +1522,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             set_message_value: set_message_value,
             get_customer_value: get_customer_value,
             get_location_value: get_location_value,
+            get_department_value: get_department_value,
             get_PO_value: get_PO_value,
             get_WO_value: get_WO_value,
             get_SO_value: get_SO_value,

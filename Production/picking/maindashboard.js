@@ -12,7 +12,7 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect'],
 
             let field = form.addField({
                 id: 'workorder',
-                type: serverWidget.FieldType.INTEGER,
+                type: serverWidget.FieldType.TEXT,
                 label: 'Manufacturing Order'
             });
 
@@ -23,7 +23,7 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect'],
 
             scriptContext.response.writePage(form);
         } else {
-            var script = 'customscript_dashboard_scanning';
+            var script = 'customscript_dashboard_pl';
             var deployment = 'customdeploy1';
             var parameters = "";
 
@@ -42,17 +42,18 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect'],
 
         }
     }
-        function get_WO_internalID(so) {
+        function get_WO_internalID(wo) {
 
             var internalid;
-
+            var retval = {};
+            log.debug("wo",wo);
             var fsearch = s.create({
                 type: "workorder",
                 filters:
                     [
-                        ["number","equalto",so],
+                        ["numbertext","is",wo],
                         "AND",
-                        ["type","anyof","workorder"],
+                        ["type","anyof","WorkOrd"],
                         "AND",
                         ["mainline","is","T"]
                     ],
@@ -67,12 +68,13 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect'],
             var pagedData = fsearch.runPaged({
                 "pageSize": 1000
             });
-
+            log.debug("pagedData",pagedData);
             pagedData.pageRanges.forEach(function (pageRange) {
-
+                log.debug("pageRange",pageRange);
                var page = pagedData.fetch({index: pageRange.index});
 
                page.data.forEach(function (fresult) {
+                log.debug("fresult",fresult);
 
                     internalid = fresult.getValue({name: "internalid"});
                     retval = {

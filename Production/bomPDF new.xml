@@ -32,7 +32,7 @@
         padding: 2px 2px;
         vertical-align: middle;
         }
-        td p { align:left }
+        td p { align:center }
         tr:nth-child(even) {
         background-color: #f2f2f2;
         }
@@ -59,7 +59,7 @@
         <div id="cheader">  
             <table style="width: 100%; font-size: 10pt;"><tr>
                 <td rowspan="3" style="padding: 0px; height: 118px;font-size: 20pt;"><img src="https://5896209.app.netsuite.com/core/media/media.nl?id=6295&c=5896209&h=qiSHiPhnCNppeL_ZbFyrH_z1_9FJd6e_PvfTPDTiB5DRP3mw" style="margin: 7px;" /></td>
-                <td align="right" style="padding: 0px; height: 49px;"><span style="font-size: 20pt;">BOM Picking</span></td>
+                <td align="right" style="padding: 0px; height: 49px;"><span style="font-size: 20pt;">Picking Ticket</span></td>
             </tr>
             </table>
             <table style="width: 100%;">
@@ -114,6 +114,7 @@
                 <th width="50%">Desc.</th>
                 <th width="6%">QTY</th>
                 <th width="9%">QTY COMMITTED </th>
+                <th width="9%">BACK ORDER </th>
             </tr>
         </thead>
             [WORK_ORDER_LINES]

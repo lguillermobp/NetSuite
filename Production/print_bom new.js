@@ -172,7 +172,12 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "label": "quantitycommitted",
                         "type": "float",
                         "sortdir": "NONE"
-                    }
+                    },
+                    search.createColumn({
+                       name: "formulanumeric",
+                       formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN {item.quantityavailable}-{quantity}+{quantitycommitted}  ELSE 0 END END",
+                       label: "BackOrder"
+                    })
                 ]
             }).run().each(function (result) {
                 lineItemIds.push(result.getValue({
@@ -183,20 +188,24 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 lineNumbers[result.getText({name: "item"})] = {
                     "line":line,
                     "qty":result.getValue({name: "quantity"}),
+                    "qtybo":result.getValue({name: "formulanumeric"}),
                     "qtyc":result.getValue({name: "quantitycommitted"})
                 };
 
-
+                if (result.getValue({name: "formulanumeric"})>0) {bgcolor='bgcolor="#F36C77"'} else {bgcolor=''}
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
-                workOrderLines += `<td> ${result.getText({name: "item"})}</td>`;
+                workOrderLines += `<td ${bgcolor}> ${result.getText({name: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantitycommitted"})}</td>`;
+                workOrderLines += `<td align="center">${result.getValue({name: "quantity"})}</td>`;
+                workOrderLines += `<td align="center">${result.getValue({name: "quantitycommitted"})}</td>`;
+                
+                workOrderLines += `<td align="center" ${bgcolor}>${result.getValue({name: "formulanumeric"})}</td>`;
                 workOrderLines += "</tr>";
                 workOrderLines += "<tr>";
                 workOrderLines += `<td colspan="2"> </td>`;
-                workOrderLines += `<td colspan="3"><table style="width: 95%; margin-top: 10px;" id="detallbin${line}"><thead><tr><th>Bin Location</th><th>Quantity</th><th>Available</th></tr></thead> </table></td>`;
+                workOrderLines += `<td colspan="2"><table style="width: 95%; margin-top: 10px;" id="detallbin${line}"><thead><tr><th>Bin Location</th><th>Quantity</th><th>Available</th></tr></thead> </table></td>`;
+                workOrderLines += `<td colspan="2"> </td>`;
                 workOrderLines += "</tr>";
 
                 line += 1;
