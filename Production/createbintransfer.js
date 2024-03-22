@@ -8,21 +8,42 @@ define(['N/record'], function(record) {
     if (context.type === context.UserEventType.CREATE) {
       var newRecord = context.newRecord;
 
-      // Get the line count of the work order
-      var lineCount = newRecord.getLineCount({
-        sublistId: 'item'
+      var currentRec = currentRecord.get();
+            
+      var wpbinlocationid = currentRec.getValue({
+          fieldId: "custpage_wipbinid"
       });
+      var locationid = currentRec.getValue({
+          fieldId: "custpage_locationid"
+      });
+
+      var sublistCount = currentRec.getLineCount({
+          sublistId: 'custpage_records'
+      });
+      console.log("sublistCount",sublistCount);
+      
+      var invtransf = record.create({
+          type: record.Type.INVENTORY_TRANSFER
+      });
+      invtransf.setValue({
+          fieldId: 'location',
+          value: locationid // Replace with the internal ID
+      });
+      invtransf.setValue({
+          fieldId: 'transferlocation',
+          value: 4 // Replace with the internal ID
+      });
+
+
+
+
 
       // Create a new inventory transfer record
       var transferRecord = record.create({
         type: record.Type.INVENTORY_TRANSFER
       });
 
-      // Set the subsidiary and other relevant fields
-      transferRecord.setValue({
-        fieldId: 'subsidiary',
-        value: newRecord.getValue('subsidiary')
-      });
+     
       // Set other fields as needed
 
       // Loop through the work order lines and add them to the transfer record

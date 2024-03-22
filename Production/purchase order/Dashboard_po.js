@@ -62,15 +62,21 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 				
 
                 sublistpm.addField({
+                    id: "custrecordml_section",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Section'
+                });
+
+                sublistpm.addField({
                     id: "custrecordml_preferredvendor",
                     type: serverWidget.FieldType.TEXT,
-                    label:'Proferrred Vendor'
+                    label:'Preferred Vendor'
                 });
 
                 sublistpm.addField({
                     id: "custrecordml_preferredvendorid",
                     type: serverWidget.FieldType.INTEGER,
-                    label:'Proferrred Vendor ID'
+                    label:'Preferred Vendor ID'
                 });
     
                 sublistpm.addField({
@@ -114,6 +120,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_preferredvendor',
                         line: counter,
                         value: result1.preferredvendor
+                        
+                    });
+                    
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_section',
+                        line: counter,
+                        value: result1.section
                         
                     });
                     sublistpm.setSublistValue({
@@ -172,12 +185,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             "AND", 
             ["mainline","is","F"], 
             "AND", 
-            ["status","noneof","WorkOrd:H","WorkOrd:C","WorkOrd:G"], 
+            ["status","anyof","WorkOrd:B","WorkOrd:D"],
             "AND", 
             ["item.vendor","noneof","@NONE@"]
         ],
         columns:
-        [
+        [   
+            search.createColumn({
+            name: "custbody_section",
+            summary: "GROUP"
+         }),
             search.createColumn({
                 name: "vendor",
                 join: "item",
@@ -240,7 +257,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     prod=fresult.getText({name: "item",summary: "GROUP"});
 
 				    pagedatas[i] = {
-					"preferredvendor": preferredvendor,
+					"section": section,
+                    "preferredvendor": preferredvendor,
                     "preferredvendorid": preferredvendorid,
 					"item": item,
                     "itemid": itemid,
@@ -253,6 +271,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     
     				i++;
                 }
+
+            section=fresult.getValue({name: "custbody_section",summary: "GROUP"});
             preferredvendor=fresult.getText({name: "vendor",join: "item",summary: "GROUP"});
             preferredvendorid=fresult.getValue({name: "vendor",join: "item",summary: "GROUP"});
             item=fresult.getText({name: "item",summary: "GROUP"});

@@ -4,7 +4,7 @@
  * @NModuleScope SameAccount
  */
 
-define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log, record, search, nDialog,runtime) {
+define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"], function(log, record, search, nDialog,runtime, GENERALTOOLS) {
     function pageInit(context) {
         // Code to execute when the page loads
         var currentRecord = context.currentRecord;
@@ -83,11 +83,33 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             });
             log.debug('rate1', rate);
             if (itemId && rate) {
-                var itemBodyFields = record.load({
+
+                try {
+                    var itemBodyFields = record.load({
                     type: "inventoryitem",
                     id: itemId,
-                    isDynamic: true
+                    isDynamic: true,
+                    defaultValues: null
                 });
+                    log.debug("itemId",itemId);
+                }
+                catch(err) {
+                    try {
+                    var itemBodyFields = record.load({
+                        type: "noninventoryitem",
+                        id: itemId,
+                        isDynamic: true,
+                        defaultValues: null
+                    });
+                        log.debug("itemId",itemId);
+                    }
+                    catch(err) {
+                       
+                            log.debug("itemId",itemId);
+                        }
+
+                    }
+                
                 
                 var lineNumber = itemBodyFields.findSublistLineWithValue({
                     sublistId: 'itemvendor',

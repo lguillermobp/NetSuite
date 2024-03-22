@@ -11,17 +11,20 @@ define(['N/record','N/log'],
                 isDynamic: true
             });
 
+            /*
             var price = rec.getMatrixSublistValue ({
                 sublistId: 'price',
                 fieldId: 'price',
                 column: 0,
                 line: 0
             }); 
-             
+             */
             rec.setValue({
-                fieldId: 'custitem_ecdprice',
-                value: price
+                fieldId: 'unitstype',
+                value: "1"
             });
+            var saverec = rec.save();
+            /*
             rec.setMatrixSublistValue ({
                 sublistId: 'price',
                 fieldId: 'price',
@@ -41,7 +44,7 @@ define(['N/record','N/log'],
             try {var saverec = rec.save();}
             catch(e) {
             log.debug('Error', e);log.debug('params.id', params.id);}
-
+            */
             /*
            var lineCount = rec.getLineCount({
                 sublistId: 'itemvendor'
@@ -74,9 +77,14 @@ define(['N/record','N/log'],
              }
              catch(e) {
                  log.debug('Error', e);}
-           */
+
+                
+             var descpo = rec.getValue({fieldId:"purchasedescription"})
+             rec.setValue({fieldId:"salesdescription",value: descpo})
+
+          
              
-            /*
+            
 
             try {
                 rec.removeLine({
@@ -89,12 +97,8 @@ define(['N/record','N/log'],
             }
             catch(e) {
                 log.debug('Error', e);}
+             */
             
-
-             var descpo = rec.getValue({fieldId:"purchasedescription"})
-             rec.setValue({fieldId:"salesdescription",value: descpo})
-             var saverec = rec.save();
-            */
         }
         return {
             each: each

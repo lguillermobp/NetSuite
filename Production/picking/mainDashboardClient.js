@@ -3,13 +3,13 @@
  * @NApiVersion 2.x
  */
 
-define(["N/ui/message","N/runtime","N/currentRecord", "N/error", "N/log",'N/url'],
+define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/log",'N/url'],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (message,runtime,currentRecord, error, log, url) {
+    function (s,message,runtime,currentRecord, error, log, url) {
 
 
 
@@ -17,8 +17,57 @@ define(["N/ui/message","N/runtime","N/currentRecord", "N/error", "N/log",'N/url'
             log.debug("context",context);
 
         }
-        function godashboard() {
-            var script = 'customscript_maindashboard';
+        function get_WO_internalID(wo) {
+
+            var internalid;
+            var retval = {};
+            log.debug("wo",wo);
+            var fsearch = s.create({
+                type: "workorder",
+                filters:
+                    [
+                        ["numbertext","is",wo],
+                        "AND",
+                        ["type","anyof","WorkOrd"],
+                        "AND",
+                        ["mainline","is","T"]
+                    ],
+                columns:
+                    [
+                        "mainline",
+                        "tranid",
+                        "internalid"
+                    ]
+            });
+
+            var pagedData = fsearch.runPaged({
+                "pageSize": 1000
+            });
+            log.debug("pagedData",pagedData);
+            pagedData.pageRanges.forEach(function (pageRange) {
+                log.debug("pageRange",pageRange);
+               var page = pagedData.fetch({index: pageRange.index});
+
+               page.data.forEach(function (fresult) {
+                log.debug("fresult",fresult);
+
+                    internalid = fresult.getValue({name: "internalid"});
+                    retval = {
+                       "internalid": internalid
+                    }
+
+                });
+
+            })
+
+            return retval;
+        }
+        function saveRecord(context) {
+            var currRec = context.currentRecord;
+
+            var wo = currRec.getValue({fieldId: "workorder"});
+
+            var script = 'customscript_dashboard_pl';
             var deployment = 'customdeploy1';
             var parameters = "";
 
@@ -27,15 +76,26 @@ define(["N/ui/message","N/runtime","N/currentRecord", "N/error", "N/log",'N/url'
                 deploymentId: deployment,
                 returnExternalUrl: false
             });
+            var retval=get_WO_internalID(wo);
 
-            window.open(suiteletURL, "_self");
+            if (retval.internalid) {
+                var idwo=retval.internalid;
+                
+                suiteletURL += "&idwo=" + idwo;
+                log.debug("suiteletURL",suiteletURL);
 
-        }
-
-
-        function saveRecord(context) {
-
-
+                window.open(suiteletURL, "_blank");
+                return true;
+            }
+            else {
+                message.create({
+                    title: "Error",
+                    message: "The Manufacturing Order does not exist. Please check the number and try again.",
+                    type: message.Type.ERROR,
+                    duration: 10000
+                }).show();
+                log.debug("Error", "Manufacturing Order not found");
+            }      
 
         }
 
@@ -165,8 +225,7 @@ define(["N/ui/message","N/runtime","N/currentRecord", "N/error", "N/log",'N/url'
 
         return {
             pageInit: pageInit,
-            godashboard: godashboard,
-            //saveRecord: saveRecord,
+            saveRecord: saveRecord,
             //fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
