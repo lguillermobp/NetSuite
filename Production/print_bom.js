@@ -100,7 +100,11 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "label": "Sales Order Requested Ship Date",
                         "type": "date",
                         "sortdir": "NONE"
-                    }
+                    }, {
+                    "name": "custrecord_wipbin",
+                        "join": "department"
+                    },
+                    "department"
                 ]
             }).run().each(function (result) {
                 workOrderLocation = result.getText({name: "location"});
@@ -114,6 +118,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 pdf = pdf.replace("[SALES_ORDER_REQ_SHIP_DATE]", result.getValue({name: "enddate",}));
                 pdf = pdf.replace("[FINISHED_GOOD]", result.getText({name: "item"}));
                 pdf = pdf.replace("[FINISHED_QUANTITY]", result.getValue({name: "quantity"}));
+                pdf = pdf.replace("[DEPARTMENT]", result.getText({name: "department"}));
+                pdf = pdf.replace("[WIP_BIN]", result.getText({name: "custrecord_wipbin", join: "department"}));
             });
 
 
@@ -164,7 +170,12 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "label": "quantitycommitted",
                         "type": "float",
                         "sortdir": "NONE"
-                    }
+                    },
+                    search.createColumn({
+                       name: "formulanumeric",
+                       formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
+                       label: "BackOrder"
+                    })
                 ]
             }).run().each(function (result) {
                 lineItemIds.push(result.getValue({
@@ -173,20 +184,23 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 }));
 
                 lineNumbers[result.getText({name: "item"})] = {
-                    "line":line,
-                    "qty":result.getValue({name: "quantity"}),
-                    "qtyc":result.getValue({name: "quantitycommitted"})
+                "line":line,
+                "qty":result.getValue({name: "quantity"}),
+                "qtyc":result.getValue({name: "quantitycommitted"}),
+                "qtybo":result.getValue({name: "formulanumeric"}),
+                "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
                 };
 
-
+                if (result.getValue({name: "formulanumeric"})>0) {
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
-                workOrderLines += `<td> ${result.getText({name: "item"})}</td>`;
+                workOrderLines += `<td>${result.getText({name: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantitycommitted"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "formulanumeric"})}</td>`;
                 workOrderLines += "</tr>";
-
+                }
                 line += 1;
 
                 return true;
@@ -212,7 +226,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     "rightparens": 0
                 }, {
                     "name": "location",
-                    "operator": "anyof",
+                    "operator": "noneof",
                     "values": [
                         workOrderLocationID
                     ],
@@ -262,7 +276,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 log.debug({title: "workOrderLocationID", details: workOrderLocationID});
                 let inventoryBalanceLocation = result.getText({name: "location"})
                 const inventoryBalanceLocationPriority = inventoryBalanceLocation === workOrderLocation ? 1 : 2;
-                inventoryBalanceLocation = inventoryBalanceLocation === "Kissimmee-WIP" ? "WIP" : "Warehouse";
+                inventoryBalanceLocation = inventoryBalanceLocation === "Orlando warehouse" ? "WHS" : "P1";
 
                 if (itembef!=result.getText({name: "item"})) {
                     itembef=result.getText({name: "item"});
@@ -278,6 +292,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 if (balanceitem>0) {
                     inventoryBalanceData.push({
                         "lineNumber": lineNumbers[result.getText({name: "item"})].line,
+                        "itemdesc": lineNumbers[result.getText({name: "item"})].itemdesc,
                         "qty": qtyr,
                         "item": result.getText({name: "item"}),
                         "locationPriority": inventoryBalanceLocationPriority,
@@ -288,27 +303,29 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         //"expirationdate": balanceitem + "-" + Number(result.getValue({name: "available"})),
                         "datecreated": result.getValue({name: "datecreated", join: "inventoryNumber"}),
                         "onhand": Number(result.getValue({name: "onhand"})),
-                        "available": Number(result.getValue({name: "available"}))
+                        "available": Number(result.getValue({name: "available"})),
+                        "qtyneeded": lineNumbers[result.getText({name: "item"})].qty - lineNumbers[result.getText({name: "item"})].qtyc,
                     });
                     log.audit("available " , result.getValue({name: "available"}));
                 }
                 balanceitem=balanceitem-Number(result.getValue({name: "available"}));
 
 
+
                 return true;
             });
 
-            inventoryBalanceData = _.orderBy(inventoryBalanceData, ["lineNumber", "available","locationPriority"], ["asc", "asc", "asc"]);
+            inventoryBalanceData = _.orderBy(inventoryBalanceData, ["binnumber", "available","locationPriority"], ["asc", "asc", "asc"]);
 
             for (const result of inventoryBalanceData) {
-                inventoryBalanceLines += "<tr style='border: 1px solid black;  padding: 4px 6px;'>";
+                inventoryBalanceLines += "<tr>";
                 inventoryBalanceLines += `<td>${result.lineNumber}</td>`
-                inventoryBalanceLines += `<td  align="left"><barcode codetype="code128" value="${result.item}"/></td>`
-               // inventoryBalanceLines += `<td>${result.location}</td>`
+                inventoryBalanceLines += `<td>${result.item}</td>`
+                inventoryBalanceLines += `<td>${result.itemdesc}</td>`
                 inventoryBalanceLines += `<td>${result.binnumber}</td>`
-                inventoryBalanceLines += `<td><strong>${result.qty}</strong></td>`
+                inventoryBalanceLines += `<td>${result.qtyneeded}</td>`
                 inventoryBalanceLines += `<td>${result.onhand}</td>`
-                
+                inventoryBalanceLines += "<td></td>";
                 inventoryBalanceLines += "</tr>";
             }
 

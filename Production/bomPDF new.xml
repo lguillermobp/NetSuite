@@ -65,7 +65,9 @@
             <table style="width: 100%;">
             <tr>
                 <th align="left">WO</th>
-                <td style="font-family: 'Libre Barcode 128 Text';font-size: 28px;">[WORK_ORDER]
+                <td style="font-family: 'Libre Barcode 128 Text';font-size: 42px;">
+                <img src="https://barcode.tec-it.com/barcode.ashx?data=[WORK_ORDER]&code=&multiplebarcodes=false&translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0&hidehrt=False" height="50pt" width="120pt"/>
+                
                   
                 </td>
                 <th align="left">Location</th>

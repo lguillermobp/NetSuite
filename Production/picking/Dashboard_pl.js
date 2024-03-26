@@ -20,6 +20,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 		 * @param context
 		 */
         var pagedatasbo=[];
+        var pagedatascm=[];
         function onRequest(context) {
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
@@ -281,32 +282,63 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     type: serverWidget.FieldType.INLINEHTML,
                 });
                 htmlField1.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.ENDROW
+                    layoutType: serverWidget.FieldLayoutType.STARTROW
                 });
-                htmlField1.defaultValue = '<div id="MyPalletId" style="width: 100%;background-color: #757575;text-align: center;line-height: 30px; font-size: 20px;	color: white;">Starting... </div>';
+
+                htmlField1.defaultValue = '<div id="MyPalletId" style="width: 100%;background-color: #757575;text-align: center;line-height: 30px; font-size: 20px;	color: white;">Available Items </div>';
+                let htmlFieldt1 = form.addField({
+                    id: "custpage_htmlt1",
+                    label: "html",
+                    type: serverWidget.FieldType.INLINEHTML,
+                });
+
+                htmlFieldt1.updateLayoutType({
+                    layoutType: serverWidget.FieldLayoutType.STARTROW
+                });
+                htmlFieldt1.defaultValue = '<div id="MyPalletId1" style="width: 100%;background-color: #757575;text-align: center;line-height: 30px; font-size: 20px;	color: white;">Total ... </div>';
     
-                var sublistpm = form.addSublist({
-                    id: 'custpage_records',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Componets',
-        
-                });
-				let htmlField = form.addField({
+
+                let htmlField = form.addField({
                     id: "custpage_html",
                     label: "html",
                     type: serverWidget.FieldType.INLINEHTML,
                 });
                 htmlField.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.ENDROW
+                    layoutType: serverWidget.FieldLayoutType.STARTROW
                 });
                 htmlField.defaultValue = '<div id="myProgress" style="width: 100%;background-color: #757575;"><div id="myBar" style="width: 0%;	height: 30px;background-color: #9e5d20;	text-align: center;	line-height: 30px; font-size: 20px;	color: white;">0%</div>	  </div>';
-        
+   
 
-                sublistpm.addField({
+                let htmlFieldt = form.addField({
+                    id: "custpage_htmlt",
+                    label: "html",
+                    type: serverWidget.FieldType.INLINEHTML,
+                });
+                htmlFieldt.updateLayoutType({
+                    layoutType: serverWidget.FieldLayoutType.MIDROW
+                });
+                htmlFieldt.defaultValue = '<div id="myProgress1" style="width: 100%;background-color: #757575;"><div id="myBar1" style="width: 0%;	height: 30px;background-color: #9e5d20;	text-align: center;	line-height: 30px; font-size: 20px;	color: white;">0%</div>	  </div>';
+
+
+                var sublistpm = form.addSublist({
+                    id: 'custpage_records',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'Available Items',
+        
+                });
+				
+                let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
                     type: serverWidget.FieldType.TEXT,
                     label:'item ID'
                 });
+                itemidf.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+
+
+
                 sublistpm.addField({
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
@@ -333,10 +365,13 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     type: serverWidget.FieldType.TEXT,
                     label: "Qty Needed"
                 });
-                sublistpm.addField({
+                let binidf = sublistpm.addField({
                     id: "custrecordml_binlocationid",
                     type: serverWidget.FieldType.TEXT,
                     label:'Bin Location ID'
+                });
+                binidf.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
                 sublistpm.addField({
@@ -479,11 +514,133 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     });
 
                    
-                    
-                   
                     counter++;
                 
 				})
+
+
+                var sublistcm = form.addSublist({
+                    id: 'custpage_recordscm',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'Commitment',
+        
+                });
+				
+                let itemidcf = sublistcm.addField({
+                    id: "custrecordcm_itemid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'item ID'
+                });
+                itemidcf.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                sublistcm.addField({
+                    id: "custrecordcm_item",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'item'
+                });
+                
+                sublistcm.addField({
+                    id: "custrecordcm_itemdesc",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Description'
+                });
+                sublistcm.addField({
+                    id: "custrecordcm_qty",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Qty'
+                });
+                sublistcm.addField({
+                    id: "custrecordcm_commitedqty",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Commited Qty"
+                });
+                sublistcm.addField({
+                    id: "custrecordcm_qtyneeded",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Qty Needed"
+                });
+                let binidcf = sublistcm.addField({
+                    id: "custrecordcm_binlocationid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Bin Location ID'
+                });
+                binidcf.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                sublistcm.addField({
+                    id: "custrecordcm_binlocation",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Bin Location'
+                });
+                
+                sublistcm.addField({
+                    id: "custrecordcm_qtyb",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Qty Bin Location'
+                });
+                
+                
+    
+                // loop through each line, skipping the header
+                
+                var counter = 0;
+                pagedatascm.forEach(function(result1) {
+
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_item',
+                        line: counter,
+                        value: result1.item,
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_itemid',
+                        line: counter,
+                        value: result1.itemid,
+                    });
+                   
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_itemdesc',
+                        line: counter,
+                        value: result1.itemdesc
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_qty',
+                        line: counter,
+                        value: result1.qty 
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_commitedqty',
+                        line: counter,
+                        value: result1.qtycommited
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_qtyneeded',
+                        line: counter,
+                        value: result1.qtyneeded
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_binlocationid',
+                        line: counter,
+                        value: result1.binlocationid
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_binlocation',
+                        line: counter,
+                        value: result1.binlocation
+                    });
+                    sublistcm.setSublistValue({
+                        id: 'custrecordcm_qtyb',
+                        line: counter,
+                        value: result1.qtyb 
+                    });
+
+                      
+                    counter++;
+                
+				})
+
+
+
 
 
                 context.response.writePage(form);
@@ -500,6 +657,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
         let lineItemIds = [];
         let lineNumbers = {};
         var j=0;
+        var b=0;
         const searchWorkOrderLines = search.create({
             "type": "transaction",
             "filters": [
@@ -545,7 +703,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 },
                 search.createColumn({
                    name: "formulanumeric",
-                   formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN {item.quantityavailable}-{quantity}+{quantitycommitted}  ELSE 0 END END",
+                   formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
                    label: "BackOrder"
                 })
             ]
@@ -569,7 +727,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "item": result.getText({name: "item"}),
                 "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
                 "binlocation": " ",
-                "qty": result.getValue({name: "quantity"}),
+                "qty": result.getValue({name: "formulanumeric"}),
                 "binlocationqty": result.getValue({name: "quantitycommitted"}),
                 "qtyneeded": result.getValue({name: "quantity"})-result.getValue({name: "quantitycommitted"}),
                 "onhand": 0,
@@ -699,6 +857,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             if (result.binlocationqty>result.qty) {result.qtyneeded=0;}
             else {result.qtyneeded=result.qty-result.binlocationqty;}
 
+
+            if ((lineNumbers[result.item].qty - lineNumbers[result.item].qtyc)>0) {
+
             pagedatas[i] = {
                 "lineNumber": result.lineNumber,
                 "item": result.item,
@@ -716,7 +877,27 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 }
 
             i++;
+            }
+            else {
 
+            pagedatascm[b] = {
+                "lineNumber": result.lineNumber,
+                "item": result.item,
+                "itemid": result.itemid,
+                "itemdesc": lineNumbers[result.item].itemdesc,
+                "binlocation": result.binnumber,
+                "binlocationid": result.binnumberid,
+                "qty": lineNumbers[result.item].qty,
+                "qtyb": result.qty,
+                "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
+                "binlocationqty": result.binlocationqty,
+                "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
+                "onhand": result.onhand,
+                "memo": "memo"
+                }
+
+            b++;
+            }
         }
 
 	

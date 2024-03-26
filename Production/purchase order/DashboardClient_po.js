@@ -13,16 +13,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         function pageInit() {
         }
 
-        function process() {
-            var currRec = currentRecord.get();
         
-            // call RenderPriorityPrintPDF.js (1941)
-            var url = "/app/site/hosting/scriptlet.nl?script=1941&deploy=1";
-            url += "&fieldfilename=" + fieldfilename;
-           
-            //window.open(url, "_blank")
-        }
-
       
         function process() {
 
@@ -30,6 +21,9 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             
             var custpageDate = currentRec.getValue({
                 fieldId: "custpage_date"
+            });
+            var memoh = currentRec.getValue({
+                fieldId: "custpage_memo"
             });
 
             var sublistCount = currentRec.getLineCount({
@@ -55,7 +49,12 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
                 if (isfirst) {
                     var vendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',
-                        line: i });
+                    line: i });
+                    var sections = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_section',
+                    line: i });
+                    var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',
+                    line: i });
+
                         var purchaseOrder = record.create({
                             type: record.Type.PURCHASE_ORDER,
                             isDynamic: true
@@ -63,24 +62,34 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
                         // Set field values
                         console.log("vendorid",vendorid);
+                        console.log("sections",sections);
+                        console.log("productionline",productionline);
                         console.log("custpageDate",custpageDate);
                         purchaseOrder.setValue({
                             fieldId: 'entity',
                             value: vendorid // Replace with the internal ID of the vendor
                         });
-
+                        purchaseOrder.setText({
+                            fieldId: 'custbody_ecdsection',
+                            text: sections // Replace with the internal ID of the vendor
+                        });
+                        purchaseOrder.setText({
+                            fieldId: 'custbody_productionline',
+                            text: productionline // Replace with the internal ID of the vendor
+                        });
                         purchaseOrder.setValue({
                             fieldId: 'trandate',
                             value: new Date(custpageDate) // Set the transaction date
+                        });
+                        purchaseOrder.setValue({
+                            fieldId: 'memo',
+                            value: memoh // Set the transaction memo
                         });
 
                         savingpo = true;
                         isfirst = false;
                     
                     }
-
-
-
 
                 var preferredvendorid = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
@@ -99,16 +108,34 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                         type: record.Type.PURCHASE_ORDER,
                         isDynamic: true
                     });
-        
+                    var sections = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_section',
+                    line: i });
+                    var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',
+                    line: i });
+
+                    console.log("vendorid",vendorid);
+                    console.log("sections",sections);
+                    console.log("productionline",productionline);
                     // Set field values
                     purchaseOrder.setValue({
                         fieldId: 'entity',
                         value: vendorid // Replace with the internal ID of the vendor
                     });
-        
+                    purchaseOrder.setText({
+                        fieldId: 'custbody_ecdsection',
+                        text: sections // Replace with the internal ID of the vendor
+                    });
+                    purchaseOrder.setText({
+                        fieldId: 'custbody_productionline',
+                        text: productionline // Replace with the internal ID of the vendor
+                    });
                     purchaseOrder.setValue({
                         fieldId: 'trandate',
                         value: new Date(custpageDate) // Set the transaction date
+                    });
+                    purchaseOrder.setValue({
+                        fieldId: 'memo',
+                        value: memoh // Set the transaction memo
                     });
 
                     

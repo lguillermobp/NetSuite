@@ -3,14 +3,15 @@
  * @NApiVersion 2.x
  */
 
-define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message"],
+define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message", "/SuiteScripts/Modules/helptools.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (url,runtime,currentRecord, error,log,record, s,message) {
+    function (url,runtime,currentRecord, error,log,record, s,message,HELPTOOLS) {
         var sublistCount;
+        var sublistCountt;
         function pageInit(context) {
             var currentRec = context.currentRecord;
 
@@ -18,8 +19,12 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
             sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
+            sublistCountt = Number(currentRec.getLineCount({
+                sublistId: 'custpage_recordsbo'
+            })+sublistCount);
             currentRec.setValue('custpage_totsel', sublistCount);
             move(" ",sublistCount,sublistCount);
+            move1(" ",sublistCount,sublistCountt);
 
         }
 
@@ -43,15 +48,17 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
             var currRec = currentRecord.get();
 
             var saleorderno = currRec.getValue({
-                fieldId: "custpage_saleorderno"
+                fieldId: "custpage_workorderno"
             });
-            log.debug({title: 'saleorderno' , details: saleorderno });
+            log.debug({title: 'workorderno' , details: saleorderno });
+            var okg=HELPTOOLS.helpgo(saleorderno);
             
 
         }
 
         function move(textb,actual, final) {
             var width=Math.round(actual/final*100);
+            var elemt = document.getElementById("MyPalletId");
             var elem = document.getElementById("myBar");
             var elem1 = document.getElementById("myProgress");
 
@@ -62,6 +69,27 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
 
             elem.style.width = width + "%";
             elem.innerHTML = "("+actual+") "+width  + "%";
+            elemt.innerHTML = "Available Items ("+final+")";
+            
+            //elem1.innerHTML = textb;
+
+        }
+
+        function move1(textb,actual, final) {
+            var width=Math.round(actual/final*100);
+            var elemt = document.getElementById("MyPalletId1");
+            var elem = document.getElementById("myBar1");
+            var elem1 = document.getElementById("myProgress1");
+
+            if (width<33)                   { elem.style.backgroundColor = "#9e5d20";}
+            else if (width>32 && width<66)  { elem.style.backgroundColor = "#095219";}
+            else if (width<100)             { elem.style.backgroundColor = "#51875d";}
+            else if (width>99)              { elem.style.backgroundColor = "#0d9e2d";}
+
+            elem.style.width = width + "%";
+            elem.innerHTML = "("+actual+") "+width  + "%";
+            elemt.innerHTML = "Total ("+final+")";
+            
             //elem1.innerHTML = textb;
 
         }
@@ -104,6 +132,7 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
                     });
                 }
                 move(" ",totsel,sublistCount);
+                move1(" ",totsel,sublistCountt);
 
             }
 
@@ -149,6 +178,7 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
                 if (!selec) continue;
 
                 move(" ",i+1,sublistCount);
+                move1(" ",i,sublistCountt);
 
                 var item = currentRec.getSublistValue({
                     sublistId: 'custpage_records',

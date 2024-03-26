@@ -155,7 +155,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
 
 
         var paramrec = r.load({
-            type: "customrecordbeekmanparams",
+            type: "customrecordparams",
             id: value,
             isDynamic: false,
             defaultValues: null
@@ -187,7 +187,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
 
 
         var fsearch = s.create({
-            type: "customrecordbeekmanparams",
+            type: "customrecordparams",
             filters:
                 [
                     ["name","is",value]
@@ -210,7 +210,6 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
                     "language",
                     "lastmodified",
                     "lastmodifiedby",
-                    "custrecordparams_type",
                     "custrecordparams_value"
                 ]
         });

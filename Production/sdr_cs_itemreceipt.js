@@ -42,6 +42,14 @@ define(["N/ui/message","N/log","N/record"],
                     "line": itemIndex
                 });
 
+                var inventorydetailavail = datarec.getCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: "inventorydetailavail"
+                });
+
+                if (inventorydetailavail == true) 
+                {
+
                 var varbin="";
 
                 var subRecordInventoryDetail = datarec.getCurrentSublistSubrecord({
@@ -127,6 +135,9 @@ define(["N/ui/message","N/log","N/record"],
                     } catch (e) {
                         log.debug({  title: "error: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
                     }
+
+
+                }
                 itemIndex++;
             }
 
@@ -290,8 +301,13 @@ define(["N/ui/message","N/log","N/record"],
                     "sublistId": "item",
                     "line": itemIndex
                 });
+                var inventorydetailavail = currentRecord.getCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: "inventorydetailavail"
+                });
 
-
+                if (inventorydetailavail == true) 
+                {
                 var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
                     sublistId: 'item',
                     fieldId: 'inventorydetail'
@@ -348,7 +364,9 @@ define(["N/ui/message","N/log","N/record"],
                         }
                     }
                 }
+                }
                 itemIndex++;
+                
             }
 
             return true;
