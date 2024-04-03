@@ -27,25 +27,9 @@
                  log.debug("internalid",internalid);
 
 
-                 if (internalid==7849913)
-                 {
-                        var orderstatus=datarec.getValue('orderstatus');
-                        log.debug("orderstatus",orderstatus);
-                        var status=datarec.getValue('status');
-                        log.debug("status",status);
-                        var statusRef=datarec.getValue('statusRef');
-                        log.debug("statusRef",statusRef);
+              
 
-                        datarec.setValue('orderstatus', "H");
-                        datarec.setValue('status', "Closed");
-                        datarec.setValue('statusRef', "closed");
-
-
-                        
-                 }
-
-
-                 if (internalid==-15406436)
+                 if (internalid==8161)
                  {
                          var lineCount = datarec.getLineCount({
                                  sublistId: 'item'
@@ -70,12 +54,12 @@
                                          value: false,
                                          ignoreFieldChange: true
                                  });
-                                datarec.setCurrentSublistValue({
-                                        sublistId: 'item',
-                                        fieldId: 'createoutsourcedwo',
-                                        value: true,
-                                        ignoreFieldChange: true
-                                });
+                                // datarec.setCurrentSublistValue({
+                                //         sublistId: 'item',
+                                //         fieldId: 'createoutsourcedwo',
+                                //         value: true,
+                                //         ignoreFieldChange: true
+                                // });
                                  
                                  datarec.commitLine({
                                          sublistId: 'item'

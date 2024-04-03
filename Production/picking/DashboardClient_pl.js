@@ -93,6 +93,29 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
             //elem1.innerHTML = textb;
 
         }
+
+        function markall() {
+
+            var count=nlapiGetLineItemCount('custpage_records'); //gets the count of lines
+            for(var i=1;i<=count;i++) {
+                nlapiSelectLineItem('custpage_records',i);
+                nlapiSetCurrentLineItemValue('custpage_records','custrecordml_selected','T',true,true); //'custcol_checkbox_field' is checkbox's field ID.
+            }
+            nlapiCommitLineItem('item');
+        }
+        function unmarkall() {
+        
+            var count=nlapiGetLineItemCount('custpage_records');
+            for(var i=1;i<=count;i++) {
+                nlapiSelectLineItem('custpage_records',i);
+                nlapiSetCurrentLineItemValue('custpage_records','custrecordml_selected','F',true,true); //'custcol_checkbox_field' is checkbox's field ID.
+            }
+            nlapiCommitLineItem('item');
+        }
+
+
+
+
          /**
          *  Function to be executed when field is changed.*
          * @param {Object} scriptContext
@@ -140,7 +163,10 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
         function process() {
 
             var currentRec = currentRecord.get();
-            
+
+            document.getElementById("secondarycustpage_process").disabled = true;
+            document.getElementById("custpage_process").disabled = true;
+
             var wpbinlocationid = currentRec.getValue({
                 fieldId: "custpage_wipbinid"
             });
@@ -281,6 +307,8 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
   
         return {
             pageInit: pageInit,
+            unmarkall: unmarkall,
+            markall: markall,
             fieldChanged: fieldChanged,
             process: process,
             godashboard: godashboard,

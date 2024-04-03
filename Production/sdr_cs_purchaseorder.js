@@ -109,13 +109,15 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                         }
 
                     }
-                
-                
+                try {
                 var lineNumber = itemBodyFields.findSublistLineWithValue({
                     sublistId: 'itemvendor',
                     fieldId: 'vendor_display',
                     value: entityname
                 });
+                errorv="F";
+            } catch (err) {errorv="V";}
+            if (errorv!="V") {
                 var lineCount = itemBodyFields.getLineCount({
                     sublistId: 'itemvendor'
                 });
@@ -149,7 +151,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 }
                
             }
-
+        }
            
        }
 

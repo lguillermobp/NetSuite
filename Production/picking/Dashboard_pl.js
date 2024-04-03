@@ -326,6 +326,17 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     label: 'Available Items',
         
                 });
+                sublistpm.addButton({
+                    id: 'ustpage_markmark',
+                    label: 'Mark all',
+                    functionName: "markall()"
+                });
+                sublistpm.addButton({
+                    id: 'ustpage_unmarkmark',
+                    label: 'Unmark all',
+                    functionName: "unmarkall()"
+                });
+                   
 				
                 let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
@@ -412,7 +423,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistpm.setSublistValue({
                         id: 'custrecordml_itemdesc',
                         line: counter,
-                        value: result1.itemdesc
+                        value: result1.itemdesc+" "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
@@ -503,7 +514,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistbo.setSublistValue({
                         id: 'custrecordbo_itemdesc',
                         line: counter,
-                        value: result1.itemdesc
+                        value: result1.itemdesc+" "
                         
                     });
                    
@@ -601,7 +612,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistcm.setSublistValue({
                         id: 'custrecordcm_itemdesc',
                         line: counter,
-                        value: result1.itemdesc
+                        value: result1.itemdesc+" "
                     });
                     sublistcm.setSublistValue({
                         id: 'custrecordcm_qty',
@@ -716,7 +727,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-                "qtyc":result.getValue({name: "quantitycommitted"}),
+                //"qtyc":result.getValue({name: "quantitycommitted"}),
+                "qtyc": 0 ,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
             };
@@ -728,7 +740,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
                 "binlocation": " ",
                 "qty": result.getValue({name: "formulanumeric"}),
-                "binlocationqty": result.getValue({name: "quantitycommitted"}),
+                "binlocationqty": 0,
                 "qtyneeded": result.getValue({name: "quantity"})-result.getValue({name: "quantitycommitted"}),
                 "onhand": 0,
                 "memo": "memo"
@@ -842,8 +854,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     "available": Number(result.getValue({name: "available"}))
                 });
             }
-            balanceitem=balanceitem-Number(result.getValue({name: "available"}));
-
+            //balanceitem=balanceitem-Number(result.getValue({name: "available"}));
+            balanceitem=balanceitem-0;
 
             return true;
         });

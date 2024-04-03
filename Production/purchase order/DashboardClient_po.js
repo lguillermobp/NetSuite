@@ -226,9 +226,43 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             return true;
         }
 
-  
+        function download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+    
+            element.style.display = 'none';
+            document.body.appendChild(element);
+    
+            element.click();
+    
+            document.body.removeChild(element);
+        }
+        function onButtonClick(context) {
+    
+            var url = new URL(document.location.href);
+            var page_status = url.searchParams.get('page_status');
+            log.debug('page_status', page_status);
+    
+    
+    // XML content of the file
+            var res = decodeURI(context)
+                res = res.replaceAll('^', '"');
+                res = res.replaceAll('&&', '\n');
+                res = res.replaceAll('^', '"');
+    
+    
+    //create file
+    
+            var filename = "BOM.csv";
+    
+            download(filename, res);
+    
+    
+        }
         return {
             pageInit: pageInit,
+            onButtonClick: onButtonClick,
             process: process
         }
     })
