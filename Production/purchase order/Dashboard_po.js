@@ -607,7 +607,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 summary: "GROUP"
              })
         ]
-                });
+        });
 
 		var pagedData = fsearch.runPaged({
 			"pageSize" : 1000

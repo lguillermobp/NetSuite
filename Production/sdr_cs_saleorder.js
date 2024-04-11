@@ -69,6 +69,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
     function lookst(sc, pl, shipdate) {
 
         pecddays();
+        console.log("ecdholydays",ecdholydays);
 
         var fsearch = s.create({
             type: "customrecord_scheduletasks",
@@ -155,16 +156,17 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
                 fieldId: "custrecord_so_sc_task",
                 value: taskId 
             });
-           
+            console.log("initial",initial);
+            console.log("days",days);
 
             if (initial==-1)      {initial=1;days=0}
             else
             {
-                if (initial<days)      {initial=1;days=0}
+                if (initial<days)      {days=0}
             }
+            
 
             log.debug("initial-days+duration",(initial-days+duration-1));
-
 
             newstartdate=new Date(ecddays[initial-days-duration+1]);
             newenddate=new Date(ecddays[initial-days]);
@@ -175,25 +177,39 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
             //var newenddate=new Date(newstartdate);
            // newenddate.setDate(newenddate.getDate()+duration);
 
+           console.log("newstartdate",newstartdate);
+           console.log("newenddate",newenddate);
 
             log.debug("newstartdate",newstartdate);
             log.debug("newenddate",newenddate);
-            newTaskRecord.setValue({
-                fieldId: "custrecord_so_sc_startdate",
-                value: newstartdate 
-            });
-            newTaskRecord.setValue({
-                fieldId: "custrecord_so_sc_enddate",
-                value: newenddate 
-            });
 
-            // Save the new record
-            var newTaskRecordId = newTaskRecord.save({
-                enableSourcing: true,
-                ignoreMandatoryFields: true
-            });
 
-         
+            if (days!=0) 
+            {
+
+                try{
+
+            
+
+                newTaskRecord.setValue({
+                    fieldId: "custrecord_so_sc_startdate",
+                    value: newstartdate 
+                });
+                newTaskRecord.setValue({
+                    fieldId: "custrecord_so_sc_enddate",
+                    value: newenddate 
+                });
+
+                // Save the new record
+                var newTaskRecordId = newTaskRecord.save({
+                    enableSourcing: true,
+                    ignoreMandatoryFields: true
+                });
+
+                }   catch(e) {
+                    console.log(e);}
+
+            }
         });
         });
        

@@ -3,22 +3,49 @@
  * @NApiVersion 2.x
  */
 
-define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message", "/SuiteScripts/Modules/helptools.js"],
+define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/currentRecord",'N/log', "N/record", "N/search","N/ui/message", "/SuiteScripts/Modules/helptools.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (url,runtime,currentRecord, error,log,record, s,message,HELPTOOLS) {
+    function (https,file, runtime,url,dialog,runtime,currentRecord,log,record, s,message,HELPTOOLS) {
         var sublistCount;
         var sublistCountt;
         function pageInit(context) {
             var currentRec = context.currentRecord;
 
+            var WOsts = currentRec.getValue({
+                fieldId: 'custpage_customerwosts'
+            });
+
+            if (WOsts == "999Released") {
+            message.create({
+                title: "Manufacturing Order Status Error",
+                message: "Te MO is now in " + WOsts + " status. Please release the MO first before processing the Picking List.",
+                type: message.Type.ERROR
+            }).show();
+            }
 
             sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
+            sublistCounttr = currentRec.getLineCount({
+                sublistId: 'custpage_recordstr'
+            });
+
+
+            if (sublistCounttr>0) {
+                message.create({
+                    title: "MO has been previously transferred",
+                    message: "Caution this Manufacturing Order already has a transfer done previously.",
+                    type: message.Type.WARNING,
+                    duration: 10000
+                }).show();
+                }
+    
+
+
             sublistCountt = Number(currentRec.getLineCount({
                 sublistId: 'custpage_recordsbo'
             })+sublistCount);
@@ -95,25 +122,66 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
         }
 
         function markall() {
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
 
-            var count=nlapiGetLineItemCount('custpage_records'); //gets the count of lines
-            for(var i=1;i<=count;i++) {
-                nlapiSelectLineItem('custpage_records',i);
-                nlapiSetCurrentLineItemValue('custpage_records','custrecordml_selected','T',true,true); //'custcol_checkbox_field' is checkbox's field ID.
+            for(var i=0;i<=count;i++) {
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_selected'
+                });
+                if (selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_selected',
+                    value: true,
+                    ignoreFieldChange: false
+                });
+               
             }
-            nlapiCommitLineItem('item');
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
         }
         function unmarkall() {
-        
-            var count=nlapiGetLineItemCount('custpage_records');
-            for(var i=1;i<=count;i++) {
-                nlapiSelectLineItem('custpage_records',i);
-                nlapiSetCurrentLineItemValue('custpage_records','custrecordml_selected','F',true,true); //'custcol_checkbox_field' is checkbox's field ID.
+            
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+            
+            for(var i=0;i<=count;i++) {
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_selected'
+                });
+                if (!selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_selected',
+                    value: false,
+                    ignoreFieldChange: false
+                });
             }
-            nlapiCommitLineItem('item');
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
         }
-
-
 
 
          /**
@@ -144,14 +212,16 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
                     totsel++;
                     currentRecord.setValue({
                         fieldId: 'custpage_totsel',
-                        value: totsel
+                        value: totsel,
+                        ignoreFieldChange: true
                     });
                 }
                 else {
                     totsel--;
                     currentRecord.setValue({
                         fieldId: 'custpage_totsel',
-                        value: totsel
+                        value: totsel,
+                        ignoreFieldChange: true
                     });
                 }
                 move(" ",totsel,sublistCount);
@@ -162,151 +232,211 @@ define(['N/url',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N
          }
         function process() {
 
-            var currentRec = currentRecord.get();
+            console.log("process","process");
 
-            document.getElementById("secondarycustpage_process").disabled = true;
-            document.getElementById("custpage_process").disabled = true;
+            dialog.confirm({
+                title: 'Do you want to submit?',
+                message: 'This is a msg for confirmation',
+            }).then(success).catch(fail);
 
-            var wpbinlocationid = currentRec.getValue({
-                fieldId: "custpage_wipbinid"
-            });
-            var locationid = currentRec.getValue({
-                fieldId: "custpage_locationid"
-            });
+                    function success(result) {
 
-            var sublistCount = currentRec.getLineCount({
-                sublistId: 'custpage_records'
-            });
-            console.log("sublistCount",sublistCount);
-            
-            var invtransf = record.create({
-                type: record.Type.INVENTORY_TRANSFER,
-                isDynamic: true
-            });
-            invtransf.setValue({
-                fieldId: 'location',
-                value: 1 // Replace with the internal ID
-            });
-            invtransf.setValue({
-                fieldId: 'transferlocation',
-                value: locationid // Replace with the internal ID
-            });
+                        if (result) {
 
 
-            for (var i = 0; i < sublistCount; i++) {
 
-                var selec = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_selected',
-                    line: i
-                });
-                
-                if (!selec) continue;
+                            var currentRec = currentRecord.get();
 
-                move(" ",i+1,sublistCount);
-                move1(" ",i,sublistCountt);
+                            document.getElementById("secondarycustpage_process").disabled = true;
+                            document.getElementById("custpage_process").disabled = true;
 
-                var item = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_itemid',
-                    line: i
-                });
-                var binlocationid = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_binlocationid',
-                    line: i
-                });
-                var binlocation = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_binlocation',
-                    line: i
-                });
-                var qty = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_qtyb',
-                    line: i
-                });
-                var qtyneed = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_qtyneeded',
-                    line: i
-                });
-                
-                if (qtyneed > qty) {qtyneed = qty;}
+                            var wpbinlocationid = currentRec.getValue({
+                                fieldId: "custpage_wipbinid"
+                            });
 
-                 // Add line items
-                 invtransf.selectNewLine({
-                    sublistId: 'inventory'
-                });
-                
-                invtransf.setCurrentSublistValue({
-                    sublistId: 'inventory',
-                    fieldId: 'item',
-                    value: item // Replace with the internal ID of the item
-                });
-                console.log("selec1",selec);
-                invtransf.setCurrentSublistValue({
-                    sublistId: 'inventory',
-                    fieldId: 'adjustqtyby',
-                    value: qtyneed // Set the quantity
-                });
+                            var workorderno = currentRec.getValue({
+                                fieldId: "custpage_workorderno"
+                            });
+
+                            var locationid = currentRec.getValue({
+                                fieldId: "custpage_locationid"
+                            });
+
+                            var sublistCount = currentRec.getLineCount({
+                                sublistId: 'custpage_records'
+                            });
+                            console.log("sublistCount",sublistCount);
+                            
+                            var invtransf = record.create({
+                                type: record.Type.INVENTORY_TRANSFER,
+                                isDynamic: true
+                            });
+                            invtransf.setValue({
+                                fieldId: 'memo',
+                                value: workorderno 
+                            });
+                            invtransf.setValue({
+                                fieldId: 'location',
+                                value: 1 // Replace with the internal ID
+                            });
+                            invtransf.setValue({
+                                fieldId: 'transferlocation',
+                                value: locationid // Replace with the internal ID
+                            });
 
 
-                // Create the subrecord for that line.
-                var subrec = invtransf.getCurrentSublistSubrecord({
-                    sublistId: 'inventory',
-                    fieldId: 'inventorydetail'
-                });
+                            for (var i = 0; i < sublistCount; i++) {
 
-                // Add a line to the subrecord's inventory assignment sublist.
-                subrec.selectNewLine({
-                    sublistId: 'inventoryassignment'
-                });
+                                var selec = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_selected',
+                                    line: i
+                                });
+                                
+                                if (!selec) continue;
 
-                subrec.setCurrentSublistValue({
-                    sublistId: 'inventoryassignment',
-                    fieldId: 'quantity',
-                    value: qtyneed
-                });
-                subrec.setCurrentSublistValue({
-                    sublistId: 'inventoryassignment',
-                    fieldId: 'binnumber',
-                    value: binlocationid
-                });
-                subrec.setCurrentSublistValue({
-                    sublistId: 'inventoryassignment',
-                    fieldId: 'tobinnumber',
-                    value: wpbinlocationid
-                });
+                                move(" ",i+1,sublistCount);
+                                move1(" ",i,sublistCountt);
 
-                
+                                var item = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_itemid',
+                                    line: i
+                                });
+                                var binlocationid = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_binlocationid',
+                                    line: i
+                                });
+                                var binlocation = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_binlocation',
+                                    line: i
+                                });
+                                var qty = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_qtyb',
+                                    line: i
+                                });
+                                var qtyneed = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_qtyneeded',
+                                    line: i
+                                });
+                                
+                                if (qtyneed > qty) {qtyneed = qty;}
 
-                // Save the line in the subrecord's sublist.
-                subrec.commitLine({
-                    sublistId: 'inventoryassignment'
-                });
+                                // Add line items
+                                invtransf.selectNewLine({
+                                    sublistId: 'inventory'
+                                });
+                                
+                                invtransf.setCurrentSublistValue({
+                                    sublistId: 'inventory',
+                                    fieldId: 'item',
+                                    value: item // Replace with the internal ID of the item
+                                });
+                                console.log("item",item);
+                                console.log("qtyneed",qtyneed);
+                                invtransf.setCurrentSublistValue({
+                                    sublistId: 'inventory',
+                                    fieldId: 'adjustqtyby',
+                                    value: qtyneed // Set the quantity
+                                });
 
 
-                invtransf.commitLine({
-                    sublistId: 'inventory'
-                });
+                                // Create the subrecord for that line.
+                                var subrec = invtransf.getCurrentSublistSubrecord({
+                                    sublistId: 'inventory',
+                                    fieldId: 'inventorydetail'
+                                });
 
-                
-            }
-            invtransf.save();
+                                // Add a line to the subrecord's inventory assignment sublist.
+                                subrec.selectNewLine({
+                                    sublistId: 'inventoryassignment'
+                                });
 
-            message.create({
-                title: "Process Completed",
-                message: "The Picking List has been processed successfully.",
-                type: message.Type.CONFIRMATION,
-                duration: 10000
-            }).show();
+                                subrec.setCurrentSublistValue({
+                                    sublistId: 'inventoryassignment',
+                                    fieldId: 'quantity',
+                                    value: qtyneed
+                                });
+                                subrec.setCurrentSublistValue({
+                                    sublistId: 'inventoryassignment',
+                                    fieldId: 'binnumber',
+                                    value: binlocationid
+                                });
+                                subrec.setCurrentSublistValue({
+                                    sublistId: 'inventoryassignment',
+                                    fieldId: 'tobinnumber',
+                                    value: wpbinlocationid
+                                });
+
+                                
+
+                                // Save the line in the subrecord's sublist.
+                                subrec.commitLine({
+                                    sublistId: 'inventoryassignment'
+                                });
+
+
+                                invtransf.commitLine({
+                                    sublistId: 'inventory'
+                                });
+
+                                
+                            }
+                            invtransf.save();
+
+                            message.create({
+                                title: "Process Completed",
+                                message: "The Picking List has been processed successfully.",
+                                type: message.Type.CONFIRMATION,
+                                duration: 10000
+                            }).show();
+
+                            location.reload();
+                        }
+                    }
+
+                    function fail(reason)
+                    {
+                        return false;
+                    }
+
+
             return true;
         }
 
-  
+        function printpl(woid) 
+        {
+            
+            
+            var suiteletURL = url.resolveScript({
+                scriptId: 'customscript_printbomlist',
+                deploymentId: 'customdeploy1',
+                returnExternalUrl: false,
+                params: {
+                    'id': woid,
+                }
+                });
+                https.get.promise({
+                    url: suiteletURL
+                }).then(function (response) {
+                    showSuccess(pdf)
+                }).catch(function (reason) {
+                    log.error("failed to send to print", reason)
+                    showError(reason);
+                });
+                // If the suitelet generates a PDF or form that should appear for the user, use window.open()
+                window.open(suiteletURL);
+                // To open SuiteLet in same tab, use location.href
+                
+
+        }
         return {
             pageInit: pageInit,
+            printpl: printpl,
             unmarkall: unmarkall,
             markall: markall,
             fieldChanged: fieldChanged,

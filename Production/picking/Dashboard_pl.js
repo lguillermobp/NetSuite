@@ -33,6 +33,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             entityname= paramWO.data.getValue({fieldId: "entityname"});
             finishedgoodsso= paramWO.data.getText({fieldId: "assemblyitem"});
             WONo= paramWO.data.getValue({fieldId: "tranid"});
+            WOsts= paramWO.data.getValue({fieldId: "status"});
+
+            log.audit("Wosts", WOsts);
             
 
             finishedqtyso= paramWO.data.getValue({fieldId: "quantity"});
@@ -60,11 +63,19 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 form.clientScriptModulePath = '/SuiteScripts/picking/DashboardClient_pl.js';
 
-                form.addButton({
-                    id: 'custpage_process',
-                    label: 'Submit',
-                    functionName: "process"
-                });
+
+                if (WOsts!="999Released") 
+                {
+                    form.addButton({
+                        id: 'custpage_process',
+                        label: 'Submit',
+                        functionName: "process"
+                    });
+
+                }
+
+
+               
                 form.addButton({
                     id: 'custpage_buttonback', //always prefix with 'custpage_'
                     label: 'Dashboard', //label of the button
@@ -147,7 +158,20 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 customerPO.defaultValue = customerPOso;
                 
+                // Work order status Field
                 
+                let workordersts = form.addField({
+                    id: "custpage_customerwosts",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Work ORder STS",
+                    container : 'fieldgroupid1'
+                });
+                workordersts.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                
+                workordersts.defaultValue = WOsts;
+
                 // department Field
                 
                 let department = form.addField({
@@ -327,17 +351,22 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
         
                 });
                 sublistpm.addButton({
-                    id: 'ustpage_markmark',
+                    id: 'custpage_markmark',
                     label: 'Mark all',
                     functionName: "markall()"
                 });
                 sublistpm.addButton({
-                    id: 'ustpage_unmarkmark',
+                    id: 'custpage_unmarkmark',
                     label: 'Unmark all',
                     functionName: "unmarkall()"
                 });
-                   
-				
+
+                sublistpm.addButton({
+                id: "custpage_print", 
+                label: "Print BOM ECD",
+                functionName: "printpl("+WOID+")"
+                })
+
                 let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
                     type: serverWidget.FieldType.TEXT,
@@ -440,6 +469,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.qtyneeded
                     });
+                    log.audit("wresult1.item " , result1.item);
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binlocationid',
                         line: counter,
@@ -528,6 +558,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     counter++;
                 
 				})
+
+
+                /*
 
 
                 var sublistcm = form.addSublist({
@@ -650,7 +683,116 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 
 				})
 
+                */
 
+                // New Subtag or SubList
+
+                var sublisttr = form.addSublist({
+                    id: 'custpage_recordstr',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'Transfered Items',
+
+                });
+
+
+                sublisttr.addField({
+                    id: "custrecordtr_item",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'item'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_itemdesc",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Description'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_qty",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Qty'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_type",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Type'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_dco",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Document'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_bin",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'BinLocation'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_user",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'User'
+                });
+                sublisttr.addField({
+                    id: "custrecordtr_date",
+                    type: serverWidget.FieldType.DATE,
+                    label:'Date'
+                });
+
+
+
+                // loop through each line, skipping the header
+
+                var resultstr= findCases5(WONo,locationsoid);
+                var counter = 0;
+                resultstr.forEach(function(result1) {
+
+
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_item',
+                        line: counter,
+                        value: result1.item
+                        
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_itemdesc',
+                        line: counter,
+                        value: result1.itemdesc+" "
+                        
+                    });
+                
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_qty',
+                        line: counter,
+                        value: result1.qty 
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_user',
+                        line: counter,
+                        value: result1.user 
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_type',
+                        line: counter,
+                        value: result1.type 
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_dco',
+                        line: counter,
+                        value: result1.dco 
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_date',
+                        line: counter,
+                        value: result1.date 
+                    });
+                    sublisttr.setSublistValue({
+                        id: 'custrecordtr_bin',
+                        line: counter,
+                        value: result1.bin 
+                    });
+
+                
+                    counter++;
+
+                })
 
 
 
@@ -727,8 +869,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-                //"qtyc":result.getValue({name: "quantitycommitted"}),
-                "qtyc": 0 ,
+                "qtyc":result.getValue({name: "quantitycommitted"}),
+                //"qtyc": 0 ,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
             };
@@ -854,8 +996,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     "available": Number(result.getValue({name: "available"}))
                 });
             }
-            //balanceitem=balanceitem-Number(result.getValue({name: "available"}));
-            balanceitem=balanceitem-0;
+            balanceitem=balanceitem-Number(result.getValue({name: "available"}));
+            //balanceitem=balanceitem-0;
 
             return true;
         });
@@ -911,11 +1053,79 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             b++;
             }
         }
-
-	
-
-		return pagedatas;
+       
+        return pagedatas;
 	}
+    var pagedatastr=[];
+    function findCases5(WO,workOrderLocation) {
+        log.audit("WO " , WO);
+        log.audit("workOrderLocation " , workOrderLocation);
+            
+        var j=0;
+        const searchWorkOrderLines = search.create({
+            type: "inventorytransfer",
+            settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
+            filters:
+            [
+                ["type","anyof","InvTrnfr"], 
+                "AND", 
+                ["memo","startswith",WO], 
+                "AND", 
+                ["location","anyof",workOrderLocation]
+            ],
+            columns:
+            [
+                "trandate",
+                "type",
+                "tranid",
+                "entity",
+                "memo",
+                "amount",
+                "item",
+                "quantity",
+                "location",
+                search.createColumn({
+                    name: "binnumber",
+                    join: "inventoryDetail"
+                }),
+                "createdby",
+                search.createColumn({
+                   name: "purchasedescription",
+                   join: "item"
+                })
+            ]
+        });
+        var pagedData = searchWorkOrderLines.runPaged({
+			"pageSize" : 1000
+		});
+
+
+
+		pagedData.pageRanges.forEach(function (pageRange) {
+
+			var page = pagedData.fetch({index: pageRange.index});
+
+			page.data.forEach(function (result) {
+           
+            
+            pagedatastr[j] = {
+                "item": result.getText({name: "item"}),
+                "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
+                "bin": result.getText({name: "binnumber", join: "inventoryDetail"}),
+                "qty": result.getValue({name: "quantity"}),
+                "type": result.getValue({name: "type"}),
+                "date": result.getValue({name: "trandate"}),
+                "dco": result.getValue({name: "tranid"}),
+                "user": result.getText({name: "createdby"})
+                }
+                j++;
+           
+        })
+    })
+        
+        return pagedatastr;
+    }
+
     return {
         onRequest: onRequest
     };

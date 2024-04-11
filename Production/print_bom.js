@@ -187,8 +187,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-                //"qtyc":result.getValue({name: "quantitycommitted"}),
-                "qtyc":0,
+                "qtyc":result.getValue({name: "quantitycommitted"}),
+                //"qtyc":0,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
                 };
@@ -310,8 +310,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     });
                     log.audit("available " , result.getValue({name: "available"}));
                 }
-                //balanceitem=balanceitem-Number(result.getValue({name: "available"}));
-                balanceitem=balanceitem-0;
+                balanceitem=balanceitem-Number(result.getValue({name: "available"}));
+                //balanceitem=balanceitem-0;
 
 
 
