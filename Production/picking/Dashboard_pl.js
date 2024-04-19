@@ -21,6 +21,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 		 */
         var pagedatasbo=[];
         var pagedatascm=[];
+        var transferred=[];
         function onRequest(context) {
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
@@ -63,8 +64,45 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 form.clientScriptModulePath = '/SuiteScripts/picking/DashboardClient_pl.js';
 
-
-                if (WOsts!="999Released") 
+                if (WOsts=="Planned") 
+                {
+                    log.audit("WOID " , WOID);
+                    try {
+                        var itemrec = record.load({
+                            type: "workorder",
+                            id: WOID,
+                            isDynamic: false,
+                            defaultValues: null
+                        });
+                        itemrec.setValue({
+                            fieldId: "orderstatus",
+                            value: 'B'
+                        });
+                        itemrec.save({
+                            enableSourcing: true,
+                            ignoreMandatoryFields: true
+                        });
+                    // Submit a change status to Released.
+                    // var otherId = record.submitFields({
+                    //     type: 'workorder',
+                    //     id: WOID,
+                    //     values: {
+                    //         'orderstatus ': 'B'
+                    //     },
+                    //     options: {
+                    //         enableSourcing: false,
+                    //         ignoreMandatoryFields: true
+                    //     }
+                    // });
+                    WOsts="Released"
+                } catch (e) {
+                    log.error({
+                        title: e.name,
+                        details: e.message
+                    });
+                }
+                }
+                if (WOsts=="Released") 
                 {
                     form.addButton({
                         id: 'custpage_process',
@@ -153,10 +191,22 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 customerPO.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                customerPO.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
+                
                 customerPO.defaultValue = customerPOso;
+
+                // CustomerPO Field
+                
+                let workorderid = form.addField({
+                    id: "custpage_workorderid",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "WO Internal ID",
+                    container : 'fieldgroupid1'
+                });
+                workorderid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                
+                workorderid.defaultValue = WOID;
                 
                 // Work order status Field
                 
@@ -398,7 +448,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 sublistpm.addField({
                     id: "custrecordml_commitedqty",
                     type: serverWidget.FieldType.TEXT,
-                    label: "Commited Qty"
+                    label: "Transferred Qty"
                 });
                 sublistpm.addField({
                     id: "custrecordml_qtyneeded",
@@ -431,7 +481,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     label: 'Selected',
                     type: serverWidget.FieldType.CHECKBOX
                 });
-    
+                var resultstr= findCases5(WONo,locationsoid);
                 // loop through each line, skipping the header
                 var resultspt= findCases1(WOID,locationsoid);
                 var counter = 0;
@@ -459,10 +509,13 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.qty 
                     });
+
+                    if (!transferred[result1.item]) {qtytrn="0"}
+                    else {qtytrn=transferred[result1.item].qty}
                     sublistpm.setSublistValue({
                         id: 'custrecordml_commitedqty',
                         line: counter,
-                        value: result1.qtycommited
+                        value: qtytrn
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qtyneeded',
@@ -470,6 +523,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         value: result1.qtyneeded
                     });
                     log.audit("wresult1.item " , result1.item);
+                    log.audit("result1.binlocationid " , result1.binlocationid);
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binlocationid',
                         line: counter,
@@ -740,7 +794,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
                 // loop through each line, skipping the header
 
-                var resultstr= findCases5(WONo,locationsoid);
+                
                 var counter = 0;
                 resultstr.forEach(function(result1) {
 
@@ -856,7 +910,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 },
                 search.createColumn({
                    name: "formulanumeric",
-                   formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
+                   formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
                    label: "BackOrder"
                 })
             ]
@@ -869,8 +923,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-                "qtyc":result.getValue({name: "quantitycommitted"}),
-                //"qtyc": 0 ,
+              //"qtyc":result.getValue({name: "quantitycommitted"}),
+                "qtyc": 0 ,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
             };
@@ -979,6 +1033,10 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 qtyr=balanceitem;
             }
             if (balanceitem>0) {
+
+                if (!result.getValue({name: "binnumber"})) {binn=" ";binnt=" ";}
+                else {binn=result.getValue({name: "binnumber"});binnt=result.getText({name: "binnumber"});}
+
                 inventoryBalanceData.push({
                     "lineNumber": lineNumbers[result.getText({name: "item"})].line,
                     "qty": qtyr,
@@ -986,8 +1044,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     "item": result.getText({name: "item"}),
                     "locationPriority": inventoryBalanceLocationPriority,
                     "location": inventoryBalanceLocation,
-                    "binnumber": result.getText({name: "binnumber"}),
-                    "binnumberid": result.getValue({name: "binnumber"}),
+                    "binnumber": binnt,
+                    "binnumberid": binn,
                     "inventorynumber": result.getText({name: "inventorynumber"}),
                     "expirationdate": result.getValue({name: "expirationDate", join: "inventoryNumber"}),
                     //"expirationdate": balanceitem + "-" + Number(result.getValue({name: "available"})),
@@ -1119,7 +1177,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "user": result.getText({name: "createdby"})
                 }
                 j++;
-           
+
+            transferred[result.getText({name: "item"})] = {
+                "qty":result.getValue({name: "quantity"})
+            };
+            
         })
     })
         

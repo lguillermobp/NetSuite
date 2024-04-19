@@ -174,7 +174,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     search.createColumn({
                        name: "formulanumeric",
                       // formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
-                       formula: "CASE WHEN ({item.quantityavailable} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity} THEN ABS({item.quantityavailable}-{quantity})  ELSE 0 END END",
+                       formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
                        label: "BackOrder"
                     })
                 ]
@@ -187,8 +187,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-                "qtyc":result.getValue({name: "quantitycommitted"}),
-                //"qtyc":0,
+                //"qtyc":result.getValue({name: "quantitycommitted"}),
+                "qtyc":0,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
                 };

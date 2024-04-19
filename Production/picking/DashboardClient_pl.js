@@ -18,15 +18,6 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             var WOsts = currentRec.getValue({
                 fieldId: 'custpage_customerwosts'
             });
-
-            if (WOsts == "999Released") {
-            message.create({
-                title: "Manufacturing Order Status Error",
-                message: "Te MO is now in " + WOsts + " status. Please release the MO first before processing the Picking List.",
-                type: message.Type.ERROR
-            }).show();
-            }
-
             sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
@@ -34,6 +25,15 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 sublistId: 'custpage_recordstr'
             });
 
+            if (WOsts != "Released") {
+            message.create({
+                title: "Manufacturing Order Status Error",
+                message: "The MO is now in " + WOsts + " status. Please release the MO first before processing the Picking List.",
+                type: message.Type.ERROR
+            }).show();
+            }
+            else {
+           
 
             if (sublistCounttr>0) {
                 message.create({
@@ -43,7 +43,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                     duration: 10000
                 }).show();
                 }
-    
+            }
 
 
             sublistCountt = Number(currentRec.getLineCount({
@@ -127,7 +127,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 sublistId: 'custpage_records'
             });
 
-            for(var i=0;i<=count;i++) {
+            for(var i=0;i<count;i++) {
 
                 currentRec.selectLine({
                     sublistId: "custpage_records",
@@ -159,7 +159,8 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 sublistId: 'custpage_records'
             });
             
-            for(var i=0;i<=count;i++) {
+            for(var i=0;i<count;i++) {
+
 
                 currentRec.selectLine({
                     sublistId: "custpage_records",
@@ -257,6 +258,9 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             var workorderno = currentRec.getValue({
                                 fieldId: "custpage_workorderno"
                             });
+                            var workorderid = currentRec.getValue({
+                                fieldId: "custpage_workorderid"
+                            });
 
                             var locationid = currentRec.getValue({
                                 fieldId: "custpage_locationid"
@@ -272,18 +276,29 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 isDynamic: true
                             });
                             invtransf.setValue({
+                                fieldId: 'subsidiary',
+                                value: "1" 
+                            });
+                            invtransf.setValue({
                                 fieldId: 'memo',
                                 value: workorderno 
                             });
                             invtransf.setValue({
+                                fieldId: 'custbody_mo',
+                                value: workorderid
+                            });
+                            
+                            try {invtransf.setValue({
                                 fieldId: 'location',
                                 value: 1 // Replace with the internal ID
                             });
+                            } catch(e) { console.log("error",e);}
+                            
                             invtransf.setValue({
                                 fieldId: 'transferlocation',
                                 value: locationid // Replace with the internal ID
                             });
-
+                            console.log("locationid",locationid);
 
                             for (var i = 0; i < sublistCount; i++) {
 
@@ -337,14 +352,15 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     value: item // Replace with the internal ID of the item
                                 });
                                 console.log("item",item);
-                                console.log("qtyneed",qtyneed);
+                                
+                               
                                 invtransf.setCurrentSublistValue({
                                     sublistId: 'inventory',
                                     fieldId: 'adjustqtyby',
                                     value: qtyneed // Set the quantity
                                 });
 
-
+                                console.log("binlocationid",binlocationid);
                                 // Create the subrecord for that line.
                                 var subrec = invtransf.getCurrentSublistSubrecord({
                                     sublistId: 'inventory',
@@ -361,17 +377,24 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     fieldId: 'quantity',
                                     value: qtyneed
                                 });
+                                console.log("qtyneed",qtyneed);
+                                try {
                                 subrec.setCurrentSublistValue({
                                     sublistId: 'inventoryassignment',
                                     fieldId: 'binnumber',
                                     value: binlocationid
                                 });
-                                subrec.setCurrentSublistValue({
+                            }
+                            catch(e) { console.log("error",e);}
+                                console.log("wpbinlocationid",wpbinlocationid);
+                                
+                                    subrec.setCurrentSublistValue({
                                     sublistId: 'inventoryassignment',
                                     fieldId: 'tobinnumber',
                                     value: wpbinlocationid
                                 });
-
+                                
+                                console.log("wpbinlocationid",wpbinlocationid);
                                 
 
                                 // Save the line in the subrecord's sublist.
@@ -388,6 +411,31 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             }
                             invtransf.save();
 
+                            // Submit a change status to Released.
+                            d= new Date();
+                             
+                        try {
+                            var itemrec = record.load({
+                                type: "workorder",
+                                id: workorderid,
+                                isDynamic: false,
+                                defaultValues: null
+                            });
+                            itemrec.setValue({
+                                fieldId: "custbody_pickingdate",
+                                value:  d
+                            });
+                            itemrec.save({
+                                enableSourcing: true,
+                                ignoreMandatoryFields: true
+                            });
+                           
+                        } catch (e) {
+                            log.error({
+                                title: e.name,
+                                details: e.message
+                            });
+                        }
                             message.create({
                                 title: "Process Completed",
                                 message: "The Picking List has been processed successfully.",
@@ -395,7 +443,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 duration: 10000
                             }).show();
 
-                            location.reload();
+                           location.reload();
                         }
                     }
 
