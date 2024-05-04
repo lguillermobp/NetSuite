@@ -29,7 +29,7 @@
 
               
 
-                 if (internalid==7755)
+                 if (internalid==10950)
                  {
                          var lineCount = datarec.getLineCount({
                                  sublistId: 'item'
@@ -42,10 +42,15 @@
                                          line: i
                                  });
                                  
+                                 itemid=datarec.getCurrentSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'item'
+                                });
                                  qty=datarec.getCurrentSublistValue({
                                         sublistId: 'item',
                                         fieldId: 'quantity'
                                 });
+
 
                                 log.debug("qty",qty);
                                 datarec.setCurrentSublistValue({
@@ -54,16 +59,12 @@
                                          value: false,
                                          ignoreFieldChange: true
                                  });
-                                // datarec.setCurrentSublistValue({
-                                //         sublistId: 'item',
-                                //         fieldId: 'createoutsourcedwo',
-                                //         value: true,
-                                //         ignoreFieldChange: true
-                                // });
+                                  
                                  
                                  datarec.commitLine({
                                          sublistId: 'item'
                                  });
+                             
 
 
                          }

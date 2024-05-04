@@ -30,14 +30,12 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
             log.debug("createdfrom",  createdfrom);
 
 
-           
-           
-
         }
 
         function showbin(context) {
 
           var datarec = currentRecord.get();
+          var varbin="";
 
           console.log(datarec);
 
@@ -50,8 +48,9 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
           log.debug("itemCount",itemCount);
 
           while (itemIndex < itemCount) {
-
+              varbin="";
               console.log(itemIndex);
+              
               try {
                   datarec.selectLine({
                       "sublistId": "item",
@@ -67,10 +66,18 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
 
             console.log(inventorydetailavail);
 
-            if (inventorydetailavail == "T") 
+            var itemreceive = datarec.getCurrentSublistValue({
+              sublistId: 'item',
+              fieldId: "itemreceive"
+            });
+           
+          
+            
+            
+            if (itemreceive && inventorydetailavail=="T")
             {
 
-              try {
+              
               
                   var subRecordInventoryDetail = datarec.getCurrentSublistSubrecord({
                     sublistId: 'item',
@@ -81,6 +88,9 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
                 });
                 console.log(linetot);
                 console.log(subRecordInventoryDetail);
+                try {
+                if (linetot > 0) 
+                {
                   subRecordInventoryDetail.selectLine({
                     sublistId: 'inventoryassignment',
                     line: 0
@@ -109,9 +119,9 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
                 });
 
                 log.debug("binNumber", binNumber);
-
+                
                     varbin+= binNumbertxt + " (" + quantity + ") ";
-
+                    console.log(varbin);
 
                     if (varbin) {
                       log.debug("varbin",varbin);
@@ -126,12 +136,12 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
                           log.debug({  title: "error: ", details: "datarec.setCurrentSublistValue Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
                       }
                   }
-                  
+                }
                 }
 
-          } catch (e) {
-            log.debug({  title: "error: ", details: "datarec.selectLine Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
-            }  
+            } catch (e) {
+              log.debug({  title: "error: ", details: "datarec.selectLine Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+              }  
 
 
 
@@ -139,12 +149,8 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
 
 
               itemIndex++;
-          }
-
-
+          }       
          
-         
-
       }
 
         /**
@@ -305,25 +311,37 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
                     sublistId: 'item',
                     fieldId: "inventorydetailavail"
                 });
-
-                if (inventorydetailavail == true) 
+                var itemreceive = currentRecord.getCurrentSublistValue({
+                  sublistId: 'item',
+                  fieldId: "itemreceive"
+                });
+                var inventorydetailset = currentRecord.getCurrentSublistValue({
+                  sublistId: 'item',
+                  fieldId: "inventorydetailset"
+                });
+              
+                
+                
+                if (itemreceive && inventorydetailavail=="T")
                 {
-                var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
+                  log.debug("itemreceive", itemreceive);
+                  var subRecordInventoryDetail = currentRecord.getCurrentSublistSubrecord({
                     sublistId: 'item',
                     fieldId: 'inventorydetail'
                 });
-
-
-                var itemid = subRecordInventoryDetail.getValue({
-                    fieldId: 'item'
-                });
-
-
+                  try {
+                
+                log.debug("subRecordInventoryDetail", subRecordInventoryDetail);
+                } catch (e) { console.log(e); }
+                console.log(subRecordInventoryDetail);
                 if (subRecordInventoryDetail) {
                     var srLineCount = subRecordInventoryDetail.getLineCount({
                         sublistId: 'inventoryassignment'
                     });
-                    
+                    var itemid = subRecordInventoryDetail.getValue({
+                      fieldId: 'item'
+                    });
+                    log.debug("srLineCount", srLineCount);
                     if (srLineCount > 0) 
                     {
                         

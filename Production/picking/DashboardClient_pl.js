@@ -18,6 +18,9 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             var WOsts = currentRec.getValue({
                 fieldId: 'custpage_customerwosts'
             });
+            var department = currentRec.getValue({
+                fieldId: 'custpage_department'
+            });
             sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
@@ -34,15 +37,23 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             }
             else {
            
+                if (department == " ") {
+                    message.create({
+                        title: "Department is Blank",
+                        message: "Please, verify  MO's department.",
+                        type: message.Type.ERROR
+                    }).show();
+                    }
+                if (sublistCounttr>0) {
+                    message.create({
+                        title: "MO has been previously transferred",
+                        message: "Caution this Manufacturing Order already has a transfer done previously.",
+                        type: message.Type.WARNING,
+                        duration: 10000
+                    }).show();
+                    }
 
-            if (sublistCounttr>0) {
-                message.create({
-                    title: "MO has been previously transferred",
-                    message: "Caution this Manufacturing Order already has a transfer done previously.",
-                    type: message.Type.WARNING,
-                    duration: 10000
-                }).show();
-                }
+            
             }
 
 
@@ -442,6 +453,52 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 type: message.Type.CONFIRMATION,
                                 duration: 10000
                             }).show();
+
+
+
+                        try {
+                            var reccom = record.load({
+                                type: "commitorderschedule",
+                                id: 10,
+                                isDynamic: false,
+                                defaultValues: null
+                            });
+                            reccom.setValue({
+                                fieldId: "startdateshadow",
+                                value:  d
+                            });
+                            reccom.setValue({
+                                fieldId: "starttimepicker",
+                                value:  d
+                            });
+
+                            var index = reccom.findSublistLineWithValue({"sublistId": "item", "fieldId": "item", "value": 13871});
+
+                            if (index != -1) {
+                                reccom.setSublistValue({
+                                    "sublistId": "item",
+                                    "fieldId": 'quantity',
+                                    "line": index,
+                                    "value": 0
+                                });
+                            }
+
+                            
+
+                            reccom.save({
+                                enableSourcing: true,
+                                ignoreMandatoryFields: true
+                            });
+                            
+                        } catch (e) {
+                            log.error({
+                                title: e.name,
+                                details: e.message
+                            });
+
+                        }
+
+
 
                            location.reload();
                         }

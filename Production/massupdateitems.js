@@ -8,7 +8,7 @@ define(['N/record','N/log'],
             var rec = record.load({
                 type: params.type,
                 id: params.id,
-                isDynamic: true
+                isDynamic: false
             });
 
             /*
@@ -19,11 +19,13 @@ define(['N/record','N/log'],
                 line: 0
             }); 
              */
+            /*
             rec.setValue({
                 fieldId: 'unitstype',
                 value: "1"
             });
             var saverec = rec.save();
+            /*
             /*
             rec.setMatrixSublistValue ({
                 sublistId: 'price',
@@ -64,7 +66,7 @@ define(['N/record','N/log'],
             try {var saverec = rec.save();}
              catch(e) {
              log.debug('Error', e);log.debug('params.id', params.id);}
-
+            */
 
 
              try {var preferredvendor = rec.setSublistValue({
@@ -78,7 +80,7 @@ define(['N/record','N/log'],
              catch(e) {
                  log.debug('Error', e);}
 
-                
+                /*
              var descpo = rec.getValue({fieldId:"purchasedescription"})
              rec.setValue({fieldId:"salesdescription",value: descpo})
 

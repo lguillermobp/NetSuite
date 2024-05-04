@@ -3,7 +3,7 @@
  * @NApiVersion 2.1
  */
 
-define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log'],
+define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
 	/**
 	 *
 	 * @param serverWidget
@@ -13,12 +13,24 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 	 * @param base
 	 * @param _
 	 */
-	function (file, redirect, runtime,serverWidget,record, search, file, error,log) {
+	function (file, redirect, runtime,serverWidget,record, search, file, error,log, GENERALTOOLS) {
 		/**
 		 *
 		 * @param context
 		 */
+        var customersselected;
+        var sectionsselected;
         function onRequest(context) {
+
+            var userObj = runtime.getCurrentUser();
+            var paramemp = GENERALTOOLS.get_employee_value(userObj.id);
+            customersselected=paramemp.data.getValue({fieldId: "custentity_customerssalected"});
+            sectionsselected=paramemp.data.getValue({fieldId: "custentity_sectionsselected"});
+            vendorsselected=paramemp.data.getValue({fieldId: "custentity_vendorsselected"});
+
+		    // var userID = userObj.id;
+		    // var userPermission = userObj.getPermission({	name : 'TRAN_BUILD'	});
+		    // autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
 
             if (context.request.method === 'GET') {
         
@@ -31,6 +43,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: 'custpage_process',
                     label: 'Generate POs',
                     functionName: "process()"
+                });
+                form.addButton({
+                    id: 'custpage_refresh',
+                    label: 'Refresh records',
+                    functionName: "refresh("+userObj.id+")"
                 });
 
                
@@ -52,10 +69,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: "html",
                     type: serverWidget.FieldType.INLINEHTML,
                 });
-                htmlField.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.ENDROW
-                });
-                htmlField.defaultValue = '<div> testing  </div>';
+                
     
     
                 var sublistpm = form.addSublist({
@@ -75,7 +89,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     for (let y in resultspt[x]) {
                         if (isfirsttime) {
                             header+='"'+y+'",';  
-                            log.debug("x",x);
+                           
                         }
                         contenido+='"'+resultspt[x][y]+'",'; 
                         
@@ -84,11 +98,39 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     isfirsttime=false;
                  }
                  plantext=header+'\n'+contenido;
-                 log.debug("header",header);
-                 log.debug("plantext",plantext);
                  
+                var vendor = form.addField({
+                    id: "custpage_vendors",
+                    type: serverWidget.FieldType.MULTISELECT,
+                    label: "Vendors",
+                    source: "Vendor"
+                    });
 
-               
+                    vendor.defaultValue = vendorsselected;
+
+                 
+                 var customer = form.addField({
+                    id: "custpage_customers",
+                    type: serverWidget.FieldType.MULTISELECT,
+                    label: "Customers",
+                    source: "Customer"
+                    });
+
+                customer.defaultValue = customersselected;
+
+                    customer.updateBreakType({
+                        breakType : serverWidget.FieldBreakType.STARTCOL
+                    });
+                    
+
+                var sections = form.addField({
+                    id: "custpage_section",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Sections",
+                    source: "customrecord_section"
+                    });
+
+                sections.defaultValue = sectionsselected;
 
 				sublistpm.addButton({
                     id: 'custpage_processtag',
@@ -101,11 +143,26 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label : 'Export CSV', //label of the button
                     functionName: 'onButtonClick("'+encodeURI(plantext)+'")'
                 });
+                sublistpm.addButton({
+                    id: 'custpage_markmark',
+                    label: 'Mark all',
+                    functionName: "markall()"
+                });
+                sublistpm.addButton({
+                    id: 'custpage_unmarkmark',
+                    label: 'Unmark all',
+                    functionName: "unmarkall()"
+                });
 
                 sublistpm.addField({
                     id: "custrecordml_productionline",
                     type: serverWidget.FieldType.TEXT,
                     label:'Production Line'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_task",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Schedule'
                 });
                 var sectionidc =sublistpm.addField({
                     id: "custrecordml_sectionid",
@@ -161,6 +218,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'Available Quantity'
                 });
                 sublistpm.addField({
+                    id: "custrecordml_qtypo",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Quantity on Purchase Order'
+                });
+                sublistpm.addField({
                     id: "custrecordml_qty",
                     type: serverWidget.FieldType.INTEGER,
                     label:'Quantity'
@@ -202,7 +264,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
 
                 var resultscurr= currencies();
-                log.debug("resultscurr",resultscurr);
+               
                 
                
     
@@ -211,6 +273,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
 
+                    //if ((result1.qty-result1.qtya)>0) 
+                    if ((result1.qty)>0)
+                    {
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_preferredvendor',
@@ -228,6 +293,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_section',
                         line: counter,
                         value: result1.section
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_task',
+                        line: counter,
+                        value: result1.task
                         
                     });
                     sublistpm.setSublistValue({
@@ -268,45 +339,57 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.qtya
                     });
                     sublistpm.setSublistValue({
+                        id: 'custrecordml_qtypo',
+                        line: counter,
+                        value: result1.qtypo
+                    });
+                    sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
                         line: counter,
-                        value: (result1.qty-result1.qtya)
+                        value: (result1.qty)
+                      //  value: (result1.qty-result1.qtya-result1.qtypo)
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_total',
                         line: counter,
                         value: result1.total.toFixed(2)
                     });
+                    
+                    if (!result1.currency) {
+                        dcurrency="US Dollar";}
+                    else {dcurrency=result1.currency;}
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_currency',
                         line: counter,
-                        value: result1.currency
+                        value: dcurrency
                     });
                     
                     sublistpm.setSublistValue({
                         id: 'custrecordml_currencyrate',
                         line: counter,
-                        value: resultscurr[result1.currency].exchangerate
+                        value: resultscurr[dcurrency].exchangerate
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_totalusd',
                         line: counter,
-                        value: (result1.total/resultscurr[result1.currency].exchangerate).toFixed(2)
+                        value: (result1.total/resultscurr[dcurrency].exchangerate).toFixed(2)
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_memo',
                         line: counter,
-                        value: result1.memo
+                        value: result1.memo.substring(0, 298)
                     });
                    
                     counter++;
+                }
                 
 				})
 
                 
                 var sublister = form.addSublist({
                     id: 'custpagee_records',
-                    type : serverWidget.SublistType.INLINEEDITOR,
+                    type : serverWidget.SublistType.LIST,
                     label: 'Vendor Error Records',
         
                 });
@@ -316,7 +399,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Production Line'
                 });
-
+                sublister.addField({
+                    id: "custrecordml_task",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Schedule'
+                });
                 sublister.addField({
                     id: "custrecordml_section",
                     type: serverWidget.FieldType.TEXT,
@@ -353,11 +440,17 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
 
-    
+                   
                     sublister.setSublistValue({
                         id: 'custrecordml_section',
                         line: counter,
                         value: result1.section
+                        
+                    });
+                    sublister.setSublistValue({
+                        id: 'custrecordml_task',
+                        line: counter,
+                        value: result1.task
                         
                     });
                     sublister.setSublistValue({
@@ -385,10 +478,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublister.setSublistValue({
                         id: 'custrecordml_memo',
                         line: counter,
-                        value: result1.memo
+                        value: result1.memo.substring(0, 298)
                     });
                    
                     counter++;
+                
                 
 				})
 
@@ -409,7 +503,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "workorder",
         filters:
         [
-            ["formulatext: CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN 'YES' ELSE CASE WHEN {item.quantityavailable}<{quantity}-NVL({quantitycommitted}, 0) THEN 'YES'  ELSE 'NO' END END","contains","YES"], 
+            ["formulatext: CASE WHEN  {quantity}-NVL({quantitycommitted}, 0)>0  THEN 'YES'  ELSE 'NO' END","contains","YES"], 
             "AND", 
             ["type","anyof","WorkOrd"], 
             "AND", 
@@ -426,8 +520,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             summary: "GROUP"
             }),
             search.createColumn({
+            name: "custbody2",
+            summary: "MAX"
+            }),
+            search.createColumn({
             name: "custbody_section",
-            summary: "GROUP"
+            summary: "MAX"
             }),
             search.createColumn({
                 name: "vendor",
@@ -453,7 +551,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             search.createColumn({
                 name: "formulatext",
                 summary: "MAX",
-                formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {item.vendorpricecurrency} ELSE ' ' END"
+                formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {item.vendorpricecurrency} ELSE '' END"
             }),
             search.createColumn({
                 name: "quantityavailable",
@@ -469,9 +567,40 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "altname",
                 join: "customerMain",
                 summary: "GROUP"
+             }),
+             search.createColumn({
+                name: "quantityonorder",
+                join: "item",
+                summary: "MAX"
              })
-        ]
-                });
+            ]
+        });
+        
+        
+        if (customersselected.length>0) {
+            log.debug("customersselected",customersselected);
+            fsearch.filters.push(search.createFilter({
+                name: "name",
+                operator: "anyof",
+                values: customersselected
+            }));
+        }
+        if (vendorsselected.length>0) {
+            log.debug("vendorsselected",vendorsselected);
+            fsearch.filters.push(search.createFilter({
+                name: "othervendor",
+                join: "item",
+                operator: "anyof",
+                values: vendorsselected
+            }));
+        }
+        if (sectionsselected.length>0) {
+            fsearch.filters.push(search.createFilter({
+                name: "custbody_section",
+                operator: "startswith",
+                values: [sectionsselected]
+            }));
+        }
 
 		var pagedData = fsearch.runPaged({
 			"pageSize" : 1000
@@ -488,25 +617,26 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             var qtytot=0;
             var qtytota=0;
             var memo="";
+            var section;
 
 			page.data.forEach(function (fresult) {
 
                 if (isfirsttime) 
                 {
                     
-                    sectiont=fresult.getValue({name: "custbody_section",summary: "GROUP"});
+                    sectiont=fresult.getValue({name: "custbody_section",summary: "MAX"});
                     prod=fresult.getText({name: "item",summary: "GROUP"});
                     isfirsttime=false;
                 }
-                log.debug("prod",prod);
-                log.debug("sectiont",sectiont);
-                if (prod!=fresult.getText({name: "item",summary: "GROUP"}) || sectiont!=fresult.getValue({name: "custbody_section",summary: "GROUP"}))
+                
+                if (prod!=fresult.getText({name: "item",summary: "GROUP"}) || sectiont!=fresult.getValue({name: "custbody_section",summary: "MAX"}))
                 {  
                     prod=fresult.getText({name: "item",summary: "GROUP"});
-                    sectiont=fresult.getValue({name: "custbody_section",summary: "GROUP"});
+                    sectiont=fresult.getValue({name: "custbody_section",summary: "MAX"});
                     
 				    pagedatas[i] = {
 					"section": section,
+                    "task": task,
                     "productionline": productionline,
                     "preferredvendor": preferredvendor,
                     "preferredvendorid": preferredvendorid,
@@ -516,7 +646,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "currency": currency,
 					"qty": qtytot,
                     "qtya": qtytota,
-                    "total": (qtytot-qtytota) * price,
+                    "qtypo": qtytotpo,
+                    "total": (qtytot) * price,
+                    //"total": (qtytot-qtytota) * price,
                     "memo": memo
 				    }
                     qtytot=0;
@@ -527,15 +659,21 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
 
             productionline=fresult.getText({name: "custbody_productionline",summary: "GROUP"});
-            section=fresult.getValue({name: "custbody_section",summary: "GROUP"});
+            if (fresult.getValue({name: "custbody_section",summary: "MAX"})) {section=fresult.getValue({name: "custbody_section",summary: "MAX"});}
+            else {section=" ";}
+            if (fresult.getValue({name: "custbody2",summary: "MAX"})) {task=fresult.getValue({name: "custbody2",summary: "MAX"});}
+            else {task=" ";}
+            
             preferredvendor=fresult.getText({name: "vendor",join: "item",summary: "GROUP"});
             preferredvendorid=fresult.getValue({name: "vendor",join: "item",summary: "GROUP"});
             item=fresult.getText({name: "item",summary: "GROUP"});
             itemid=fresult.getValue({name: "item",summary: "GROUP"});
             price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
             currency=fresult.getValue({name: "formulatext",summary: "MAX"});
+            
             qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
-            qtytota+=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
+            qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
+            qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
             memo+=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"})+"; ";
 			})
 		});
@@ -550,7 +688,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "workorder",
         filters:
         [
-            ["formulatext: CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN 'YES' ELSE CASE WHEN {item.quantityavailable}<{quantity}-NVL({quantitycommitted}, 0) THEN 'YES'  ELSE 'NO' END END","contains","YES"], 
+            ["formulatext: CASE WHEN  {quantity}-NVL({quantitycommitted}, 0)>0  THEN 'YES'  ELSE 'NO' END","contains","YES"], 
             "AND", 
             ["type","anyof","WorkOrd"], 
             "AND", 
@@ -567,8 +705,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             summary: "GROUP"
             }),
             search.createColumn({
+            name: "custbody2",
+            summary: "MAX"
+            }),
+            search.createColumn({
             name: "custbody_section",
-            summary: "GROUP"
+            summary: "MAX"
             }),
             search.createColumn({
                 name: "vendor",
@@ -584,7 +726,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             search.createColumn({
                 name: "formulanumeric",
                 summary: "SUM",
-                formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity}-NVL({item.quantityavailable}, 0) ELSE {quantity}-NVL({item.quantityavailable}, 0) END"
+                formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE {quantity} END"
             }),
             search.createColumn({
                 name: "formulacurrency",
@@ -605,9 +747,38 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "altname",
                 join: "customerMain",
                 summary: "GROUP"
+             }),
+             search.createColumn({
+                name: "quantityonorder",
+                join: "item",
+                summary: "MAX"
              })
         ]
         });
+
+        if (customersselected.length>0) {
+            fsearch.filters.push(search.createFilter({
+                name: "name",
+                operator: "anyof",
+                values: customersselected
+            }));
+        }
+        if (vendorsselected.length>0) {
+            log.debug("vendorsselected",vendorsselected);
+            fsearch.filters.push(search.createFilter({
+                name: "othervendor",
+                join: "item",
+                operator: "anyof",
+                values: vendorsselected
+            }));
+        }
+        if (sectionsselected.length>0) {
+            fsearch.filters.push(search.createFilter({
+                name: "custbody_section",
+                operator: "startswith",
+                values: [sectionsselected]
+            }));
+        }
 
 		var pagedData = fsearch.runPaged({
 			"pageSize" : 1000
@@ -633,6 +804,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
 				    pagedatas[i] = {
 					"section": section,
+                    "task": task,
                     "productionline": productionline,
                     "preferredvendor": preferredvendor,
                     "preferredvendorid": preferredvendorid,
@@ -640,6 +812,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "itemid": itemid,
 					"price": price,
 					"qty": qtytot,
+                    "qtypo": qtytotpo,
                     "memo": memo
 				    }
                     qtytot=0;
@@ -649,13 +822,17 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
 
             productionline=fresult.getText({name: "custbody_productionline",summary: "GROUP"});
-            section=fresult.getValue({name: "custbody_section",summary: "GROUP"});
+            if (fresult.getValue({name: "custbody_section",summary: "MAX"})) {section=fresult.getValue({name: "custbody_section",summary: "MAX"});}
+            else {section=" ";}
+            if (fresult.getValue({name: "custbody2",summary: "MAX"})) {task=fresult.getValue({name: "custbody2",summary: "MAX"});}
+            else {task=" ";}
             preferredvendor=fresult.getText({name: "vendor",join: "item",summary: "GROUP"});
             preferredvendorid=fresult.getValue({name: "vendor",join: "item",summary: "GROUP"});
             item=fresult.getText({name: "item",summary: "GROUP"});
             itemid=fresult.getValue({name: "item",summary: "GROUP"});
             price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
             qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
+            qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
             memo+=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"})+"; ";
 			})
 		});

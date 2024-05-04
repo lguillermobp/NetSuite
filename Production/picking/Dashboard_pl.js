@@ -42,19 +42,37 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             finishedqtyso= paramWO.data.getValue({fieldId: "quantity"});
 
             var SOID= paramWO.data.getValue({fieldId: "createdfrom"});
+            if (SOID) {
+                paramSO = GENERALTOOLS.get_SO_value(SOID);
+                SONo = paramSO.data.getValue({fieldId: "tranid"});
+                customerPOso = paramSO.data.getValue({fieldId: "otherrefnum"});
+            }
+            else {
+                customerPOso = " ";
+                SONo = " ";
+            }
 
-            paramSO = GENERALTOOLS.get_SO_value(SOID);
-            customerso = paramSO.data.getText({fieldId: "entity"});
-            SONo = paramSO.data.getValue({fieldId: "tranid"});
+            //paramSO = GENERALTOOLS.get_SO_value(SOID);
+            customerso = paramWO.data.getText({fieldId: "entity"});
+            //SONo = paramSO.data.getValue({fieldId: "tranid"});
             departmentso = paramWO.data.getText({fieldId: "department"});
             departmentid = paramWO.data.getValue({fieldId: "department"});
             locationso = paramWO.data.getText({fieldId: "location"});
             locationsoid = paramWO.data.getValue({fieldId: "location"});
-            customerPOso = paramSO.data.getValue({fieldId: "otherrefnum"});
-            paramdpt = GENERALTOOLS.get_department_value(departmentid);
-            wipbinso = paramdpt.data.getText({fieldId: "custrecord_wipbin"});
-            wipbinsoid = paramdpt.data.getValue({fieldId: "custrecord_wipbin"});
+            //customerPOso = paramSO.data.getValue({fieldId: "otherrefnum"});
 
+            if (departmentid) 
+            {
+                paramdpt = GENERALTOOLS.get_department_value(departmentid);
+                wipbinso = paramdpt.data.getText({fieldId: "custrecord_wipbin"});
+                wipbinsoid = paramdpt.data.getValue({fieldId: "custrecord_wipbin"});
+            }
+            else 
+            {
+                wipbinso = " ";
+                wipbinsoid = " ";
+                departmentso = " ";
+            }
 
 
             if (context.request.method === 'GET') {
@@ -102,7 +120,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     });
                 }
                 }
-                if (WOsts=="Released") 
+                if (WOsts=="Released" && departmentid) 
                 {
                     form.addButton({
                         id: 'custpage_process',
@@ -481,7 +499,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     label: 'Selected',
                     type: serverWidget.FieldType.CHECKBOX
                 });
-                var resultstr= findCases5(WONo,locationsoid);
+                var resultstr= findCases5(WOID,locationsoid);
                 // loop through each line, skipping the header
                 var resultspt= findCases1(WOID,locationsoid);
                 var counter = 0;
@@ -574,6 +592,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     label:'Description'
                 });
 
+                sublistbo.addField({
+                    id: "custrecordbo_binnumberd",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Bin Number'
+                });
 
                 sublistbo.addField({
                     id: "custrecordbo_qty",
@@ -595,11 +618,16 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         value: result1.item
                         
                     });
+
                     sublistbo.setSublistValue({
                         id: 'custrecordbo_itemdesc',
                         line: counter,
                         value: result1.itemdesc+" "
-                        
+                    });
+                    sublistbo.setSublistValue({
+                        id: 'custrecordbo_binnumberd',
+                        line: counter,
+                        value: result1.binnumberd+" "
                     });
                    
                     sublistbo.setSublistValue({
@@ -912,6 +940,14 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                    name: "formulanumeric",
                    formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
                    label: "BackOrder"
+                }),
+                search.createColumn({
+                   name: "formulatext",
+                   formula: "SUBSTR({item.purchasedescription}, 0, 290)"
+                }),
+                search.createColumn({
+                   name: "binnumber",
+                   join: "item"
                 })
             ]
         }).run().each(function (result) {
@@ -920,26 +956,31 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 join: "item"
             }));
 
+            if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
+            else {qtytrn=transferred[result.getText({name: "item"})].qty}
+
             lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
-              //"qtyc":result.getValue({name: "quantitycommitted"}),
-                "qtyc": 0 ,
+                //"qtyc":result.getValue({name: "quantitycommitted"}),
+                "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric"}),
-                "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
+                "itemdesc":result.getValue({name: "formulatext"}),
+                "binnumberd":result.getValue({name: "binnumber", join: "item"})
             };
             if (result.getValue({name: "formulanumeric"})>0) 
             {
             pagedatasbo[j] = {
                 "lineNumber": line,
                 "item": result.getText({name: "item"}),
-                "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
+                "itemdesc": result.getValue({name: "formulatext"}),
                 "binlocation": " ",
                 "qty": result.getValue({name: "formulanumeric"}),
                 "binlocationqty": 0,
                 "qtyneeded": result.getValue({name: "quantity"})-result.getValue({name: "quantitycommitted"}),
                 "onhand": 0,
-                "memo": "memo"
+                "memo": "memo",
+                "binnumberd":result.getValue({name: "binnumber", join: "item"})
                 }
                 j++;
             }
@@ -984,7 +1025,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "name": "binnumber",
                 "operator": "noneof",
                 "values": [
-                    "10892","15207","10462"
+                    "@NONE@"
                 ],
                 "isor": false,
                 "isnot": false,
@@ -1023,7 +1064,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             if (itembef!=result.getText({name: "item"})) {
                 itembef=result.getText({name: "item"});
-                balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty);
+                balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty) - parseInt(lineNumbers[result.getText({name: "item"})].qtyc);
             }
             var qtyr=0;
             if (balanceitem>result.getValue({name: "available"})) {
@@ -1127,7 +1168,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             [
                 ["type","anyof","InvTrnfr"], 
                 "AND", 
-                ["memo","startswith",WO], 
+                ["custbody_mo","anyof",WO],  
                 "AND", 
                 ["location","anyof",workOrderLocation]
             ],

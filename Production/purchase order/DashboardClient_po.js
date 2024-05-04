@@ -13,7 +13,68 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         function pageInit() {
         }
 
-        
+        function markall() {
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+
+            for(var i=0;i<count;i++) {
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit'
+                });
+                if (selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit',
+                    value: true,
+                    ignoreFieldChange: false
+                });
+               
+            }
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
+        }
+        function unmarkall() {
+            
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+            
+            for(var i=0;i<count;i++) {
+
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit'
+                });
+                if (!selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit',
+                    value: false,
+                    ignoreFieldChange: false
+                });
+            }
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
+        }
       
         function process() {
 
@@ -32,6 +93,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             console.log("sublistCount",sublistCount);
             
             var isfirst= true;
+           
 
             log.debug("custpageDate",custpageDate);
             log.debug("sublistCount",sublistCount);
@@ -121,10 +183,13 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                         fieldId: 'entity',
                         value: vendorid // Replace with the internal ID of the vendor
                     });
+                    if (sections) 
+                    {
                     purchaseOrder.setText({
                         fieldId: 'custbody_ecdsection',
                         text: sections // Replace with the internal ID of the vendor
                     });
+                    }
                     purchaseOrder.setText({
                         fieldId: 'custbody_productionline',
                         text: productionline // Replace with the internal ID of the vendor
@@ -184,7 +249,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 purchaseOrder.selectNewLine({
                     sublistId: 'item'
                 });
-
+                log.debug("i",i);
                 purchaseOrder.setCurrentSublistValue({
                     sublistId: 'item',
                     fieldId: 'item',
@@ -238,6 +303,52 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
     
             document.body.removeChild(element);
         }
+
+        function refresh(idemp) {
+
+            var employeeRecord = record.load({
+                type: record.Type.EMPLOYEE,
+                id: idemp,
+                isDynamic: true
+            });
+
+            var currentRec = currentRecord.get();
+
+            var sections = currentRec.getValue({
+                fieldId: "custpage_section"
+            });
+            var customers = currentRec.getValue({
+                fieldId: "custpage_customers"
+            });
+            var vendors = currentRec.getValue({
+                fieldId: "custpage_vendors"
+            });
+
+            console.log("sections",sections);
+            console.log("customers",customers);
+            console.log("vendors",vendors);
+
+            // Set value for custentity_customerssalected field
+            employeeRecord.setValue({
+                fieldId: "custentity_customerssalected",
+                value: customers
+            });
+             // Set value for custentity_customerssalected field
+            employeeRecord.setValue({
+                fieldId: "custentity_sectionsselected",
+                value: sections
+            });
+            employeeRecord.setValue({
+                fieldId: "custentity_vendorsselected",
+                value: vendors
+            });
+           
+            employeeRecord.save();
+            
+           
+            location.reload();
+        }
+
         function onButtonClick(context) {
     
             var url = new URL(document.location.href);
@@ -262,6 +373,9 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         }
         return {
             pageInit: pageInit,
+            unmarkall: unmarkall,
+            markall: markall,
+            refresh: refresh,
             onButtonClick: onButtonClick,
             process: process
         }

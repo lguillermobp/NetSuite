@@ -29,10 +29,9 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
             var lineCount = currentRecord.getLineCount({
                 sublistId: 'inventory'
             });
+            
 
             log.debug("lineCount",lineCount);
-
-
 
         }
 
@@ -49,7 +48,18 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          * @since 2015.2
          */
         function fieldChanged(context) {
+            var currentRecord = context.currentRecord;
 
+            if (context.fieldId == "custbody_atlas_inv_adj_reason") {
+            reason = currentRecord.getValue({fieldId: "custbody_atlas_inv_adj_reason"});
+
+            var customRecord = r.load({
+                type: 'customrecord_atlas_inv_adj_reasn',
+                id: reason
+            });
+
+            currentRecord.setValue({fieldId: "account", value: customRecord.getValue({fieldId: "custrecord_atlas_glaccount"})});
+        }
         }
 
         /**
@@ -209,28 +219,28 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                 var userObj = runtime.getCurrentUser();
                 log.debug("userObj", userObj.id);
 
-                var paramrec = GENERALTOOLS.get_param_value(11);
-                var recipientsstr = paramrec.data.getValue({fieldId: "custrecordparams_value"});
-                var paramrec = GENERALTOOLS.get_param_value(12);
-                var subject = paramrec.data.getValue({fieldId: "custrecordparams_value"});
-                var paramrec = GENERALTOOLS.get_param_value(13);
-                var emailBody = paramrec.data.getValue({fieldId: "custrecordparams_value"});
+                // var paramrec = GENERALTOOLS.get_param_value(11);
+                // var recipientsstr = paramrec.data.getValue({fieldId: "custrecordparams_value"});
+                // var paramrec = GENERALTOOLS.get_param_value(12);
+                // var subject = paramrec.data.getValue({fieldId: "custrecordparams_value"});
+                // var paramrec = GENERALTOOLS.get_param_value(13);
+                // var emailBody = paramrec.data.getValue({fieldId: "custrecordparams_value"});
 
-                const recipients = recipientsstr.split(',');
-                log.debug("recipients", recipients);
+                // const recipients = recipientsstr.split(',');
+                // log.debug("recipients", recipients);
 
-                subject = subject.replace("${tranid}", tranid);
-                subject = subject.replace("${ITEM}", itemcode);
+                // subject = subject.replace("${tranid}", tranid);
+                // subject = subject.replace("${ITEM}", itemcode);
 
-                emailBody = emailBody.replace("${tranid}", tranid);
-                emailBody = emailBody.replace("${ITEM}", itemcode);
+                // emailBody = emailBody.replace("${tranid}", tranid);
+                // emailBody = emailBody.replace("${ITEM}", itemcode);
 
-                email.send({
-                    author: userObj.id,
-                    recipients: recipients,
-                    subject: subject,
-                    body: emailBody
-                });
+                // email.send({
+                //     author: userObj.id,
+                //     recipients: recipients,
+                //     subject: subject,
+                //     body: emailBody
+                // });
 
             }
             getNLMultiButtonByName('multibutton_submitter').onMainButtonClick(this);
@@ -425,7 +435,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
         return {
             pageInit: pageInit,
-            //fieldChanged: fieldChanged,
+            fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
             //lineInit: lineInit,

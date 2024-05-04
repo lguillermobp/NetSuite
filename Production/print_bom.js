@@ -18,6 +18,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
     function (search, file, render, runtime, format, xml,log,  _) {
         var workOrderLocation;
         var workOrderLocationID;
+        var transferred=[];
         function onRequest(context) {
             const WO_INTERNAL_ID = String(context.request.parameters.id);
 
@@ -123,7 +124,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
             });
 
 
-
+            var resultstr= findCases5(WO_INTERNAL_ID,workOrderLocationID);
             let workOrderLines = "";
             let line = 1;
             let lineItemIds = [];
@@ -184,11 +185,14 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     join: "item"
                 }));
 
+                log.audit("transferred " , transferred); 
+                if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
+                else {qtytrn=transferred[result.getText({name: "item"})].qty}
                 lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
-                "qtyc":0,
+                "qtyc":qtytrn,
                 "qtybo":result.getValue({name: "formulanumeric"}),
                 "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
                 };
@@ -209,7 +213,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
             })
 
             lineItemIds = _.uniq(lineItemIds);
-            log.audit("lineItemIds " , lineItemIds);
+           
             pdf = pdf.replace("WORK_ORDER_LINES", workOrderLines);
             let balanceitem=0;
             let itembef;
@@ -282,7 +286,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
 
                 if (itembef!=result.getText({name: "item"})) {
                     itembef=result.getText({name: "item"});
-                    balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty);
+                    balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty) - parseInt(lineNumbers[result.getText({name: "item"})].qtyc);
                 }
                 var qtyr=0;
                 if (balanceitem>result.getValue({name: "available"})) {
@@ -305,10 +309,10 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         //"expirationdate": balanceitem + "-" + Number(result.getValue({name: "available"})),
                         "datecreated": result.getValue({name: "datecreated", join: "inventoryNumber"}),
                         "onhand": Number(result.getValue({name: "onhand"})),
-                        "available": Number(result.getValue({name: "available"})),
+                        "available": lineNumbers[result.getText({name: "item"})].qtyc,
                         "qtyneeded": lineNumbers[result.getText({name: "item"})].qty - lineNumbers[result.getText({name: "item"})].qtyc,
                     });
-                    log.audit("available " , result.getValue({name: "available"}));
+                   
                 }
                 balanceitem=balanceitem-Number(result.getValue({name: "available"}));
                 //balanceitem=balanceitem-0;
@@ -340,7 +344,79 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
             // context.response.write(String(pdf));
             context.response.renderPdf({xmlString: pdf})
         }
-
+        var pagedatastr=[];
+        function findCases5(WO,workOrderLocation) {
+            log.audit("WO " , WO);
+            log.audit("workOrderLocation " , workOrderLocation);
+                
+            var j=0;
+            const searchWorkOrderLines = search.create({
+                type: "inventorytransfer",
+                settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
+                filters:
+                [
+                    ["type","anyof","InvTrnfr"], 
+                    "AND", 
+                    ["custbody_mo","anyof",WO], 
+                    "AND", 
+                    ["location","anyof",workOrderLocation]
+                ],
+                columns:
+                [
+                    "trandate",
+                    "type",
+                    "tranid",
+                    "entity",
+                    "memo",
+                    "amount",
+                    "item",
+                    "quantity",
+                    "location",
+                    search.createColumn({
+                        name: "binnumber",
+                        join: "inventoryDetail"
+                    }),
+                    "createdby",
+                    search.createColumn({
+                       name: "purchasedescription",
+                       join: "item"
+                    })
+                ]
+            });
+            var pagedData = searchWorkOrderLines.runPaged({
+                "pageSize" : 1000
+            });
+    
+    
+    
+            pagedData.pageRanges.forEach(function (pageRange) {
+    
+                var page = pagedData.fetch({index: pageRange.index});
+    
+                page.data.forEach(function (result) {
+               
+                log.audit("result " , result);
+                pagedatastr[j] = {
+                    "item": result.getText({name: "item"}),
+                    "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
+                    "bin": result.getText({name: "binnumber", join: "inventoryDetail"}),
+                    "qty": result.getValue({name: "quantity"}),
+                    "type": result.getValue({name: "type"}),
+                    "date": result.getValue({name: "trandate"}),
+                    "dco": result.getValue({name: "tranid"}),
+                    "user": result.getText({name: "createdby"})
+                    }
+                    j++;
+    
+                transferred[result.getText({name: "item"})] = {
+                    "qty":result.getValue({name: "quantity"})
+                };
+                
+            })
+        })
+            
+            return pagedatastr;
+        }
         return {
             onRequest: onRequest
         }

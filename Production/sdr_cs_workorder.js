@@ -17,97 +17,33 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
          *
          * @since 2015.2
          */
-        function pageInit(context) {
+        function pageInit(context) 
+        {
+
 
                 log.debug("context.mode",context.mode);
                 log.debug("context.currentRecord",context.currentRecord);
-                datarec=context.currentRecord;
-                internalid = datarec.getValue({fieldId: "id"});
-                log.debug("internalid",internalid);
-                saleorder = datarec.getValue({fieldId: "createdfrom"});
+                var currentRecord = context.currentRecord;
 
-                saleorderlin = datarec.getValue({fieldId: "soline"});
-                assemblyitem = datarec.getValue({fieldId: "assemblyitem"});
-                quantity = datarec.getValue({fieldId: "quantity"});
-                log.debug("saleorder",saleorder);
-                if (saleorder)
+                task = currentRecord.getValue({fieldId: "custbody2"});
+                createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
+                log.debug("task",task);
+                log.debug("createdfrom",createdfrom);
+                if (task && createdfrom)
                 {
-
-                        var varrut = GENERALTOOLS.get_SO_value(saleorder);
-                        otherrefnum= varrut.data.getValue({fieldId: "otherrefnum"});
-                        var index = varrut.data.findSublistLineWithValue({"sublistId": "item", "fieldId": "item", "value": assemblyitem});
-
-                        log.debug("assemblyitem",assemblyitem);
-                        var varitm = GENERALTOOLS.get_item_value(assemblyitem);
-                        log.debug("varitm",varitm);
-                        spccon = varitm.data.getValue({fieldId: "custitem_spacialcondition"});
-                        datarec.setValue({      "fieldId": "custbody_spacialcondition",
-                                                "value": spccon,
-                                                ignoreFieldChange: true });
-
-
-                        var custcolcasespermasterbox = varrut.data.getSublistValue({
-                                "sublistId": "item",
-                                "fieldId": 'custcolcasespermasterbox',
-                                "line": index
-                        });
-                        var custcolboxesperpallet = varrut.data.getSublistValue({
-                                "sublistId": "item",
-                                "fieldId": 'custcolboxesperpallet',
-                                "line": index
-                        });
-                        if  (custcolcasespermasterbox!=0)
-                        {       var custcolboxes = Math.ceil(quantity / custcolcasespermasterbox);               }
-                        else {  var custcolboxes = 0;}
-                        if  (custcolboxesperpallet!=0)
-                        {       var totpal= Math.ceil(custcolboxes/custcolboxesperpallet); }
-                        else {  var totpal = 0;}
-
-
-                        datarec.setValue({
-                                "fieldId": "custbodycasespermasterbox",
-                                "value": custcolcasespermasterbox,
-                                ignoreFieldChange: true
-                        });
-
-                        datarec.setValue({
-                                "fieldId": "custbodyboxesperpallet",
-                                "value": custcolboxesperpallet,
-                                ignoreFieldChange: true
-                        });
-
-                        datarec.setValue({
-                                "fieldId": "custbodytotalpallets",
-                                "value": totpal,
-                                ignoreFieldChange: true
-                        });
-
-                        datarec.setValue({
-                                "fieldId": "custbodytotalboxes",
-                                "value": custcolboxes,
-                                ignoreFieldChange: true
-                        });
-                        datarec.setText({
-                                fieldId: "custbody_bkmn_wo_cust_po_num",
-                                text: otherrefnum
-                        });
-
+                paramschedule = GENERALTOOLS.getScheduleParams(task, createdfrom); 
+                log.debug("paramschedule",paramschedule);
+                paramdata = paramschedule.data; 
+                if (paramdata)  
+                        {
+                        log.debug("paramdata",paramdata);
+                        internalid = paramdata.getValue({name: "internalid"});
+                        log.debug("internalid",internalid);
+                        currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
+                        }
                 }
+               
         }
-
-
-        function generateMasterLabels() {
-
-                    message.create({
-                            title: "You have clicked it ",
-                            message: "You are the best.",
-                            type: message.Type.CONFIRMATION,
-                            duration: 2000
-                    }).show();
-
-
-        }
-
         /**
          * Function to be executed when field is changed.
          *
@@ -122,32 +58,8 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
          */
         function fieldChanged(context) {
 
-                var currentRecord = context.currentRecord
 
-                var fieldId = context.fieldId
-                log.debug("fieldId",fieldId);
-
-
-                if (fieldId === "quantity" || fieldId === "custbodyboxesperpallet" || fieldId === "custbodycasespermasterbox") {
-
-                        quantity = currentRecord.getValue({fieldId: "quantity"});
-
-
-                        custbodycasespermasterbox = currentRecord.getValue({fieldId: "custbodycasespermasterbox"});
-                        custbodyboxesperpallet = currentRecord.getValue({fieldId: "custbodyboxesperpallet"});
-
-                        if  (custbodycasespermasterbox!=0)
-                        {       var totbox= Math.ceil(quantity/custbodycasespermasterbox);               }
-                        else {  var totbox = 0;}
-                        if  (custbodyboxesperpallet!=0)
-                        {       var totpal= Math.ceil(totbox/custbodyboxesperpallet); }
-                        else {  var totpal = 0;}
-
-
-                        currentRecord.setValue('custbodytotalpallets', totpal);
-                        currentRecord.setValue('custbodytotalboxes', totbox);
-
-                }
+               
 
 
         }
@@ -280,138 +192,17 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
         var location;
         var locationPO;
         var userID;
-        function saveRecord(context) {
+        function saveRecord(context) 
+        {
 
                 var currentRecord = context.currentRecord;
 
-                outsourced = currentRecord.getValue({fieldId: "outsourced"});
-                location = currentRecord.getValue({fieldId: "location"});
-                linkedpo = currentRecord.getValue({fieldId: "linkedpo"});
-                WO = currentRecord.getValue({fieldId: "tranid"});
+                task = currentRecord.getValue({fieldId: "custbody2"});
+                log.debug("task",task);
 
-
-                if (linkedpo)
-                {
-
-                var paramPO = r.load({
-                        type: "purchaseorder",
-                        id: linkedpo,
-                        isDynamic: false,
-                        defaultValues: null
-                });
-                locationPO = paramPO.getValue({fieldId: "location"});
-                log.debug("locationPO", locationPO);
-
-                if (locationPO != '10')
-                {
-
-
-
-
-
-                        PO = paramPO.getValue({fieldId: "tranid"});
-                        expense_total = paramPO.getValue({fieldId: "expense_total"});
-
-                        if (expense_total == 0)
-                        {
-                                var userObj = runtime.getCurrentUser();
-                                userID = userObj.id;
-
-                                var parammsg = GENERALTOOLS.get_message_value('SYS_00002', userID);
-                                var msgdes = parammsg.data.getValue({name: "custrecord_msgdes"});
-                                var msgdes1 = parammsg.data.getValue({name: "custrecord_msg_desl"});
-                                var msgrcv = parammsg.data.getValue({name: "custrecord_msgrcv"});
-                                var msggra = parammsg.data.getValue({name: "custrecord_msg_severity"});
-
-                                message = '<strong>Message:</strong> ' + msgdes + '<br/><br/>';
-                                message += '<strong>Message 2:</strong> ' + msgdes1 + '<br/><br/>';
-                                message += '<strong>Recovery:</strong> ' + msgrcv + '<br/><br/>';
-                                message += '<strong>Severity:</strong> ' + msggra;
-
-                                if (!finalResultSet)
-                                {
-
-
-                                nDialog.confirm({
-                                        title: '** ERROR **',
-                                        message: message
-                                }).then(success).catch(fail);
-                                }
-                                //If user provided a final answer from confirm box, return out
-                                else
-                                {
-                                        //Reset the finalResultSet flag to false
-                                        //	in case user selected "Cancel" on the confirm box.
-                                        finalResultSet = false;
-
-                                        //return will either give the control back to user
-                                        //	or continue with saving of the record
-                                        return finalResult;
-                                }
-
-                        }
-                        else {
-                                return true;
-                        }
-                }
-                else {
-                        return true;
-                }
-                }
-                else {
-                        return true;
-                }
+                return true;
 
         }
-
-
-            function success(result)
-            {
-
-                            //Sets value of finalResult to user provided answer
-                            finalResult = result;
-                            //Updates the finalResultSet flag to true
-                            //	to indicate that user has made his/her choice
-                            finalResultSet = true;
-
-                            console.log("Thank you. You may proceed.");
-                            if (result) {
-                                    log.debug("result", result);
-
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0601');
-                            var recipientsstr = paramrec.data.getValue({name: "custrecordparams_value"});
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0602');
-                            var subject = paramrec.data.getValue({name: "custrecordparams_value"});
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0603');
-                            var emailBody = paramrec.data.getValue({name: "custrecordparams_value"});
-
-
-                            const recipients = recipientsstr.split(',');
-                            log.debug("recipients", recipients);
-                            log.debug("WO", WO);
-
-                            subject = subject.replace("${WO}", WO);
-                            subject = subject.replace("${PO}", PO);
-
-                            emailBody = emailBody.replace("${WO}", WO);
-                            emailBody = emailBody.replace("${PO}", PO);
-
-                            log.debug("emailBody", emailBody);
-
-                            email.send({
-                                    author: userID,
-                                    recipients: recipients,
-                                    subject: subject,
-                                    body: emailBody
-                            });
-                    }
-
-                    getNLMultiButtonByName('multibutton_submitter').onMainButtonClick(this);
-            }
-            function fail(reason)
-            {
-                    return false;
-            }
 
         return {
             pageInit: pageInit,

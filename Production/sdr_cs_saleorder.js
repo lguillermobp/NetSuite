@@ -158,11 +158,11 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
             });
             console.log("initial",initial);
             console.log("days",days);
-
-            if (initial==-1)      {initial=1;days=0}
+            var noadd="N"
+            if (initial==-1)      {initial=1;days=0;noadd="Y"}
             else
             {
-                if (initial<days)      {days=0}
+                if (initial<days)      {days=0;noadd="Y"}
             }
             
 
@@ -184,7 +184,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
             log.debug("newenddate",newenddate);
 
 
-            if (days!=0) 
+            if (noadd=="N") 
             {
 
                 try{

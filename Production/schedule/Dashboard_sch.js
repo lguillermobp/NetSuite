@@ -161,7 +161,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "customrecord_so_scheduletasks",
             filters:
             [
-                ["custrecord_salecontract.mainline","is","T"]
+                ["custrecord_salecontract.mainline","is","T"], 
+                "AND", 
+                ["custrecord_so_sc_startdate","onorafter",ecddays[0]]
             ],
             columns:
             [

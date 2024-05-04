@@ -1157,7 +1157,90 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             return retvar;
         }
 
+        function getScheduleParams(task, createdfrom) {
+            var z = 0;
+            var billofmk= [];
+            var fsearch =   s.create({
+                type: "customrecord_so_scheduletasks",
+                filters:
+                    [
+                        ["custrecord_salecontract.mainline","is","T"], 
+                        "AND", 
+                        ["custrecord_salecontract","anyof",createdfrom], 
+                        "AND", 
+                        ["custrecord_so_sc_task.name","haskeywords",task]
+                    ],
+                    
+                columns:
+                    [
+                        s.createColumn({
+                            name: "custrecord_sc_productionline",
+                            join: "CUSTRECORD_SO_SC_TASK"
+                         }),
+                         s.createColumn({
+                            name: "custrecord_sc_tasksgroup",
+                            join: "CUSTRECORD_SO_SC_TASK"
+                         }),
+                         s.createColumn({
+                            name: "custrecord_sc_task",
+                            join: "CUSTRECORD_SO_SC_TASK"
+                         }),
+                         s.createColumn({
+                            name: "custrecord_sc_tasksseq",
+                            join: "CUSTRECORD_SO_SC_TASK"
+                         }),
+                         "internalid",
+                         "custrecord_so_sc_note",
+                         "custrecord_so_sc_startdate",
+                         "custrecord_so_sc_enddate",
+                         s.createColumn({
+                            name: "custrecord_sc_days",
+                            join: "CUSTRECORD_SO_SC_TASK"
+                         }),
+                         "custrecord_so_sc_status",
+                         "custrecord_sc_soduration",
+                         s.createColumn({
+                            name: "entity",
+                            join: "CUSTRECORD_SALECONTRACT"
+                         }),
+                         s.createColumn({
+                            name: "internalid",
+                            join: "CUSTRECORD_SALECONTRACT"
+                         })
+                    ]
+            });
 
+
+
+            var pagedData = fsearch.runPaged({
+                "pageSize": 1000
+            });
+
+            var paramrec;
+            pagedData.pageRanges.forEach(function (pageRange) {
+
+                var page = pagedData.fetch({index: pageRange.index});
+                var wbillid = ' ';
+                var i = 0;
+
+                page.data.forEach(function (fresult) {
+
+
+                    paramrec = fresult;
+                });
+
+            })
+           
+            var retvar= {};
+            retvar = {
+                "sts": "Complated",
+                "date": "",
+                "records": z,
+                "data": paramrec
+            };
+
+            return retvar;
+        }
 
 
     function get_item_informations(item) {
@@ -1510,6 +1593,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
         return {
             findassembly: findassembly,
             delassembly: delassembly,
+            getScheduleParams: getScheduleParams,
             get_bom_list: get_bom_list,
             get_kits_list: get_kits_list,
             get_item_value: get_item_value,
