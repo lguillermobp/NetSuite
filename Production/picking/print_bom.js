@@ -177,6 +177,10 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                       // formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
                        formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
                        label: "BackOrder"
+                    }),
+                    search.createColumn({
+                       name: "binnumber",
+                       join: "item"
                     })
                 ]
             }).run().each(function (result) {
@@ -203,7 +207,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += `<td>${result.getText({name: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantitycommitted"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "formulanumeric"})}</td>`;
                 workOrderLines += "</tr>";
                 }

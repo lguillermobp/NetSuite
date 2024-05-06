@@ -91,7 +91,7 @@
                 <th width="12%">Item</th>
                 <th width="48%">Desc.</th>
                 <th width="9%">QTY</th>
-                <th width="14%">COMMITTED</th>
+                <th width="14%">Bin Location</th>
                 <th width="12%">BackOrder</th>
             </tr>
             [WORK_ORDER_LINES]

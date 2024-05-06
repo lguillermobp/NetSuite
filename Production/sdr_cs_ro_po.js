@@ -29,7 +29,7 @@
 
               
 
-                 if (internalid==10950)
+                 if (internalid==7531)
                  {
                          var lineCount = datarec.getLineCount({
                                  sublistId: 'item'

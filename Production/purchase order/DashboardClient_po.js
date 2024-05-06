@@ -147,6 +147,11 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                             fieldId: 'memo',
                             value: memoh // Set the transaction memo
                         });
+                        purchaseOrder.setValue({
+                            fieldId: 'custbody_typepo',
+                            value: "4" // Set the transaction memo
+                        });
+    
 
                         savingpo = true;
                         isfirst = false;
@@ -201,6 +206,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     purchaseOrder.setValue({
                         fieldId: 'memo',
                         value: memoh // Set the transaction memo
+                    });
+                    purchaseOrder.setValue({
+                        fieldId: 'custbody_typepo',
+                        value: "4" // Set the transaction memo
                     });
 
                     
