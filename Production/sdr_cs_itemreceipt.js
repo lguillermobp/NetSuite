@@ -31,6 +31,10 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
 
 
         }
+        function printrn(url) {
+          console.log(url);
+          window.open(url, "_blank");
+        }
 
         function showbin(context) {
 
@@ -52,13 +56,14 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
               console.log(itemIndex);
               
               try {
-                  datarec.selectLine({
+                  var linelb = datarec.selectLine({
                       "sublistId": "item",
                       "line": itemIndex
                   });
               } catch (e) {
                   log.debug({  title: "error: ", details: "datarec.selectLine Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
               }  
+              console.log(linelb);
               var inventorydetailavail = datarec.getCurrentSublistValue({
                 sublistId: 'item',
                 fieldId: "inventorydetailreq"
@@ -535,6 +540,7 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
         return {
             pageInit: pageInit,
             showbin: showbin,
+            printrn: printrn,
             //fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,

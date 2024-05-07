@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+<head>
+	<link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
+	<#if .locale == "zh_CN">
+		<link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
+	<#elseif .locale == "zh_TW">
+		<link name="NotoSansCJKtc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKtc_Regular}" src-bold="${nsfont.NotoSansCJKtc_Bold}" bytes="2" />
+	<#elseif .locale == "ja_JP">
+		<link name="NotoSansCJKjp" type="font" subtype="opentype" src="${nsfont.NotoSansCJKjp_Regular}" src-bold="${nsfont.NotoSansCJKjp_Bold}" bytes="2" />
+	<#elseif .locale == "ko_KR">
+		<link name="NotoSansCJKkr" type="font" subtype="opentype" src="${nsfont.NotoSansCJKkr_Regular}" src-bold="${nsfont.NotoSansCJKkr_Bold}" bytes="2" />
+	<#elseif .locale == "th_TH">
+		<link name="NotoSansThai" type="font" subtype="opentype" src="${nsfont.NotoSansThai_Regular}" src-bold="${nsfont.NotoSansThai_Bold}" bytes="2" />
+	</#if>
+    <style>
+    title1  {font-weight: 300;word-spacing: 3px;line-height: 2em;padding-bottom: 0.35em}
+    table { font-size: 9pt; table-layout: fixed; width: 100%; }
+    th { font-weight: bold; font-size: 8pt; vertical-align: middle; padding: 5px 6px 3px; background-color: #e3e3e3; color: #333333; padding-bottom: 10px; padding-top: 10px; }
+    td { padding: 4px 6px; }
+    b { font-weight: bold; color: #333333; }
+</style>
+    <macrolist>
+        <macro id="nlheader">
+            <table class="header" style="width: 100%;"><tr>
+	<td style="width: 394px;"><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="margin: 7px;" /></td>
+	<td align="right" style="width: 410px;font-size: 15pt;">Reception Note</td>
+	</tr>
+	<tr>
+	<td align="left" style="width: 410px;"><span class="nameandaddress">ECD</span><br /><span class="nameandaddress">4930 Industrial Ln, Kissimmee, FL 34758</span><br /><span class="nameandaddress">Phone: (407) 483-4825</span><br /><span class="nameandaddress">Email: </span></td>
+	<td align="right" style="width: 410px;">
+	<table border="1" cellpadding="1" cellspacing="1" style="width: 100%;">
+	<thead>
+		<tr>
+		<th scope="col">Order</th>
+		<th scope="col">Date</th>
+		</tr>
+	</thead><tr>
+		<td>${results[0].tranid}</td>
+		<td>${results[0].trandate}</td>
+		</tr>
+		<tr>
+		<td colspan="2">${results[0].memomain}</td>
+		</tr>
+		<tr>
+		<td>Vendor</td>
+		<td>${results[0].formulatext}</td>
+		</tr></table>
+	</td>
+	</tr></table>
+        </macro>
+        <macro id="nlfooter">
+            <table class="footer" style="width: 100%;"><tr>
+	<td><barcode codetype="code128" showtext="true" value="${results[0].tranid}"/></td>
+	<td align="right"><pagenumber/> of <totalpages/></td>
+	</tr></table>
+        </macro>
+    </macrolist>
+    
+</head>
+<body header="nlheader" header-height="18%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+    <table>
+      <#list results as result>
+        <#if result_index == 0>
+          <thead>
+            <tr>
+              <th width="10%">Item</th>
+              <th width="54%">Description</th>
+              <th width="10%">Quantity Received</th>
+              <th width="13%">Quantity to receive</th>
+              <th width="13%">Bin Location</th>
+            </tr>
+          </thead>
+        </#if>
+         
+        <tr>
+          <td>${result.formulatext_1}</td>
+		  <td>${result.memo}</td>
+          <td>${result.quantityshiprecv}</td>
+          <td>${result.formulanumeric}</td>
+          <td>${result.binnumber}</td>
+        </tr>
+      </#list>
+    </table>
+</body>
+</pdf>
