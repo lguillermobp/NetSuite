@@ -28,8 +28,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             var userPermission = userObj.getPermission({	name : 'TRAN_BUILD'	});
             autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
 
-            WOID = context.request.parameters.idwo;
-            paramWO = GENERALTOOLS.get_WO_value(WOID);
+            POID = context.request.parameters.idpo;
+            paramPO = GENERALTOOLS.get_PO_value(POID);
             
             entityname= paramWO.data.getValue({fieldId: "entityname"});
             finishedgoodsso= paramWO.data.getText({fieldId: "assemblyitem"});

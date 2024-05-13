@@ -189,9 +189,10 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     join: "item"
                 }));
 
-                log.audit("transferred " , transferred); 
+                
                 if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
                 else {qtytrn=transferred[result.getText({name: "item"})].qty}
+
                 lineNumbers[result.getText({name: "item"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity"}),
@@ -268,7 +269,10 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         join: "inventoryNumber",
                         sort: search.Sort.ASC
                     }),
-                    "binnumber",
+                    search.createColumn({
+                        name: "binnumber",
+                        sort: search.Sort.ASC
+                    }),
                     "location",
                     "inventorynumber",
                     "status",
@@ -283,7 +287,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     })
                 ]
             }).run().each(function (result) {
-                log.debug({title: "workOrderLocationID", details: workOrderLocationID});
+                
                 let inventoryBalanceLocation = result.getText({name: "location"})
                 const inventoryBalanceLocationPriority = inventoryBalanceLocation === workOrderLocation ? 1 : 2;
                 inventoryBalanceLocation = inventoryBalanceLocation === "Orlando warehouse" ? "WHS" : "P1";
@@ -350,8 +354,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
         }
         var pagedatastr=[];
         function findCases5(WO,workOrderLocation) {
-            log.audit("WO " , WO);
-            log.audit("workOrderLocation " , workOrderLocation);
+          
                 
             var j=0;
             const searchWorkOrderLines = search.create({
@@ -399,7 +402,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
     
                 page.data.forEach(function (result) {
                
-                log.audit("result " , result);
+                
                 pagedatastr[j] = {
                     "item": result.getText({name: "item"}),
                     "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),

@@ -38,7 +38,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
         internalidsc = currentRecord.getValue({ fieldId: "custrecord_salecontract" });
         seq = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
-        if (startdate!=oldstartdate) 
+
+        if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 
         {
             log.debug("startdate",startdate);
             log.debug("oldstartdate",oldstartdate);

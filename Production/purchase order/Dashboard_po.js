@@ -159,10 +159,28 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Production Line'
                 });
+                var taskid =sublistpm.addField({
+                    id: "custrecordml_taskid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Schedule'
+                });
+                taskid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
                 sublistpm.addField({
                     id: "custrecordml_task",
                     type: serverWidget.FieldType.TEXT,
                     label:'Task Schedule'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_taskds",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Start Date'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_taskde",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'End Date'
                 });
                 var sectionidc =sublistpm.addField({
                     id: "custrecordml_sectionid",
@@ -182,7 +200,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Preferred Vendor'
                 });
-
+                sublistpm.addField({
+                    id: "custrecordml_leadtime",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Lead Time'
+                });
                 var vendorid = sublistpm.addField({
                     id: "custrecordml_preferredvendorid",
                     type: serverWidget.FieldType.INTEGER,
@@ -283,6 +305,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.preferredvendor
                         
                     });
+                    log.debug("result1.leadtime",result1.leadtime);
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_leadtime',
+                        line: counter,
+                        value: result1.leadtime
+                        
+                    });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_sectionid',
                         line: counter,
@@ -298,9 +327,28 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistpm.setSublistValue({
                         id: 'custrecordml_task',
                         line: counter,
+                        value: result1.taskd
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_taskid',
+                        line: counter,
                         value: result1.task
                         
                     });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_taskds',
+                        line: counter,
+                        value: result1.taskds
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_taskde',
+                        line: counter,
+                        value: result1.taskde
+                        
+                    });
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_productionline',
                         line: counter,
@@ -503,7 +551,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "workorder",
         filters:
         [
-            ["formulatext: CASE WHEN  {quantity}-NVL({quantitycommitted}, 0)>0  THEN 'YES'  ELSE 'NO' END","contains","YES"], 
+            ["formulatext: CASE WHEN  {quantity}-NVL({quantitycommitted}, 0)>0  THEN 'YES'  ELSE 'NO' END","contains","%"], 
             "AND", 
             ["type","anyof","WorkOrd"], 
             "AND", 
@@ -511,7 +559,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             "AND", 
             ["status","anyof","WorkOrd:B","WorkOrd:D"],
             "AND", 
-            ["item.vendor","noneof","@NONE@"]
+            ["item.vendor","noneof","@NONE@"], 
+            "AND", 
+            ["sum(formulanumeric: CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END)","notequalto","0"]
         ],
         columns:
         [   
@@ -520,8 +570,27 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             summary: "GROUP"
             }),
             search.createColumn({
-            name: "custbody2",
-            summary: "MAX"
+               name: "custrecord_so_sc_task",
+               join: "CUSTBODY_TASKSC",
+               summary: "GROUP",
+               label: "Task Schedule"
+            }),
+            search.createColumn({
+               name: "custrecord_so_sc_startdate",
+               join: "CUSTBODY_TASKSC",
+               summary: "MAX",
+               label: "Start Date"
+            }),
+            search.createColumn({
+               name: "custrecord_so_sc_enddate",
+               join: "CUSTBODY_TASKSC",
+               summary: "MAX",
+               label: "End Date"
+            }),
+            search.createColumn({
+               name: "preferredstockleveldays",
+               join: "item",
+               summary: "GROUP"
             }),
             search.createColumn({
             name: "custbody_section",
@@ -572,44 +641,58 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "quantityonorder",
                 join: "item",
                 summary: "MAX"
+             }),
+             search.createColumn({
+                name: "formulatext",
+                summary: "GROUP",
+                formula: "{custbody_tasksc.custrecord_so_sc_task}"
              })
             ]
         });
         
-        
+        if (customersselected.length==1) {
+            customersselected1=customersselected[0];}
+            else {customersselected1=customersselected;}
+
+        if (vendorsselected.length==1) {
+            vendorsselected1=vendorsselected[0];}
+            else {vendorsselected1=vendorsselected;}
+       
         if (customersselected.length>0) {
             log.debug("customersselected",customersselected);
+            log.debug("customersselected1",customersselected1);
             fsearch.filters.push(search.createFilter({
                 name: "name",
                 operator: "anyof",
-                values: customersselected
+                values: customersselected1
             }));
         }
         if (vendorsselected.length>0) {
             log.debug("vendorsselected",vendorsselected);
+            log.debug("vendorsselected1",vendorsselected1);
             fsearch.filters.push(search.createFilter({
                 name: "othervendor",
                 join: "item",
                 operator: "anyof",
-                values: vendorsselected
+                values: vendorsselected1
             }));
         }
-        if (sectionsselected.length>0) {
-            fsearch.filters.push(search.createFilter({
-                name: "custbody_section",
-                operator: "startswith",
-                values: [sectionsselected]
-            }));
-        }
+        // if (sectionsselected.length>0) {
+        //     fsearch.filters.push(search.createFilter({
+        //         name: "custbody_section",
+        //         operator: "startswith",
+        //         values: [sectionsselected]
+        //     }));
+        // }
+       
 
 		var pagedData = fsearch.runPaged({
 			"pageSize" : 1000
 		});
 
 
-
 		pagedData.pageRanges.forEach(function (pageRange) {
-
+            log.debug("pageRange",pageRange);
 			var page = pagedData.fetch({index: pageRange.index});
             var prod="";
             var sectiont="";
@@ -618,14 +701,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             var qtytota=0;
             var memo="";
             var section;
+            var i=0;
+
 
 			page.data.forEach(function (fresult) {
+                log.debug("fresult",fresult);
 
                 if (isfirsttime) 
                 {
                     
                     sectiont=fresult.getValue({name: "custbody_section",summary: "MAX"});
                     prod=fresult.getText({name: "item",summary: "GROUP"});
+                    
                     isfirsttime=false;
                 }
                 
@@ -637,6 +724,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 				    pagedatas[i] = {
 					"section": section,
                     "task": task,
+                    "taskd": taskd,
+                    "taskds": taskds,
+                    "taskde": taskde,
                     "productionline": productionline,
                     "preferredvendor": preferredvendor,
                     "preferredvendorid": preferredvendorid,
@@ -647,6 +737,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 					"qty": qtytot,
                     "qtya": qtytota,
                     "qtypo": qtytotpo,
+                    "leadtime": leadtime,
                     "total": (qtytot) * price,
                     //"total": (qtytot-qtytota) * price,
                     "memo": memo
@@ -654,28 +745,73 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     qtytot=0;
                     qtytota=0;
                     memo="";
+                    procesar="N";
                     
     				i++;
                 }
-
+            
             productionline=fresult.getText({name: "custbody_productionline",summary: "GROUP"});
             if (fresult.getValue({name: "custbody_section",summary: "MAX"})) {section=fresult.getValue({name: "custbody_section",summary: "MAX"});}
             else {section=" ";}
-            if (fresult.getValue({name: "custbody2",summary: "MAX"})) {task=fresult.getValue({name: "custbody2",summary: "MAX"});}
+            if (fresult.getValue({name: "custrecord_so_sc_task",join: "CUSTBODY_TASKSC",summary: "GROUP"})) {task=fresult.getValue({name: "custrecord_so_sc_task",join: "CUSTBODY_TASKSC",summary: "GROUP"});}
             else {task=" ";}
-            
+            if (fresult.getValue({name: "formulatext",summary: "GROUP"})) {taskd=fresult.getValue({name: "formulatext",summary: "GROUP"});}
+            else {taskd=" ";}
+            if (fresult.getValue({name: "custrecord_so_sc_startdate",join: "CUSTBODY_TASKSC",summary: "MAX"})) {taskds=fresult.getValue({name: "custrecord_so_sc_startdate",join: "CUSTBODY_TASKSC",summary: "MAX"});}
+            else {taskds=" ";}
+            if (fresult.getValue({name: "custrecord_so_sc_enddate",join: "CUSTBODY_TASKSC",summary: "MAX"})) {taskde=fresult.getValue({name: "custrecord_so_sc_enddate",join: "CUSTBODY_TASKSC",summary: "MAX"});}
+            else {taskde=" ";}
+            if (fresult.getValue({name: "preferredstockleveldays",join: "item",summary: "GROUP"})) {leadtime=fresult.getValue({name: "preferredstockleveldays",join: "item",summary: "GROUP"});}
+            else {leadtime=0;}
+            log.debug("leadtime",leadtime);
+            procesar="Y";
             preferredvendor=fresult.getText({name: "vendor",join: "item",summary: "GROUP"});
+            leadtime=Number(fresult.getValue({name: "preferredstockleveldays",join: "item",summary: "GROUP"}))+0;
             preferredvendorid=fresult.getValue({name: "vendor",join: "item",summary: "GROUP"});
             item=fresult.getText({name: "item",summary: "GROUP"});
             itemid=fresult.getValue({name: "item",summary: "GROUP"});
             price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
             currency=fresult.getValue({name: "formulatext",summary: "MAX"});
+
+            log.debug("item",item);
             
+
             qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
+            log.debug("qtytot",qtytot);
             qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
             qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
             memo+=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"})+"; ";
 			})
+            log.debug("i",i);
+            log.debug("isfirsttime",isfirsttime);
+            if (procesar=="Y")
+                {  
+                    
+				    pagedatas[i] = {
+					"section": section,
+                    "task": task,
+                    "taskd": taskd,
+                    "taskds": taskds,
+                    "taskde": taskde,
+                    "productionline": productionline,
+                    "preferredvendor": preferredvendor,
+                    "preferredvendorid": preferredvendorid,
+					"item": item,
+                    "itemid": itemid,
+					"price": price,
+                    "currency": currency,
+					"qty": qtytot,
+                    "leadtime": leadtime,
+                    "qtya": qtytota,
+                    "qtypo": qtytotpo,
+                    "total": (qtytot) * price,
+                    //"total": (qtytot-qtytota) * price,
+                    "memo": memo
+				    }
+
+                    
+    				i++;
+                }
 		});
 
 		return pagedatas;
@@ -817,6 +953,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 				    }
                     qtytot=0;
                     memo="";
+                    procesar="N";
                     
     				i++;
                 }
@@ -834,7 +971,32 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
             qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
             memo+=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"})+"; ";
+            procesar="Y";
 			})
+
+            if (procesar=="Y")
+                {  
+                  
+
+				    pagedatas[i] = {
+					"section": section,
+                    "task": task,
+                    "productionline": productionline,
+                    "preferredvendor": preferredvendor,
+                    "preferredvendorid": preferredvendorid,
+					"item": item,
+                    "itemid": itemid,
+					"price": price,
+					"qty": qtytot,
+                    "qtypo": qtytotpo,
+                    "memo": memo
+				    }
+                    qtytot=0;
+                    memo="";
+                    procesar="N";
+                    
+    				i++;
+                }
 		});
 
 		return pagedatas;
