@@ -7,15 +7,15 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
     const onRequest = (scriptContext) => {
         if (scriptContext.request.method === 'GET') {
             let form = serverWidget.createForm({
-                title: 'Picking Dashboard'
+                title: 'Receiving Dashboard'
             });
 
-            form.clientScriptModulePath = '/SuiteScripts/picking/mainDashboardClient.js';
+            form.clientScriptModulePath = '/SuiteScripts/receiving/mainDashboardClient_re.js';
 
             let field = form.addField({
-                id: 'workorder',
+                id: 'purchaseorder',
                 type: serverWidget.FieldType.TEXT,
-                label: 'Manufacturing Order'
+                label: 'Purchase Order'
             });
 
             form.addSubmitButton({

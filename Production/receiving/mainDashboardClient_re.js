@@ -17,18 +17,18 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             log.debug("context",context);
 
         }
-        function get_WO_internalID(wo) {
+        function get_PO_internalID(po) {
 
             var internalid;
             var retval = {};
-            log.debug("wo",wo);
+            log.debug("po",po);
             var fsearch = s.create({
-                type: "workorder",
+                type: "purchaseorder",
                 filters:
                     [
-                        ["numbertext","is",wo],
+                        ["numbertext","is",po],
                         "AND",
-                        ["type","anyof","WorkOrd"],
+                        ["type","anyof","PurchOrd"],
                         "AND",
                         ["mainline","is","T"]
                     ],
@@ -65,9 +65,9 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
         function saveRecord(context) {
             var currRec = context.currentRecord;
 
-            var wo = currRec.getValue({fieldId: "workorder"});
+            var po = currRec.getValue({fieldId: "purchaseorder"});
 
-            var script = 'customscript_dashboard_pl';
+            var script = 'customscript_dashboard_re';
             var deployment = 'customdeploy1';
             var parameters = "";
 
@@ -76,12 +76,12 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
                 deploymentId: deployment,
                 returnExternalUrl: false
             });
-            var retval=get_WO_internalID(wo);
+            var retval=get_PO_internalID(po);
 
             if (retval.internalid) {
-                var idwo=retval.internalid;
+                var idpo=retval.internalid;
                 
-                suiteletURL += "&idwo=" + idwo;
+                suiteletURL += "&idpo=" + idpo;
                 log.debug("suiteletURL",suiteletURL);
 
                 window.open(suiteletURL, "_blank");
@@ -90,7 +90,7 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             else {
                 message.create({
                     title: "Error",
-                    message: "The Manufacturing Order does not exist. Please check the number and try again.",
+                    message: "The Purchase Order does not exist. Please check the number and try again.",
                     type: message.Type.ERROR,
                     duration: 10000
                 }).show();

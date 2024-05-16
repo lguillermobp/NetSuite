@@ -15,59 +15,12 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
         function pageInit(context) {
             var currentRec = context.currentRecord;
 
-            var WOsts = currentRec.getValue({
-                fieldId: 'custpage_customerwosts'
-            });
-            var department = currentRec.getValue({
-                fieldId: 'custpage_department'
-            });
-            sublistCount = currentRec.getLineCount({
-                sublistId: 'custpage_records'
-            });
-            sublistCounttr = currentRec.getLineCount({
-                sublistId: 'custpage_recordstr'
-            });
-
-            if (WOsts != "Released") {
-            message.create({
-                title: "Manufacturing Order Status Error",
-                message: "The MO is now in " + WOsts + " status. Please release the MO first before processing the Picking List.",
-                type: message.Type.ERROR
-            }).show();
-            }
-            else {
-           
-                if (department == " ") {
-                    message.create({
-                        title: "Department is Blank",
-                        message: "Please, verify  MO's department.",
-                        type: message.Type.ERROR
-                    }).show();
-                    }
-                if (sublistCounttr>0) {
-                    message.create({
-                        title: "MO has been previously transferred",
-                        message: "Caution this Manufacturing Order already has a transfer done previously.",
-                        type: message.Type.WARNING,
-                        duration: 10000
-                    }).show();
-                    }
-
             
-            }
-
-
-            sublistCountt = Number(currentRec.getLineCount({
-                sublistId: 'custpage_recordsbo'
-            })+sublistCount);
-            currentRec.setValue('custpage_totsel', sublistCount);
-            move(" ",sublistCount,sublistCount);
-            move1(" ",sublistCount,sublistCountt);
 
         }
 
         function godashboard() {
-            var script = 'customscript_maindashboard';
+            var script = 'customscript_maindashboard_re';
             var deployment = 'customdeploy1';
             var parameters = "";
 
@@ -212,34 +165,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
 
             var fieldId = context.fieldId
 
-            if (fieldId === "custrecordml_selected" ) {
-                var selec = currentRecord.getCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_selected'
-                });
-                var totsel = currentRecord.getValue({
-                    fieldId: 'custpage_totsel'
-                });
-                if (selec) {
-                    totsel++;
-                    currentRecord.setValue({
-                        fieldId: 'custpage_totsel',
-                        value: totsel,
-                        ignoreFieldChange: true
-                    });
-                }
-                else {
-                    totsel--;
-                    currentRecord.setValue({
-                        fieldId: 'custpage_totsel',
-                        value: totsel,
-                        ignoreFieldChange: true
-                    });
-                }
-                move(" ",totsel,sublistCount);
-                move1(" ",totsel,sublistCountt);
-
-            }
+           
 
          }
         function process() {
@@ -539,6 +465,265 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 
 
         }
+
+         /**
+         * Function to be executed when field is changed.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         * @param {string} scriptContext.fieldId - Field name
+         * @param {number} scriptContext.lineNum - Line number. Will be undefined if not a sublist or matrix field
+         * @param {number} scriptContext.columnNum - Line number. Will be undefined if not a matrix field
+         *
+         * @since 2015.2
+         */
+         function fieldChanged(context) {
+            log.audit("field",context.fieldId);
+             
+          }
+  
+          /**
+           * Function to be executed when field is slaved.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           * @param {string} scriptContext.fieldId - Field name
+           *
+           * @since 2015.2
+           */
+          function postSourcing(scriptContext) {
+  
+          }
+  
+          /**
+           * Function to be executed after sublist is inserted, removed, or edited.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           *
+           * @since 2015.2
+           */
+          function sublistChanged(context) {
+  
+  
+          }
+  
+          /**
+           * Function to be executed after line is selected.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           *
+           * @since 2015.2
+           */
+          function lineInit(scriptContext) {
+  
+          }
+  
+          /**
+           * Validation function to be executed when field is changed.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           * @param {string} scriptContext.fieldId - Field name
+           * @param {number} scriptContext.lineNum - Line number. Will be undefined if not a sublist or matrix field
+           * @param {number} scriptContext.columnNum - Line number. Will be undefined if not a matrix field
+           *
+           * @returns {boolean} Return true if field is valid
+           *
+           * @since 2015.2
+           */
+          function validateField(scriptContext) {
+  
+          }
+  
+          /**
+           * Validation function to be executed when sublist line is committed.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           *
+           * @returns {boolean} Return true if sublist line is valid
+           *
+           * @since 2015.2
+           */
+          function validateLine(currentRecord) {
+  
+  
+              return true;
+          }
+  
+          /**
+           * Validation function to be executed when sublist line is inserted.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           *
+           * @returns {boolean} Return true if sublist line is valid
+           *
+           * @since 2015.2
+           */
+          function validateInsert(scriptContext) {
+  
+          }
+  
+          /**
+           * Validation function to be executed when record is deleted.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @param {string} scriptContext.sublistId - Sublist name
+           *
+           * @returns {boolean} Return true if sublist line is valid
+           *
+           * @since 2015.2
+           */
+          function validateDelete(scriptContext) {
+  
+          }
+  
+  
+          /**
+           * Validation function to be executed when record is saved.
+           *
+           * @param {Object} scriptContext
+           * @param {Record} scriptContext.currentRecord - Current form record
+           * @returns {boolean} Return true if record is valid
+           *
+           * @since 2015.2
+           */
+          function saveRecord(context) {
+
+            currentRecord = context.currentRecord;
+            log.audit("currentRecord",currentRecord);
+
+            var POID = currentRecord.getValue({
+                fieldId: 'custpage_prchaseorderid'
+            });
+            console.log(POID);
+
+            var sublistCount = currentRecord.getLineCount({
+                sublistId: 'custpage_records'
+            });
+
+            var purchaseOrder = record.load({
+                type: record.Type.PURCHASE_ORDER,
+                id: POID,
+                isDynamic: false
+            });
+
+            console.log(purchaseOrder);
+//======================================================================================
+
+                // *** USING THE RECORD MODULE ***
+                var itemReceipt = record.transform({
+                    fromType: record.Type.PURCHASE_ORDER,
+                    fromId: POID,
+                    toType: record.Type.ITEM_RECEIPT,
+                    isDynamic: true
+                });
+
+                var _loop = function _loop(i) {
+
+                    var requiredQuantity = itemReceipt.getSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'quantityremaining',
+                        line: i
+                    });
+
+                    var lineid = itemReceipt.getSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'line',
+                        line: i
+                    });
+
+                    var lineNumber = currentRecord.findSublistLineWithValue({
+                        sublistId: 'item',
+                        fieldId: 'line',
+                        value: lineid
+                    });
+
+                    
+
+
+                }
+                console.log(sublistCount);
+
+                for (var i = 0; i < sublistCount; i++) {
+
+                    var selec = currentRecord.getSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_selected',
+                        line: i
+                    });
+                    var item = currentRecord.getSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_itemid',
+                        line: i
+                    });
+                    var binlocationid = currentRecord.getSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_binlocationid',
+                        line: i
+                    });
+                    var binlocation = currentRecord.getSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_binlocation',
+                        line: i
+                    });
+                    var qty = currentRecord.getSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_qtyb',
+                        line: i
+                    });
+                    if (!selec) continue;
+                    
+                    newItemReceipt.selectNewLine({ // Select line to input info to
+                        sublistId: 'item'
+                    });
+                    console.log(selec);
+                    newItemReceipt.setCurrentSublistValue({ // Set item for line
+                        sublistId: 'item',
+                        fieldId: 'item',
+                        value: item
+                    });
+                    newItemReceipt.setCurrentSublistValue({ // Set qty for line
+                        sublistId: 'item',
+                        fieldId: 'quantity',
+                        value: qty
+                    });
+                    
+                    
+                }
+                newItemReceipt.commitLine({ // Commit the line
+                    sublistId: 'item'
+                });
+                try {
+                    var newItemReceiptID = newItemReceipt.save(); // Attempting to save the record
+                    log.debug("New Item Receipt ID", newItemReceiptID)
+                } catch (e) {
+                    log.error("Not able to save new Item Receipt - " + e.name, e.message);
+                }
+
+                var itemReceiptLineCount = itemReceipt.getLineCount('item');
+
+                for (var i = 0; i < itemReceiptLineCount; i += 1) {
+                    _loop(i);
+                }
+
+//======================================================================================
+
+           
+            // return true;
+    
+            }  
         return {
             pageInit: pageInit,
             printpl: printpl,
@@ -547,6 +732,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             fieldChanged: fieldChanged,
             process: process,
             godashboard: godashboard,
-            gohelp: gohelp
+            gohelp: gohelp,
+            saveRecord: saveRecord,
         }
     })

@@ -903,84 +903,88 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 ["mainline","is","F"]
              ],
             
-            "columns": [
-                {
-                    "name": "internalid",
-                    "join": "item",
-                    "label": "Internal ID",
-                    "type": "select",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "item",
-                    "label": "Item",
-                    "type": "select",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "purchasedescription",
-                    "join": "item",
-                    "label": "Description",
-                    "type": "text",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "quantity",
-                    "label": "Quantity",
-                    "type": "float",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "quantitycommitted",
-                    "label": "quantitycommitted",
-                    "type": "float",
-                    "sortdir": "NONE"
-                },
+            "columns": 
+            [
+                
+                search.createColumn({
+                   name: "internalid",
+                   summary: "GROUP"
+                }),
+                search.createColumn({
+                   name: "item",
+                   summary: "GROUP"
+                }),
+                search.createColumn({
+                   name: "purchasedescription",
+                   join: "item",
+                   summary: "GROUP"
+                }),
+                search.createColumn({
+                   name: "quantity",
+                   summary: "SUM"
+                }),
+                search.createColumn({
+                   name: "quantitycommitted",
+                   summary: "SUM"
+                }),
                 search.createColumn({
                    name: "formulanumeric",
-                   formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
-                   label: "BackOrder"
+                   summary: "SUM",
+                   formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END"
                 }),
                 search.createColumn({
                    name: "formulatext",
+                   summary: "GROUP",
                    formula: "SUBSTR({item.purchasedescription}, 0, 290)"
                 }),
                 search.createColumn({
                    name: "binnumber",
-                   join: "item"
+                   join: "item",
+                   summary: "GROUP"
+                }),
+                search.createColumn({
+                   name: "internalid",
+                   join: "item",
+                   summary: "GROUP"
                 })
-            ]
+             ]
         }).run().each(function (result) {
             lineItemIds.push(result.getValue({
                 name: "internalid",
-                join: "item"
+                join: "item",
+                summary: "GROUP"
             }));
 
-            if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
-            else {qtytrn=transferred[result.getText({name: "item"})].qty}
+            if (!transferred[result.getText({name: "item",summary: "GROUP"})]) {qtytrn="0"}
+            else {qtytrn=transferred[result.getText({name: "item",summary: "GROUP"})].qty}
+            log.audit("item " , result.getText({name: "item",summary: "GROUP"}));
+            log.audit("backo " , result.getValue({name: "formulanumeric",summary: "SUM"}));
+            log.audit("qtytrn " , qtytrn);
+            log.audit("qty " , result.getValue({name: "quantity",summary: "SUM"}));
 
-            lineNumbers[result.getText({name: "item"})] = {
+           
+            lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
                 "line":line,
-                "qty":result.getValue({name: "quantity"}),
+                "qty":result.getValue({name: "quantity",summary: "SUM"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc": qtytrn ,
-                "qtybo":result.getValue({name: "formulanumeric"}),
-                "itemdesc":result.getValue({name: "formulatext"}),
-                "binnumberd":result.getValue({name: "binnumber", join: "item"})
+                "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
+                "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
+                "binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
             };
-            if (result.getValue({name: "formulanumeric"})>0) 
+            if (result.getValue({name: "formulanumeric",summary: "SUM"})>0) 
             {
             pagedatasbo[j] = {
                 "lineNumber": line,
-                "item": result.getText({name: "item"}),
-                "itemdesc": result.getValue({name: "formulatext"}),
+                "item": result.getText({name: "item",summary: "GROUP"}),
+                "itemdesc": result.getValue({name: "formulatext",summary: "GROUP"}),
                 "binlocation": " ",
-                "qty": result.getValue({name: "formulanumeric"}),
+                "qty": result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "binlocationqty": 0,
-                "qtyneeded": result.getValue({name: "quantity"})-result.getValue({name: "quantitycommitted"}),
+                "qtyneeded": result.getValue({name: "quantity",summary: "SUM"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
                 "onhand": 0,
                 "memo": "memo",
-                "binnumberd":result.getValue({name: "binnumber", join: "item"})
+                "binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
                 }
                 j++;
             }
@@ -991,10 +995,10 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             return true;
         })
-
+       
         lineItemIds = _.uniq(lineItemIds);
         log.audit("workOrderLocation " , workOrderLocation);
-        log.audit("lineItemIds " , lineItemIds);
+        
         let balanceitem=0;
         let itembef;
         let inventoryBalanceLines = "";
@@ -1124,7 +1128,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
                 "qty": lineNumbers[result.item].qty,
-                "qtyb": result.qty,
+                "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
                 "binlocationqty": result.binlocationqty,
                 "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
@@ -1144,7 +1148,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
                 "qty": lineNumbers[result.item].qty,
-                "qtyb": result.qty,
+                "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
                 "binlocationqty": result.binlocationqty,
                 "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
@@ -1222,8 +1226,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 }
                 j++;
 
+
+            if (!transferred[result.getText({name: "item"})]) {qtytrn=0}
+            else {qtytrn=Number(transferred[result.getText({name: "item"})]).qty}
             transferred[result.getText({name: "item"})] = {
-                "qty":result.getValue({name: "quantity"})
+            "qty":Number(result.getValue({name: "quantity"}))+qtytrn
             };
             
         })

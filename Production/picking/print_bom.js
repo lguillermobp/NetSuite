@@ -139,77 +139,82 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     ["mainline","is","F"]
                  ],
                 
-                "columns": [
-                    {
-                        "name": "internalid",
-                        "join": "item",
-                        "label": "Internal ID",
-                        "type": "select",
-                        "sortdir": "NONE"
-                    },
-                    {
-                        "name": "item",
-                        "label": "Item",
-                        "type": "select",
-                        "sortdir": "NONE"
-                    },
-                    {
-                        "name": "purchasedescription",
-                        "join": "item",
-                        "label": "Description",
-                        "type": "text",
-                        "sortdir": "NONE"
-                    },
-                    {
-                        "name": "quantity",
-                        "label": "Quantity",
-                        "type": "float",
-                        "sortdir": "NONE"
-                    },
-                    {
-                        "name": "quantitycommitted",
-                        "label": "quantitycommitted",
-                        "type": "float",
-                        "sortdir": "NONE"
-                    },
+                "columns":   [
+                
+                    search.createColumn({
+                       name: "internalid",
+                       summary: "GROUP"
+                    }),
+                    search.createColumn({
+                       name: "item",
+                       summary: "GROUP"
+                    }),
+                    search.createColumn({
+                       name: "purchasedescription",
+                       join: "item",
+                       summary: "GROUP"
+                    }),
+                    search.createColumn({
+                       name: "quantity",
+                       summary: "SUM"
+                    }),
+                    search.createColumn({
+                       name: "quantitycommitted",
+                       summary: "SUM"
+                    }),
                     search.createColumn({
                        name: "formulanumeric",
-                      // formula: "CASE WHEN ({item.quantityavailable} is null AND {quantitycommitted} is null) THEN {quantity} ELSE CASE WHEN {item.quantityavailable}<{quantity}-{quantitycommitted} THEN ABS({item.quantityavailable}-{quantity}+{quantitycommitted})  ELSE 0 END END",
-                       formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
-                       label: "BackOrder"
+                       summary: "SUM",
+                       formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END"
+                    }),
+                    search.createColumn({
+                       name: "formulatext",
+                       summary: "GROUP",
+                       formula: "SUBSTR({item.purchasedescription}, 0, 290)"
                     }),
                     search.createColumn({
                        name: "binnumber",
-                       join: "item"
+                       join: "item",
+                       summary: "GROUP"
+                    }),
+                    search.createColumn({
+                       name: "internalid",
+                       join: "item",
+                       summary: "GROUP"
                     })
-                ]
+                 ]
             }).run().each(function (result) {
                 lineItemIds.push(result.getValue({
                     name: "internalid",
-                    join: "item"
+                    join: "item",
+                    summary: "GROUP"
                 }));
 
                 
-                if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
-                else {qtytrn=transferred[result.getText({name: "item"})].qty}
+                if (!transferred[result.getText({name: "item",summary: "GROUP"})]) {qtytrn="0"}
+                else {qtytrn=transferred[result.getText({name: "item",summary: "GROUP"})].qty}
+                log.audit("item " , result.getText({name: "item",summary: "GROUP"}));
+                log.audit("backo " , result.getValue({name: "formulanumeric",summary: "SUM"}));
+                log.audit("qtytrn " , qtytrn);
+                log.audit("qty " , result.getValue({name: "quantity",summary: "SUM"}));
 
-                lineNumbers[result.getText({name: "item"})] = {
+                lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
                 "line":line,
-                "qty":result.getValue({name: "quantity"}),
+                "qty":result.getValue({name: "quantity",summary: "SUM"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc":qtytrn,
-                "qtybo":result.getValue({name: "formulanumeric"}),
-                "itemdesc":result.getValue({name: "purchasedescription", join: "item"})
+                "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
+                "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
                 };
 
-                if (result.getValue({name: "formulanumeric"})>0) {
+                if (result.getValue({name: "formulanumeric",summary: "SUM"})>0) {
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
-                workOrderLines += `<td>${result.getText({name: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantity"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "formulanumeric"})}</td>`;
+                workOrderLines += `<td>${result.getText({name: "item",summary: "GROUP"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item",summary: "GROUP"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "quantity",summary: "SUM"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item",summary: "GROUP"})}</td>`;
+                workOrderLines += `<td>${result.getValue({name: "formulanumeric",summary: "SUM"})}</td>`;
                 workOrderLines += "</tr>";
                 }
                 line += 1;
@@ -218,7 +223,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
             })
 
             lineItemIds = _.uniq(lineItemIds);
-           
+            log.audit("lineItemIds " , lineItemIds);
             pdf = pdf.replace("WORK_ORDER_LINES", workOrderLines);
             let balanceitem=0;
             let itembef;
@@ -415,8 +420,10 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     }
                     j++;
     
+                if (!transferred[result.getText({name: "item"})]) {qtytrn=0}
+                else {qtytrn=Number(transferred[result.getText({name: "item"})]).qty}
                 transferred[result.getText({name: "item"})] = {
-                    "qty":result.getValue({name: "quantity"})
+                "qty":Number(result.getValue({name: "quantity"}))+qtytrn
                 };
                 
             })

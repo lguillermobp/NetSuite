@@ -31,106 +31,28 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             POID = context.request.parameters.idpo;
             paramPO = GENERALTOOLS.get_PO_value(POID);
             
-            entityname= paramWO.data.getValue({fieldId: "entityname"});
-            finishedgoodsso= paramWO.data.getText({fieldId: "assemblyitem"});
-            WONo= paramWO.data.getValue({fieldId: "tranid"});
-            WOsts= paramWO.data.getValue({fieldId: "status"});
-
-            log.audit("Wosts", WOsts);
+            entityname= paramPO.data.getValue({fieldId: "entityname"});
             
+            PONo= paramPO.data.getValue({fieldId: "tranid"});
+            POsts= paramPO.data.getValue({fieldId: "status"});
 
-            finishedqtyso= paramWO.data.getValue({fieldId: "quantity"});
+            log.audit("Posts", POsts);
+           
+            locationso = paramPO.data.getText({fieldId: "location"});
+            locationsoid = paramPO.data.getValue({fieldId: "location"});
 
-            var SOID= paramWO.data.getValue({fieldId: "createdfrom"});
-            if (SOID) {
-                paramSO = GENERALTOOLS.get_SO_value(SOID);
-                SONo = paramSO.data.getValue({fieldId: "tranid"});
-                customerPOso = paramSO.data.getValue({fieldId: "otherrefnum"});
-            }
-            else {
-                customerPOso = " ";
-                SONo = " ";
-            }
 
-            //paramSO = GENERALTOOLS.get_SO_value(SOID);
-            customerso = paramWO.data.getText({fieldId: "entity"});
-            //SONo = paramSO.data.getValue({fieldId: "tranid"});
-            departmentso = paramWO.data.getText({fieldId: "department"});
-            departmentid = paramWO.data.getValue({fieldId: "department"});
-            locationso = paramWO.data.getText({fieldId: "location"});
-            locationsoid = paramWO.data.getValue({fieldId: "location"});
-            //customerPOso = paramSO.data.getValue({fieldId: "otherrefnum"});
-
-            if (departmentid) 
-            {
-                paramdpt = GENERALTOOLS.get_department_value(departmentid);
-                wipbinso = paramdpt.data.getText({fieldId: "custrecord_wipbin"});
-                wipbinsoid = paramdpt.data.getValue({fieldId: "custrecord_wipbin"});
-            }
-            else 
-            {
-                wipbinso = " ";
-                wipbinsoid = " ";
-                departmentso = " ";
-            }
 
 
             if (context.request.method === 'GET') {
         
                 let form = serverWidget.createForm({
-                    title: `Picking Dashboard`
+                    title: `Item Receipt Dashboard`
                 });
-                form.clientScriptModulePath = '/SuiteScripts/picking/DashboardClient_pl.js';
+                form.clientScriptModulePath = '/SuiteScripts/receiving/DashboardClient_re.js';
 
-                if (WOsts=="Planned") 
-                {
-                    log.audit("WOID " , WOID);
-                    try {
-                        var itemrec = record.load({
-                            type: "workorder",
-                            id: WOID,
-                            isDynamic: false,
-                            defaultValues: null
-                        });
-                        itemrec.setValue({
-                            fieldId: "orderstatus",
-                            value: 'B'
-                        });
-                        itemrec.save({
-                            enableSourcing: true,
-                            ignoreMandatoryFields: true
-                        });
-                    // Submit a change status to Released.
-                    // var otherId = record.submitFields({
-                    //     type: 'workorder',
-                    //     id: WOID,
-                    //     values: {
-                    //         'orderstatus ': 'B'
-                    //     },
-                    //     options: {
-                    //         enableSourcing: false,
-                    //         ignoreMandatoryFields: true
-                    //     }
-                    // });
-                    WOsts="Released"
-                } catch (e) {
-                    log.error({
-                        title: e.name,
-                        details: e.message
-                    });
-                }
-                }
-                if (WOsts=="Released" && departmentid) 
-                {
-                    form.addButton({
-                        id: 'custpage_process',
-                        label: 'Submit',
-                        functionName: "process"
-                    });
-
-                }
-
-
+             
+                const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1788&deploy=1&id=${POID}`
                
                 form.addButton({
                     id: 'custpage_buttonback', //always prefix with 'custpage_'
@@ -142,6 +64,16 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     label: 'HELP', //label of the button
                     functionName: 'gohelp'
                 });
+                form.addButton({
+                    id: "custpage_print", 
+                    label: "Print Reception Note",
+                    functionName: `printrn('${printSuitelet}');`
+                })
+
+                form.addSubmitButton({
+                    id: 'custpage_buttonreceiving', //always prefix with 'custpage_'
+                    label: 'Receiving' //label of the button
+                });
         
                 var fieldgroup1 = form.addFieldGroup({
                     id : 'fieldgroupid1',
@@ -149,127 +81,59 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 var fieldgroup2 = form.addFieldGroup({
                     id : 'fieldgroupid2',
-                    label : 'BOM'
+                    label : 'Vendor'
                 });
 
-                // Sales Contract Field
+                // Purchase Order Field
 
-                let saleorderno = form.addField({
-                    id: "custpage_saleorderno",
+                let purcharseorderno = form.addField({
+                    id: "custpage_prchaseorderno",
                     type: serverWidget.FieldType.TEXT,
-                    label: "sale Order",
+                    label: "Purchase Order",
                     container : 'fieldgroupid1'
                 });
-                saleorderno.updateLayoutType({
+                purcharseorderno.updateLayoutType({
                     layoutType: serverWidget.FieldLayoutType.MIDROW
                 });
-                saleorderno.updateDisplayType({
+                purcharseorderno.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
-                saleorderno.defaultValue = SONo;
+                purcharseorderno.defaultValue = PONo;
 
-                 // Work Order Field
-                
-                 let workorderno = form.addField({
-                    id: "custpage_workorderno",
+
+
+                let purcharseorderid = form.addField({
+                    id: "custpage_prchaseorderid",
                     type: serverWidget.FieldType.TEXT,
-                    label: "Work Order",
+                    label: "Purchase Order",
                     container : 'fieldgroupid1'
                 });
-                workorderno.updateLayoutType({
+
+                purcharseorderid.updateLayoutType({
                     layoutType: serverWidget.FieldLayoutType.MIDROW
                 });
-                workorderno.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                workorderno.defaultValue = WONo;
-
-                // Customer Field
-                
-                let customer = form.addField({
-                    id: "custpage_customer",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Customer",
-                    container : 'fieldgroupid1'
-                });
-                
-                customer.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                customer.defaultValue = customerso;
-
-                // CustomerPO Field
-                
-                let customerPO = form.addField({
-                    id: "custpage_customerpo",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Customer PO",
-                    container : 'fieldgroupid1'
-                });
-                customerPO.updateDisplayType({
+                purcharseorderid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                
-                customerPO.defaultValue = customerPOso;
+                purcharseorderid.defaultValue = POID;
 
-                // CustomerPO Field
-                
-                let workorderid = form.addField({
-                    id: "custpage_workorderid",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "WO Internal ID",
-                    container : 'fieldgroupid1'
-                });
-                workorderid.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                
-                workorderid.defaultValue = WOID;
-                
+               
                 // Work order status Field
                 
-                let workordersts = form.addField({
-                    id: "custpage_customerwosts",
+                let purchaseordersts = form.addField({
+                    id: "custpage_purchaseordersts",
                     type: serverWidget.FieldType.TEXT,
-                    label: "Work ORder STS",
+                    label: "Purchase Order STS",
                     container : 'fieldgroupid1'
                 });
-                workordersts.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                
-                workordersts.defaultValue = WOsts;
-
-                // department Field
-                
-                let department = form.addField({
-                    id: "custpage_department",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Department",
-                    container : 'fieldgroupid1'
-                });
-                department.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.STARTROW
-                });
-                department.updateDisplayType({
+                purchaseordersts.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
-                department.defaultValue = departmentso;
-
-                // wipbin Field
                 
-                let wipbinid = form.addField({
-                    id: "custpage_wipbinid",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "wip binlocation id",
-                    container : 'fieldgroupid1'
-                });
-                
-                wipbinid.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
+                purchaseordersts.defaultValue = POsts;
 
-                wipbinid.defaultValue = wipbinsoid;
+           
+              
 
                 // wipbin Field
                 
@@ -284,19 +148,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
-                let wipbin = form.addField({
-                    id: "custpage_wipbin",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "wip binlocation",
-                    container : 'fieldgroupid1'
-                });
-                wipbin.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.MIDROW
-                });
-                wipbin.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                wipbin.defaultValue = wipbinso;
+   
                 
                 // location Field
                 
@@ -310,6 +162,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 locationid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
+
+
+                
                 locationid.defaultValue = locationsoid;
                 let location = form.addField({
                     id: "custpage_location",
@@ -322,100 +177,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 location.defaultValue = locationso;
-                // Ship Date Field
-                /*
-                let shipdate = form.addField({
-                    id: "custpage_shipdate",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "shipdate",
-                    container : 'fieldgroupid1'
-                });
-                
-                shipdate.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                shipdate.defaultValue = shipdateso;
-
-                */
-                // Finished Goods Field
-                
-                let finishedgoods = form.addField({
-                    id: "custpage_finishedgoods",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Finished Goods",
-                    container : 'fieldgroupid1'
-                });
-                
-                finishedgoods.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                finishedgoods.defaultValue = finishedgoodsso;
-
-                // Finished Goods Field
-                
-                let finishedqty = form.addField({
-                    id: "custpage_finishedqty",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Finished Quantity",
-                    container : 'fieldgroupid1'
-                });
-                
-                finishedqty.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
-                finishedqty.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                finishedqty.defaultValue = finishedqtyso;
-    
-                let htmlField1 = form.addField({
-                    id: "custpage_html1",
-                    label: "html",
-                    type: serverWidget.FieldType.INLINEHTML,
-                });
-                htmlField1.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.STARTROW
-                });
-
-                htmlField1.defaultValue = '<div id="MyPalletId" style="width: 100%;background-color: #757575;text-align: center;line-height: 30px; font-size: 20px;	color: white;">Available Items </div>';
-                let htmlFieldt1 = form.addField({
-                    id: "custpage_htmlt1",
-                    label: "html",
-                    type: serverWidget.FieldType.INLINEHTML,
-                });
-
-                htmlFieldt1.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.STARTROW
-                });
-                htmlFieldt1.defaultValue = '<div id="MyPalletId1" style="width: 100%;background-color: #757575;text-align: center;line-height: 30px; font-size: 20px;	color: white;">Total ... </div>';
-    
-
-                let htmlField = form.addField({
-                    id: "custpage_html",
-                    label: "html",
-                    type: serverWidget.FieldType.INLINEHTML,
-                });
-                htmlField.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.STARTROW
-                });
-                htmlField.defaultValue = '<div id="myProgress" style="width: 100%;background-color: #757575;"><div id="myBar" style="width: 0%;	height: 30px;background-color: #9e5d20;	text-align: center;	line-height: 30px; font-size: 20px;	color: white;">0%</div>	  </div>';
-   
-
-                let htmlFieldt = form.addField({
-                    id: "custpage_htmlt",
-                    label: "html",
-                    type: serverWidget.FieldType.INLINEHTML,
-                });
-                htmlFieldt.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.MIDROW
-                });
-                htmlFieldt.defaultValue = '<div id="myProgress1" style="width: 100%;background-color: #757575;"><div id="myBar1" style="width: 0%;	height: 30px;background-color: #9e5d20;	text-align: center;	line-height: 30px; font-size: 20px;	color: white;">0%</div>	  </div>';
-
 
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Available Items',
+                    type : serverWidget.SublistType.INLINEEDITOR,
+                    label: 'Items',
         
                 });
                 sublistpm.addButton({
@@ -429,12 +195,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     functionName: "unmarkall()"
                 });
 
-                sublistpm.addButton({
-                id: "custpage_print", 
-                label: "Print BOM ECD",
-                functionName: "printpl("+WOID+")"
-                })
-
+               
                 let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
                     type: serverWidget.FieldType.TEXT,
@@ -444,35 +205,30 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
-
-
-
-                sublistpm.addField({
+                let sl_item = sublistpm.addField({
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
                     label:'item'
                 });
+                sl_item.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
                 
-                sublistpm.addField({
+                let sl_itemdesc = sublistpm.addField({
                     id: "custrecordml_itemdesc",
                     type: serverWidget.FieldType.TEXT,
                     label:'Description'
+                });
+                sl_itemdesc.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 sublistpm.addField({
                     id: "custrecordml_qty",
                     type: serverWidget.FieldType.INTEGER,
                     label:'Qty'
                 });
-                sublistpm.addField({
-                    id: "custrecordml_commitedqty",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Transferred Qty"
-                });
-                sublistpm.addField({
-                    id: "custrecordml_qtyneeded",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Qty Needed"
-                });
+                
+               
                 let binidf = sublistpm.addField({
                     id: "custrecordml_binlocationid",
                     type: serverWidget.FieldType.TEXT,
@@ -482,26 +238,33 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
-                sublistpm.addField({
-                    id: "custrecordml_binlocation",
+                let lineid = sublistpm.addField({
+                    id: "custrecordml_lineid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Line ID'
+                });
+                lineid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                let sl_bin =sublistpm.addField({
+                    id: "custrecordml_bin",
                     type: serverWidget.FieldType.TEXT,
                     label:'Bin Location'
                 });
-                
-                sublistpm.addField({
-                    id: "custrecordml_qtyb",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'Qty Bin Location'
+                sl_bin.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
+                
+                
                 
                 sublistpm.addField({
                     id: 'custrecordml_selected',
                     label: 'Selected',
                     type: serverWidget.FieldType.CHECKBOX
                 });
-                var resultstr= findCases5(WOID,locationsoid);
-                // loop through each line, skipping the header
-                var resultspt= findCases1(WOID,locationsoid);
+                
+                var resultspt= findCases1(POID);
                 var counter = 0;
                 resultspt.forEach(function(result1) {
 
@@ -516,52 +279,40 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.itemid,
                     });
-                   
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_lineid',
+                        line: counter,
+                        value: result1.lineid,
+                    });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_itemdesc',
                         line: counter,
-                        value: result1.itemdesc+" "
+                        value: result1.memo+" "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
                         line: counter,
                         value: result1.qty 
                     });
-
-                    if (!transferred[result1.item]) {qtytrn="0"}
-                    else {qtytrn=transferred[result1.item].qty}
-                    sublistpm.setSublistValue({
-                        id: 'custrecordml_commitedqty',
-                        line: counter,
-                        value: qtytrn
-                    });
-                    sublistpm.setSublistValue({
-                        id: 'custrecordml_qtyneeded',
-                        line: counter,
-                        value: result1.qtyneeded
-                    });
+                    
                     log.audit("wresult1.item " , result1.item);
-                    log.audit("result1.binlocationid " , result1.binlocationid);
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binlocationid',
                         line: counter,
-                        value: result1.binlocationid
+                        value: "result1.binlocationid"
                     });
                     sublistpm.setSublistValue({
-                        id: 'custrecordml_binlocation',
+                        id: 'custrecordml_bin',
                         line: counter,
                         value: result1.binlocation
                     });
-                    sublistpm.setSublistValue({
-                        id: 'custrecordml_qtyb',
-                        line: counter,
-                        value: result1.qtyb 
-                    });
+                    
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_selected',
                         line: counter,
-                        value: "T" 
+                        value: result1.selected 
                         
                     });
                     
@@ -571,311 +322,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 				})
 
                 
-                // New Subtag or SubList
-
-                var sublistbo = form.addSublist({
-                    id: 'custpage_recordsbo',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Back Order',
-        
-                });
-				
-
-                sublistbo.addField({
-                    id: "custrecordbo_item",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'item'
-                });
-                sublistbo.addField({
-                    id: "custrecordbo_itemdesc",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Description'
-                });
-
-                sublistbo.addField({
-                    id: "custrecordbo_binnumberd",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Bin Number'
-                });
-
-                sublistbo.addField({
-                    id: "custrecordbo_qty",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'Qty'
-                });
-               
-               
-    
-                // loop through each line, skipping the header
-                
-                var counter = 0;
-                pagedatasbo.forEach(function(result1) {
-
-
-                    sublistbo.setSublistValue({
-                        id: 'custrecordbo_item',
-                        line: counter,
-                        value: result1.item
-                        
-                    });
-
-                    sublistbo.setSublistValue({
-                        id: 'custrecordbo_itemdesc',
-                        line: counter,
-                        value: result1.itemdesc+" "
-                    });
-                    sublistbo.setSublistValue({
-                        id: 'custrecordbo_binnumberd',
-                        line: counter,
-                        value: result1.binnumberd+" "
-                    });
-                   
-                    sublistbo.setSublistValue({
-                        id: 'custrecordbo_qty',
-                        line: counter,
-                        value: result1.qty 
-                    });
-
-                   
-                    counter++;
-                
-				})
-
-
-                /*
-
-
-                var sublistcm = form.addSublist({
-                    id: 'custpage_recordscm',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Commitment',
-        
-                });
-				
-                let itemidcf = sublistcm.addField({
-                    id: "custrecordcm_itemid",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'item ID'
-                });
-                itemidcf.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                sublistcm.addField({
-                    id: "custrecordcm_item",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'item'
-                });
-                
-                sublistcm.addField({
-                    id: "custrecordcm_itemdesc",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Description'
-                });
-                sublistcm.addField({
-                    id: "custrecordcm_qty",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'Qty'
-                });
-                sublistcm.addField({
-                    id: "custrecordcm_commitedqty",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Commited Qty"
-                });
-                sublistcm.addField({
-                    id: "custrecordcm_qtyneeded",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "Qty Needed"
-                });
-                let binidcf = sublistcm.addField({
-                    id: "custrecordcm_binlocationid",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Bin Location ID'
-                });
-                binidcf.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                sublistcm.addField({
-                    id: "custrecordcm_binlocation",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Bin Location'
-                });
-                
-                sublistcm.addField({
-                    id: "custrecordcm_qtyb",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'Qty Bin Location'
-                });
-                
-                
-    
-                // loop through each line, skipping the header
-                
-                var counter = 0;
-                pagedatascm.forEach(function(result1) {
-
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_item',
-                        line: counter,
-                        value: result1.item,
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_itemid',
-                        line: counter,
-                        value: result1.itemid,
-                    });
-                   
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_itemdesc',
-                        line: counter,
-                        value: result1.itemdesc+" "
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_qty',
-                        line: counter,
-                        value: result1.qty 
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_commitedqty',
-                        line: counter,
-                        value: result1.qtycommited
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_qtyneeded',
-                        line: counter,
-                        value: result1.qtyneeded
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_binlocationid',
-                        line: counter,
-                        value: result1.binlocationid
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_binlocation',
-                        line: counter,
-                        value: result1.binlocation
-                    });
-                    sublistcm.setSublistValue({
-                        id: 'custrecordcm_qtyb',
-                        line: counter,
-                        value: result1.qtyb 
-                    });
-
-                      
-                    counter++;
-                
-				})
-
-                */
-
-                // New Subtag or SubList
-
-                var sublisttr = form.addSublist({
-                    id: 'custpage_recordstr',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Transfered Items',
-
-                });
-
-
-                sublisttr.addField({
-                    id: "custrecordtr_item",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'item'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_itemdesc",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Description'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_qty",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'Qty'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_type",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Type'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_dco",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Document'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_bin",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'BinLocation'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_user",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'User'
-                });
-                sublisttr.addField({
-                    id: "custrecordtr_date",
-                    type: serverWidget.FieldType.DATE,
-                    label:'Date'
-                });
-
-
-
-                // loop through each line, skipping the header
-
-                
-                var counter = 0;
-                resultstr.forEach(function(result1) {
-
-
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_item',
-                        line: counter,
-                        value: result1.item
-                        
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_itemdesc',
-                        line: counter,
-                        value: result1.itemdesc+" "
-                        
-                    });
-                
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_qty',
-                        line: counter,
-                        value: result1.qty 
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_user',
-                        line: counter,
-                        value: result1.user 
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_type',
-                        line: counter,
-                        value: result1.type 
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_dco',
-                        line: counter,
-                        value: result1.dco 
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_date',
-                        line: counter,
-                        value: result1.date 
-                    });
-                    sublisttr.setSublistValue({
-                        id: 'custrecordtr_bin',
-                        line: counter,
-                        value: result1.bin 
-                    });
-
-                
-                    counter++;
-
-                })
-
+           
 
 
                 context.response.writePage(form);
@@ -884,354 +331,135 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             
             }
     }
-	function findCases1(WO_INTERNAL_ID,workOrderLocation) {
-		var pagedatas=[];
-
-        let workOrderLines = "";
-        let line = 1;
-        let lineItemIds = [];
-        let lineNumbers = {};
-        var j=0;
-        var b=0;
-        const searchWorkOrderLines = search.create({
-            "type": "transaction",
-            "filters": [
-                ["type","anyof","WorkOrd"], 
-                "AND", 
-                ["internalid","anyof",[WO_INTERNAL_ID]], 
-                "AND", 
-                ["mainline","is","F"]
-             ],
-            
-            "columns": [
-                {
-                    "name": "internalid",
-                    "join": "item",
-                    "label": "Internal ID",
-                    "type": "select",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "item",
-                    "label": "Item",
-                    "type": "select",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "purchasedescription",
-                    "join": "item",
-                    "label": "Description",
-                    "type": "text",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "quantity",
-                    "label": "Quantity",
-                    "type": "float",
-                    "sortdir": "NONE"
-                },
-                {
-                    "name": "quantitycommitted",
-                    "label": "quantitycommitted",
-                    "type": "float",
-                    "sortdir": "NONE"
-                },
-                search.createColumn({
-                   name: "formulanumeric",
-                   formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END",
-                   label: "BackOrder"
-                }),
-                search.createColumn({
-                   name: "formulatext",
-                   formula: "SUBSTR({item.purchasedescription}, 0, 290)"
-                }),
-                search.createColumn({
-                   name: "binnumber",
-                   join: "item"
-                })
-            ]
-        }).run().each(function (result) {
-            lineItemIds.push(result.getValue({
-                name: "internalid",
-                join: "item"
-            }));
-
-            if (!transferred[result.getText({name: "item"})]) {qtytrn="0"}
-            else {qtytrn=transferred[result.getText({name: "item"})].qty}
-
-            lineNumbers[result.getText({name: "item"})] = {
-                "line":line,
-                "qty":result.getValue({name: "quantity"}),
-                //"qtyc":result.getValue({name: "quantitycommitted"}),
-                "qtyc": qtytrn ,
-                "qtybo":result.getValue({name: "formulanumeric"}),
-                "itemdesc":result.getValue({name: "formulatext"}),
-                "binnumberd":result.getValue({name: "binnumber", join: "item"})
-            };
-            if (result.getValue({name: "formulanumeric"})>0) 
-            {
-            pagedatasbo[j] = {
-                "lineNumber": line,
-                "item": result.getText({name: "item"}),
-                "itemdesc": result.getValue({name: "formulatext"}),
-                "binlocation": " ",
-                "qty": result.getValue({name: "formulanumeric"}),
-                "binlocationqty": 0,
-                "qtyneeded": result.getValue({name: "quantity"})-result.getValue({name: "quantitycommitted"}),
-                "onhand": 0,
-                "memo": "memo",
-                "binnumberd":result.getValue({name: "binnumber", join: "item"})
-                }
-                j++;
-            }
-
-            i++;
-
-            line += 1;
-
-            return true;
-        })
-
-        lineItemIds = _.uniq(lineItemIds);
-        log.audit("workOrderLocation " , workOrderLocation);
-        log.audit("lineItemIds " , lineItemIds);
-        let balanceitem=0;
-        let itembef;
-        let inventoryBalanceLines = "";
-        let inventoryBalanceData = [];
-        const searchInventoryBalance = search.create({
-            "type": "InventoryBalance",
-            "filters": [{
-                "name": "internalid",
-                "join": "item",
-                "operator": "anyof",
-                "values": lineItemIds,
-                "isor": false,
-                "isnot": false,
-                "leftparens": 0,
-                "rightparens": 0
-            }, {
-                "name": "location",
-                "operator": "noneof",
-                "values": [
-                    workOrderLocation
-                ],
-                "isor": false,
-                "isnot": false,
-                "leftparens": 0,
-                "rightparens": 0
-            },
-            {
-                "name": "binnumber",
-                "operator": "noneof",
-                "values": [
-                    "@NONE@"
-                ],
-                "isor": false,
-                "isnot": false,
-                "leftparens": 0,
-                "rightparens": 0
-            }
-            ],
-            "columns": [
-                search.createColumn({
-                    name: "item",
-                    sort: search.Sort.ASC
-                }),
-                search.createColumn({
-                    name: "datecreated",
-                    join: "inventoryNumber",
-                    sort: search.Sort.ASC
-                }),
-                search.createColumn({
-                    name: "binnumber",
-                    sort: search.Sort.ASC
-                }),
-                "location",
-                "inventorynumber",
-                "status",
-                search.createColumn({
-                    name: "onhand",
-                    sort: search.Sort.ASC
-                }),
-                "available",
-                search.createColumn({
-                    name: "expirationdate",
-                    join: "inventoryNumber"
-                })
-            ]
-        }).run().each(function (result) {
-            let inventoryBalanceLocation = result.getText({name: "location"})
-            const inventoryBalanceLocationPriority = inventoryBalanceLocation === workOrderLocation ? 1 : 2;
-            inventoryBalanceLocation = inventoryBalanceLocation === "Kissimmee-WIP" ? "WIP" : "Warehouse";
-
-            if (itembef!=result.getText({name: "item"})) {
-                itembef=result.getText({name: "item"});
-                balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty) - parseInt(lineNumbers[result.getText({name: "item"})].qtyc);
-            }
-            var qtyr=0;
-            if (balanceitem>result.getValue({name: "available"})) {
-                qtyr=parseInt(result.getValue({name: "available"}));
-            }
-            else {
-                qtyr=balanceitem;
-            }
-            if (balanceitem>0) {
-
-                if (!result.getValue({name: "binnumber"})) {binn=" ";binnt=" ";}
-                else {binn=result.getValue({name: "binnumber"});binnt=result.getText({name: "binnumber"});}
-
-                inventoryBalanceData.push({
-                    "lineNumber": lineNumbers[result.getText({name: "item"})].line,
-                    "qty": qtyr,
-                    "itemid": result.getValue({name: "item"}),
-                    "item": result.getText({name: "item"}),
-                    "locationPriority": inventoryBalanceLocationPriority,
-                    "location": inventoryBalanceLocation,
-                    "binnumber": binnt,
-                    "binnumberid": binn,
-                    "inventorynumber": result.getText({name: "inventorynumber"}),
-                    "expirationdate": result.getValue({name: "expirationDate", join: "inventoryNumber"}),
-                    //"expirationdate": balanceitem + "-" + Number(result.getValue({name: "available"})),
-                    "datecreated": result.getValue({name: "datecreated", join: "inventoryNumber"}),
-                    "onhand": Number(result.getValue({name: "onhand"})),
-                    "available": Number(result.getValue({name: "available"}))
-                });
-            }
-            balanceitem=balanceitem-Number(result.getValue({name: "available"}));
-            //balanceitem=balanceitem-0;
-
-            return true;
+	function findCases1(POID) {
+        var pagedatas=[];
+		
+        var purchaseOrder = record.load({
+            type: record.Type.PURCHASE_ORDER,
+            id: POID,
+            isDynamic: true
         });
 
-        inventoryBalanceData = _.orderBy(inventoryBalanceData, ["lineNumber", "available","locationPriority"], ["asc", "asc", "asc"]);
-        var scripjs="";
-        for (const result of inventoryBalanceData) {
+        var itemReceipt = record.transform({
+            fromType: record.Type.PURCHASE_ORDER,
+            fromId: POID,
+            toType: record.Type.ITEM_RECEIPT,
+            isDynamic: true
+        });
 
-            result.binlocationqty=0;
+        var _loop = function _loop(i) {
 
-            if (result.binlocationqty>result.qty) {result.qtyneeded=0;}
-            else {result.qtyneeded=result.qty-result.binlocationqty;}
-
-
-            if ((lineNumbers[result.item].qty - lineNumbers[result.item].qtyc)>0) {
+            var requiredQuantity = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'quantityremaining',
+                line: i
+            });
+            var inventoryDetailAvail = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'inventorydetailavail',
+                line: i
+            });
+            var item = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'itemname',
+                line: i
+            });
+            var itemid = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'item',
+                line: i
+            });
+            var lineid = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'line',
+                line: i
+            });
+            var locitem = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'location',
+                line: i
+            });
+            var binitem = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'binitem',
+                line: i
+            });
+            var itemText = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'description',
+                line: i
+            });
+            var binloc = "No use Bin";
+            var selected = "T";
+            var binlocid = " ";
+            if (binitem) 
+                {
+                    rec = record.load({
+                        type: "inventoryitem",
+                        id: itemid,
+                        isDynamic: true
+                    })
+                
+                        var lineNumber = rec.findSublistLineWithValue({
+                        sublistId: 'binnumber',
+                        fieldId: 'preferredbin',
+                        value: true
+                    });
+                
+                    if (lineNumber!=-1) {
+                        
+                        var binloc = rec.getSublistText({sublistId: "binnumber", fieldId: "binnumber", line: lineNumber});
+                        var binlocid = rec.getSublistValue({sublistId: "binnumber", fieldId: "binnumber", line: lineNumber});
+                        var selected = "T";
+                    
+                    }
+                    else {
+                        var binloc = "No Bin";
+                        var binlocid = " ";
+                        var selected = "F";
+                    }
+                }
+               
 
             pagedatas[i] = {
-                "lineNumber": result.lineNumber,
-                "item": result.item,
-                "itemid": result.itemid,
-                "itemdesc": lineNumbers[result.item].itemdesc,
-                "binlocation": result.binnumber,
-                "binlocationid": result.binnumberid,
-                "qty": lineNumbers[result.item].qty,
-                "qtyb": result.qty,
-                "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
-                "binlocationqty": result.binlocationqty,
-                "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
-                "onhand": result.onhand,
-                "memo": "memo"
+                "item": item,
+                "lineid": lineid,
+                "itemid": itemid,
+                "qty": Math.ceil(requiredQuantity),
+                "locitem": locitem,
+                "memo": itemText,
+                "inventoryDetailAvail": inventoryDetailAvail,
+                "binlocationid": binlocid,
+                "binlocation": binloc,
+                "selected": selected
                 }
 
-            i++;
-            }
-            else {
-
-            pagedatascm[b] = {
-                "lineNumber": result.lineNumber,
-                "item": result.item,
-                "itemid": result.itemid,
-                "itemdesc": lineNumbers[result.item].itemdesc,
-                "binlocation": result.binnumber,
-                "binlocationid": result.binnumberid,
-                "qty": lineNumbers[result.item].qty,
-                "qtyb": result.qty,
-                "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
-                "binlocationqty": result.binlocationqty,
-                "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
-                "onhand": result.onhand,
-                "memo": "memo"
-                }
-
-            b++;
-            }
         }
+        var itemReceiptLineCount = itemReceipt.getLineCount('item');
+
+        for (var i = 0; i < itemReceiptLineCount; i += 1) {
+            _loop(i);
+        }
+
+        // Set any necessary fields on the item receipt record
+        // For example, you can set the location, quantity, and bin location for each line item
+
+        // Save the item receipt record
+
+        //var itemReceiptId = itemReceipt.save();
+
+        // Redirect to the newly created item receipt record
+
+        // redirect.toRecord({
+        //     type: record.Type.ITEM_RECEIPT,
+        //     id: itemReceiptId
+        // });
+        
        
         return pagedatas;
 	}
-    var pagedatastr=[];
-    function findCases5(WO,workOrderLocation) {
-        log.audit("WO " , WO);
-        log.audit("workOrderLocation " , workOrderLocation);
-            
-        var j=0;
-        const searchWorkOrderLines = search.create({
-            type: "inventorytransfer",
-            settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
-            filters:
-            [
-                ["type","anyof","InvTrnfr"], 
-                "AND", 
-                ["custbody_mo","anyof",WO],  
-                "AND", 
-                ["location","anyof",workOrderLocation]
-            ],
-            columns:
-            [
-                "trandate",
-                "type",
-                "tranid",
-                "entity",
-                "memo",
-                "amount",
-                "item",
-                "quantity",
-                "location",
-                search.createColumn({
-                    name: "binnumber",
-                    join: "inventoryDetail"
-                }),
-                "createdby",
-                search.createColumn({
-                   name: "purchasedescription",
-                   join: "item"
-                })
-            ]
-        });
-        var pagedData = searchWorkOrderLines.runPaged({
-			"pageSize" : 1000
-		});
-
-
-
-		pagedData.pageRanges.forEach(function (pageRange) {
-
-			var page = pagedData.fetch({index: pageRange.index});
-
-			page.data.forEach(function (result) {
-           
-            
-            pagedatastr[j] = {
-                "item": result.getText({name: "item"}),
-                "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
-                "bin": result.getText({name: "binnumber", join: "inventoryDetail"}),
-                "qty": result.getValue({name: "quantity"}),
-                "type": result.getValue({name: "type"}),
-                "date": result.getValue({name: "trandate"}),
-                "dco": result.getValue({name: "tranid"}),
-                "user": result.getText({name: "createdby"})
-                }
-                j++;
-
-            transferred[result.getText({name: "item"})] = {
-                "qty":result.getValue({name: "quantity"})
-            };
-            
-        })
-    })
-        
-        return pagedatastr;
-    }
-
+   
+    
     return {
         onRequest: onRequest
     };

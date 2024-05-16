@@ -26,7 +26,10 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
             log.debug("shippingAddress", currentRecord.getValue({ fieldId: "shippingaddress_text" }));
         }
     }
-    
+    function printrn(url) {
+        console.log(url);
+        window.open(url, "_blank");
+      }
     function fieldChanged(context) {
         // Code to execute when a field value changes
         var currentRecord = context.currentRecord;
@@ -165,6 +168,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         pageInit: pageInit,
         fieldChanged: fieldChanged,
         sublistChanged: sublistChanged,
+        printrn: printrn
         // saveRecord: saveRecord
     };
 });

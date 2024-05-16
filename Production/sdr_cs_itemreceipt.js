@@ -64,6 +64,11 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
                   log.debug({  title: "error: ", details: "datarec.selectLine Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
               }  
               console.log(linelb);
+
+             
+
+
+
               var inventorydetailavail = datarec.getCurrentSublistValue({
                 sublistId: 'item',
                 fieldId: "inventorydetailreq"
@@ -82,7 +87,11 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
             if (itemreceive && inventorydetailavail=="T")
             {
 
-              
+              if (datarec.hasCurrentSublistSubrecord({
+                sublistId: 'item',
+                fieldId: 'inventorydetail'
+            }) )
+            {
               
                   var subRecordInventoryDetail = datarec.getCurrentSublistSubrecord({
                     sublistId: 'item',
@@ -148,7 +157,7 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
               log.debug({  title: "error: ", details: "datarec.selectLine Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
               }  
 
-
+            }
 
           }
 
@@ -171,6 +180,7 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
          * @since 2015.2
          */
         function fieldChanged(context) {
+          log.audit("field",context.fieldId);
            
         }
 
@@ -541,7 +551,7 @@ define(["N/ui/message","N/log","N/record", 'N/ui/dialog','N/currentRecord'],
             pageInit: pageInit,
             showbin: showbin,
             printrn: printrn,
-            //fieldChanged: fieldChanged,
+            fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
             //lineInit: lineInit,
