@@ -86,10 +86,16 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
             });
             log.debug('rate1', rate);
             if (itemId && rate) {
+                paramitem = GENERALTOOLS.get_Item_basic(itemId);
+                paramdata = paramitem.data;
+                
+                log.debug('paramdata', paramdata.recordtype);
+                typerecord=paramdata.recordtype;
+                log.debug('typerecord', typerecord);
 
                 try {
                     var itemBodyFields = record.load({
-                    type: "inventoryitem",
+                    type: typerecord,
                     id: itemId,
                     isDynamic: true,
                     defaultValues: null
@@ -145,7 +151,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                     itemBodyFields.removeLine({sublistId: 'itemvendor', line: lineNumber,ignoreRecalc: true});
 
                     itemBodyFields.selectNewLine({sublistId: "itemvendor"});
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: false});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
                     itemBodyFields.commitLine({sublistId: "itemvendor"});

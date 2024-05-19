@@ -3,7 +3,7 @@
  * @NApiVersion 2.1
  */
 
-define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log', "/SuiteScripts/Modules/LoDash.js", "/SuiteScripts/Modules/generaltoolsv1.js"],
+define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log', "/SuiteScripts/Modules/LoDash.js", "/SuiteScripts/Modules/generaltoolsv1.js"],
 	/**
 	 *
 	 * @param serverWidget
@@ -14,14 +14,12 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 	 * @param _
 	 */
     
-	function (runtime, redirect, runtime,serverWidget,record, search, file, error,log,  _, GENERALTOOLS) {
+	function (url, runtime, redirect, runtime,serverWidget,record, search, file, error,log,  _, GENERALTOOLS) {
 		/**
 		 *
 		 * @param context
 		 */
-        var pagedatasbo=[];
-        var pagedatascm=[];
-        var transferred=[];
+        let itembinloc = [];
         function onRequest(context) {
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
@@ -29,19 +27,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
 
             POID = context.request.parameters.idpo;
-            paramPO = GENERALTOOLS.get_PO_value(POID);
-            
-            entityname= paramPO.data.getValue({fieldId: "entityname"});
-            
-            PONo= paramPO.data.getValue({fieldId: "tranid"});
-            POsts= paramPO.data.getValue({fieldId: "status"});
 
-            log.audit("Posts", POsts);
+            
            
-            locationso = paramPO.data.getText({fieldId: "location"});
-            locationsoid = paramPO.data.getValue({fieldId: "location"});
-
-
 
 
             if (context.request.method === 'GET') {
@@ -50,6 +38,40 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     title: `Item Receipt Dashboard`
                 });
                 form.clientScriptModulePath = '/SuiteScripts/receiving/DashboardClient_re.js';
+
+                if (!POID) {
+                    
+                    
+                        var script = 'customscript_maindashboard_re';
+                        var deployment = 'customdeploy1';
+                        var parameters = "";
+            
+                        
+                        redirect.toSuitelet({
+                            scriptId:script,
+                            deploymentId: deployment,
+                            parameters: {
+                               
+                            } 
+                           
+                        });
+            
+                      return;
+            
+                    
+                }
+
+                paramPO = GENERALTOOLS.get_PO_value(POID);
+            
+                entityname= paramPO.data.getValue({fieldId: "entityname"});
+                
+                PONo= paramPO.data.getValue({fieldId: "tranid"});
+                POsts= paramPO.data.getValue({fieldId: "status"});
+    
+                log.audit("Posts", POsts);
+               
+                locationso = paramPO.data.getText({fieldId: "location"});
+                locationsoid = paramPO.data.getValue({fieldId: "location"});
 
              
                 const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1788&deploy=1&id=${POID}`
@@ -72,7 +94,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
                 form.addSubmitButton({
                     id: 'custpage_buttonreceiving', //always prefix with 'custpage_'
-                    label: 'Receiving' //label of the button
+                    label: 'Received' //label of the button
                 });
         
                 var fieldgroup1 = form.addFieldGroup({
@@ -133,8 +155,13 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 purchaseordersts.defaultValue = POsts;
 
            
-              
+                let memo = form.addField({
+                    id: "custpage_memo",
+                    label: "MEMO",
+                    type: serverWidget.FieldType.TEXT,
+                });
 
+                
                 // wipbin Field
                 
                 let totsel = form.addField({
@@ -166,17 +193,37 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
                 
                 locationid.defaultValue = locationsoid;
+
                 let location = form.addField({
                     id: "custpage_location",
                     type: serverWidget.FieldType.TEXT,
                     label: "location",
                     container : 'fieldgroupid1'
                 });
-                
+
+                location.updateBreakType({
+                    breakType : serverWidget.FieldBreakType.STARTCOL
+                });
                 location.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 location.defaultValue = locationso;
+
+                let vendor = form.addField({
+                    id: "custpage_vendor",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Vendor",
+                    container : 'fieldgroupid1'
+                });
+                
+                vendor.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                vendor.defaultValue = entityname;
+
+
+
+
 
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',
@@ -214,6 +261,14 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 
+                let sl_itemv = sublistpm.addField({
+                    id: "custrecordml_itemv",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Vendor Item'
+                });
+                sl_itemv.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
                 let sl_itemdesc = sublistpm.addField({
                     id: "custrecordml_itemdesc",
                     type: serverWidget.FieldType.TEXT,
@@ -222,21 +277,22 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 sl_itemdesc.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
+
+                let sl_qtyo =sublistpm.addField({
+                    id: "custrecordml_qtyo",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Qty Original'
+                });
+                sl_qtyo.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+
                 sublistpm.addField({
                     id: "custrecordml_qty",
                     type: serverWidget.FieldType.INTEGER,
                     label:'Qty'
                 });
                 
-               
-                let binidf = sublistpm.addField({
-                    id: "custrecordml_binlocationid",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Bin Location ID'
-                });
-                binidf.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
 
                 let lineid = sublistpm.addField({
                     id: "custrecordml_lineid",
@@ -247,14 +303,14 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
-                let sl_bin =sublistpm.addField({
+               
+                let sl_bint =sublistpm.addField({
                     id: "custrecordml_bin",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Bin Location'
+                    type: serverWidget.FieldType.SELECT,
+                    label:'Bin Location',
+                    source: "bin"
                 });
-                sl_bin.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.DISABLED
-                });
+                
                 
                 
                 
@@ -268,6 +324,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 var counter = 0;
                 resultspt.forEach(function(result1) {
 
+
+                    if (!itembinloc[result1.itemid] && result1.binloc!="No use Bin") {binloc="ERROR";selected="F"}
+                    else {binloc=itembinloc[result1.itemid].binloc;binlocid=itembinloc[result1.itemid].binlocid;selected="T"}
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_item',
@@ -294,25 +353,31 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.qty 
                     });
-                    
-                    log.audit("wresult1.item " , result1.item);
-                    
                     sublistpm.setSublistValue({
-                        id: 'custrecordml_binlocationid',
+                        id: 'custrecordml_qtyo',
                         line: counter,
-                        value: "result1.binlocationid"
+                        value: result1.qtyo
                     });
                     sublistpm.setSublistValue({
-                        id: 'custrecordml_bin',
+                        id: 'custrecordml_itemv',
                         line: counter,
-                        value: result1.binlocation
+                        value: result1.itemv+" "
                     });
-                    
+                                      
+
+                     if (binloc!="ERROR" && binloc!="No use Bin") {
+                        
+                     sublistpm.setSublistValue({
+                         id: 'custrecordml_bin',
+                         line: counter,
+                         value: binlocid
+                     });
+                     }
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_selected',
                         line: counter,
-                        value: result1.selected 
+                        value: selected 
                         
                     });
                     
@@ -320,10 +385,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     counter++;
                 
 				})
-
-                
-           
-
 
                 context.response.writePage(form);
             } else {
@@ -333,13 +394,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
     }
 	function findCases1(POID) {
         var pagedatas=[];
+        let lineItemIds = [];
 		
-        var purchaseOrder = record.load({
-            type: record.Type.PURCHASE_ORDER,
-            id: POID,
-            isDynamic: true
-        });
-
+       
         var itemReceipt = record.transform({
             fromType: record.Type.PURCHASE_ORDER,
             fromId: POID,
@@ -354,6 +411,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 fieldId: 'quantityremaining',
                 line: i
             });
+            var QuantityO = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'itemquantity',
+                line: i
+            });
             var inventoryDetailAvail = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'inventorydetailavail',
@@ -364,11 +426,20 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 fieldId: 'itemname',
                 line: i
             });
+
+            
+
             var itemid = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'item',
                 line: i
             });
+            var vendorname = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'vendorname',
+                line: i
+            });
+            lineItemIds.push(itemid);
             var lineid = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'line',
@@ -389,43 +460,22 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 fieldId: 'description',
                 line: i
             });
-            var binloc = "No use Bin";
+            var binloc = "Error";
             var selected = "T";
             var binlocid = " ";
-            if (binitem) 
-                {
-                    rec = record.load({
-                        type: "inventoryitem",
-                        id: itemid,
-                        isDynamic: true
-                    })
-                
-                        var lineNumber = rec.findSublistLineWithValue({
-                        sublistId: 'binnumber',
-                        fieldId: 'preferredbin',
-                        value: true
-                    });
-                
-                    if (lineNumber!=-1) {
-                        
-                        var binloc = rec.getSublistText({sublistId: "binnumber", fieldId: "binnumber", line: lineNumber});
-                        var binlocid = rec.getSublistValue({sublistId: "binnumber", fieldId: "binnumber", line: lineNumber});
-                        var selected = "T";
-                    
-                    }
-                    else {
-                        var binloc = "No Bin";
-                        var binlocid = " ";
-                        var selected = "F";
-                    }
-                }
-               
+            
+            if (!binitem) {
+                var binloc = "No use Bin";
+            }
+
 
             pagedatas[i] = {
                 "item": item,
+                "itemv": vendorname,
                 "lineid": lineid,
                 "itemid": itemid,
                 "qty": Math.ceil(requiredQuantity),
+                "qtyo": Math.ceil(QuantityO),
                 "locitem": locitem,
                 "memo": itemText,
                 "inventoryDetailAvail": inventoryDetailAvail,
@@ -440,23 +490,67 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
         for (var i = 0; i < itemReceiptLineCount; i += 1) {
             _loop(i);
         }
-
-        // Set any necessary fields on the item receipt record
-        // For example, you can set the location, quantity, and bin location for each line item
-
-        // Save the item receipt record
-
-        //var itemReceiptId = itemReceipt.save();
-
-        // Redirect to the newly created item receipt record
-
-        // redirect.toRecord({
-        //     type: record.Type.ITEM_RECEIPT,
-        //     id: itemReceiptId
-        // });
         
+        
+        pagedatas1 = pagedatas.sort((a, b) => {
+            if (a.item > b.item) return 1
+            return -1
+            });
+        
+        
+        lineItemIds = _.uniq(lineItemIds);
+
+        //============================================================
+        log.audit("lineItemIds",lineItemIds);
+        
+        const searchInventoryBalance = search.create({
+            type: "item",
+            filters:
+            [
+               ["internalid","anyof",lineItemIds], 
+               "AND", 
+               ["binnumber","isnotempty",""]
+            ],
+            columns:
+            [
+               "internalid",
+               "itemid",
+               "displayname",
+               "salesdescription",
+               "type",
+               "binnumber",
+               search.createColumn({
+                  name: "internalid",
+                  join: "binNumber"
+                })
+            ]
+        })
+        var pagedData = searchInventoryBalance.runPaged({
+			"pageSize" : 1000
+		});
+
+
+
+		pagedData.pageRanges.forEach(function (pageRange) {
+
+			var page = pagedData.fetch({index: pageRange.index});
+
+			page.data.forEach(function (result) {
+            
+            
+            itembinloc[result.getValue({name: "internalid"})] = {
+                "binloc":result.getValue({name: "binnumber"}),
+                "binlocid":result.getValue({name: "internalid",join: "binNumber"})
+            }
+
+            })
+                   
+        })
+
+        //============================================================
+
        
-        return pagedatas;
+        return pagedatas1;
 	}
    
     

@@ -30,7 +30,9 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
                         "AND",
                         ["type","anyof","PurchOrd"],
                         "AND",
-                        ["mainline","is","T"]
+                        ["mainline","is","T"], 
+                        "AND", 
+                        ["status","anyof","PurchOrd:D","PurchOrd:E","PurchOrd:B"]
                     ],
                 columns:
                     [
@@ -90,7 +92,7 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             else {
                 message.create({
                     title: "Error",
-                    message: "The Purchase Order does not exist. Please check the number and try again.",
+                    message: "The Purchase Order does not exist or has already been received. Please check the number and try again",
                     type: message.Type.ERROR,
                     duration: 10000
                 }).show();

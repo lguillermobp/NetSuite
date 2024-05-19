@@ -804,11 +804,9 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
                     "recordtype",
                     "salesdescription",
                     "averagecost",
-                    "custitem_htscode",
                     "bomquantity",
                     "lastpurchaseprice",
-                    "custitemcasespermasterbox",
-                    "custitemboxesperpallet",
+                    "binnumber",
                     "weight"]
             });
 

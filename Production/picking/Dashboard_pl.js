@@ -1216,7 +1216,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             
             pagedatastr[j] = {
                 "item": result.getText({name: "item"}),
-                "itemdesc": result.getValue({name: "purchasedescription", join: "item"}),
+                "itemdesc": result.getValue({name: "purchasedescription", join: "item"}).substring(0, 299),
                 "bin": result.getText({name: "binnumber", join: "inventoryDetail"}),
                 "qty": result.getValue({name: "quantity"}),
                 "type": result.getValue({name: "type"}),

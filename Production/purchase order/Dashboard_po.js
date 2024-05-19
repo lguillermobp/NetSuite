@@ -20,6 +20,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		 */
         var customersselected;
         var sectionsselected;
+        var summarypos=[];
         function onRequest(context) {
 
             var userObj = runtime.getCurrentUser();
@@ -532,7 +533,165 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 
 				})
 
+               
+
+                //======================================================================================================
+
+                    var sublistppd = form.addSublist({
+                    id: 'custpageppd_records',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'PPD',
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_productionline",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Production Line'
+                    });
+                    var sectionidc =sublistppd.addField({
+                        id: "custrecordml_sectionid",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Sectionid'
+                    });
+                    sectionidc.updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.HIDDEN
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_section",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Section'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_preferredvendor",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Preferred Vendor'
+                    });
+                    var vendorid = sublistppd.addField({
+                        id: "custrecordml_preferredvendorid",
+                        type: serverWidget.FieldType.INTEGER,
+                        label:'Preferred Vendor ID'
+                    });
+                    vendorid.updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.HIDDEN
+                    });
+        
+                   
+                    sublistppd.addField({
+                        id: "custrecordml_currency",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Currency Vendor'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_total",
+                        type: serverWidget.FieldType.FLOAT,
+                        label:'Total'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_currencyrate",
+                        type: serverWidget.FieldType.FLOAT,
+                        label:'Exchange Rate'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_totalusd",
+                        type: serverWidget.FieldType.FLOAT,
+                        label:'Total USD'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_memo",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Project'
+                    });
+                    sublistppd.addField({
+                        id: 'custrecordml_omit',
+                        label: 'Omit',
+                        type: serverWidget.FieldType.CHECKBOX
+                    });
+    
+        
+                    // loop through each line, skipping the header
+                    
+                    var counter = 0;
+                    resultspt.forEach(function(result1) {
+    
+                        
+    
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_preferredvendor',
+                            line: counter,
+                            value: result1.preferredvendor
+                            
+                        });
+                       
+                       
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_sectionid',
+                            line: counter,
+                            value: 0
+                            
+                        });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_section',
+                            line: counter,
+                            value: result1.section
+                            
+                        });
+                        
+                        
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_productionline',
+                            line: counter,
+                            value: result1.productionline
+                            
+                        });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_preferredvendorid',
+                            line: counter,
+                            value: result1.preferredvendorid
+                            
+                        });
+                        
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_total',
+                            line: counter,
+                            value: result1.total.toFixed(2)
+                        });
+                        
+                        if (!result1.currency) {
+                            dcurrency="US Dollar";}
+                        else {dcurrency=result1.currency;}
+                        
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_currency',
+                            line: counter,
+                            value: dcurrency
+                        });
+                        
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_currencyrate',
+                            line: counter,
+                            value: resultscurr[dcurrency].exchangerate
+                        });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_totalusd',
+                            line: counter,
+                            value: (result1.total/resultscurr[dcurrency].exchangerate).toFixed(2)
+                        });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_memo',
+                            line: counter,
+                            value: result1.memo.substring(0, 298)
+                        });
+                       
+                        counter++;
+                    
+            
+                    })
+
                 
+    
+
+
+
+                //======================================================================================================
 
 
 
