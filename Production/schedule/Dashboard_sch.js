@@ -163,6 +163,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             [
                 ["custrecord_salecontract.mainline","is","T"], 
                 "AND", 
+                ["custrecord_so_sc_productionline","anyof","1"], 
+                "AND", 
                 ["custrecord_so_sc_startdate","onorafter",ecddays[0]]
             ],
             columns:

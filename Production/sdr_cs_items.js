@@ -18,7 +18,11 @@ define(["N/log","N/record","N/search"],
          */
         function pageInit(context) {
 
-
+            var currentRecord = context.currentRecord;
+            currentRecord.setValue({
+                fieldId: 'usebins',
+                value: true
+            });
 
         }
 
@@ -43,16 +47,6 @@ define(["N/log","N/record","N/search"],
             log.debug("fieldId",fieldId);
 
 
-               /*     const d = new Date(datexp);
-                    d.setDate(d.getDate() + daysrec);
-
-                    currentRecord.setCurrentSublistValue({
-                        sublistId: sublistId,
-                        fieldId: "expectedreceiptdate",
-                        value: d,
-                        ignoreFieldChange: true
-                    });
-                */
 
         return {fieldChanged: fieldChanged}
     }
@@ -186,8 +180,8 @@ function saveRecord(context) {
 }
 
 return {
-    //pageInit: pageInit,
-    fieldChanged: fieldChanged,
+    pageInit: pageInit,
+    //fieldChanged: fieldChanged,
     //postSourcing: postSourcing,
     // sublistChanged: sublistChanged,
     //lineInit: lineInit,

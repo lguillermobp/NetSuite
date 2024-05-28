@@ -11,7 +11,7 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 isDynamic: true
             });
 
-            task = currentRecord.getValue({fieldId: "custbody2"});
+            task = currentRecord.getValue({fieldId: "custbody_task"});
             createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
             log.debug("task",task);
             log.debug("createdfrom",createdfrom);

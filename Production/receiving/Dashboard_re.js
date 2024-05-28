@@ -28,7 +28,27 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 
             POID = context.request.parameters.idpo;
 
+            if (!POID) {
+                    
+                    
+                var script = 'customscript_maindashboard_re';
+                var deployment = 'customdeploy1';
+                var parameters = "";
+    
+                
+                redirect.toSuitelet({
+                    scriptId:script,
+                    deploymentId: deployment,
+                    parameters: {
+                       
+                    } 
+                   
+                });
+    
+              return;
+    
             
+        }
            
 
 
@@ -39,27 +59,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 });
                 form.clientScriptModulePath = '/SuiteScripts/receiving/DashboardClient_re.js';
 
-                if (!POID) {
-                    
-                    
-                        var script = 'customscript_maindashboard_re';
-                        var deployment = 'customdeploy1';
-                        var parameters = "";
-            
-                        
-                        redirect.toSuitelet({
-                            scriptId:script,
-                            deploymentId: deployment,
-                            parameters: {
-                               
-                            } 
-                           
-                        });
-            
-                      return;
-            
-                    
-                }
+               
 
                 paramPO = GENERALTOOLS.get_PO_value(POID);
             

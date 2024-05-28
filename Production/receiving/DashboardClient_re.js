@@ -396,6 +396,10 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                         sublistId: 'item',
                         fieldId: 'item'
                     });
+                    var binitem = itemReceipt.getCurrentSublistText({
+                        sublistId: 'item',
+                        fieldId: 'binitem'
+                    });
                     console.log("lineid: " + lineid);
                     console.log("itemt: " + itemt);
                     var lineNumber = currentRecord.findSublistLineWithValue({
@@ -442,8 +446,8 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             fieldId: 'quantity',
                             value: qty
                         });
-
-                        if (selec) 
+                        console.log(binitem);
+                        if (selec && binitem=="T") 
                         {
 
 
@@ -454,10 +458,10 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             console.log(subrecord);
 
                            // Add a line to the subrecord's inventory assignment sublist.
-                           subrecord.selectNewLine({
+                           var newline=subrecord.selectNewLine({
                                 sublistId: 'inventoryassignment'
                             });
-
+                            console.log(newline);
                             subrecord.setCurrentSublistValue({
                                 sublistId: 'inventoryassignment',
                                 fieldId: 'binnumber', 
@@ -476,59 +480,14 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             subrecord.commitLine({
                                 sublistId: 'inventoryassignment'
                             });
-                            }
+                        }
 
                          // Save the line in the record's sublist
                         itemReceipt.commitLine({
                             sublistId: 'item'
                         });
 
-                        // itemReceipt.commitLine({ // Commit the line
-                        //     sublistId: 'item'
-                        //     });
-
-
-/*
-
-
-                        if (itemReceipt.hasCurrentSublistSubrecord({
-                            sublistId: 'item',
-                            fieldId: 'inventorydetail'
-                        }) )
-                        {
-                          
-                            var subRecordInventoryDetail = itemReceipt.getCurrentSublistSubrecord({
-                                sublistId: 'item',
-                                fieldId: 'inventorydetail'
-                            });
-                            var linetot = subRecordInventoryDetail.getLineCount({
-                              "sublistId": "inventoryassignment"
-                            });
-                            console.log(linetot);
-                            console.log(subRecordInventoryDetail);
-                          
-                            if (linetot > 0) 
-                            {
-                              subRecordInventoryDetail.selectLine({
-                                sublistId: 'inventoryassignment',
-                                line: 0
-                            });
-                          
-                            var binNumber = subRecordInventoryDetail.setCurrentSublistText({
-                                sublistId: 'inventoryassignment',
-                                fieldId: 'binnumber',
-                                value: binlocation
-                            });
-                            console.log(binNumber);
-                            }
-                         }
-
-
-                        */
-
-                            // itemReceipt.commitLine({ // Commit the line
-                            //     sublistId: 'item'
-                            // });
+                     
 
                     }
 
@@ -544,7 +503,21 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 try {
                     
                     log.debug("New Item Receipt ID", itemReceiptID);
-                   // godashboard();
+                    message.create({
+                        title: "Success",
+                        message: "Item receipt has been created successfully",
+                        type: message.Type.CONFIRMATION
+                    }).show();
+                    
+                    function success(result) { console.log('Success with value: ' + result) } 
+                    function failure(reason) { console.log('Failure: ' + reason) } 
+
+                    dialog.alert({ 
+                    title: 'Nice Job!!!', 
+                    message: 'Item Receipt has been created successfully, please Click OK to continue.' 
+                    }).then(success).catch(failure); 
+                    
+                   
                    return true;
                 } catch (e) {
                     message.create({

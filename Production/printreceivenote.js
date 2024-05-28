@@ -66,7 +66,8 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                        }),
                        search.createColumn({
                           name: "item",
-                          summary: "GROUP"
+                          summary: "GROUP",
+                          sort: search.Sort.ASC
                        }),
                        search.createColumn({
                           name: "custcol_notes",
