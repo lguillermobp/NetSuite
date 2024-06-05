@@ -192,6 +192,13 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     var newpotdate=new Date(taskds);
                     newpotdate.setDate(newpotdate.getDate()-leadtime);
                     
+                    if (new Date(newpotdate)<new Date(custpageDate)) 
+                        {newpotdatedue=new Date(custpageDate);}
+                    else 
+                        {var newpotdatedue=new Date(custpageDate);}
+                    
+                    newpotdatedue.setDate(newpotdatedue.getDate()+leadtime);
+                    
             
 
                         var purchaseOrder = record.create({
@@ -220,6 +227,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                         purchaseOrder.setValue({
                             fieldId: 'trandate',
                             value: new Date(newpotdate) // Set the transaction date
+                        });
+                        purchaseOrder.setValue({
+                            fieldId: 'duedate',
+                            value: new Date(newpotdatedue) // Set the transaction date
                         });
                         purchaseOrder.setValue({
                             fieldId: 'memo',
@@ -273,6 +284,13 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     line: i });
                     var newpotdate=new Date(taskds);
                     newpotdate.setDate(newpotdate.getDate()-leadtime);
+
+                    if (new Date(newpotdate)<new Date(custpageDate)) 
+                        {newpotdatedue=new Date(custpageDate);}
+                    else 
+                        {var newpotdatedue=new Date(custpageDate);}
+                    
+                    newpotdatedue.setDate(newpotdatedue.getDate()+leadtime);
                     
 
                     // Set field values
@@ -298,6 +316,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     purchaseOrder.setValue({
                         fieldId: 'trandate',
                         value: new Date(newpotdate) // Set the transaction date
+                    });
+                    purchaseOrder.setValue({
+                        fieldId: 'duedate',
+                        value: new Date(newpotdatedue) // Set the transaction date
                     });
                     purchaseOrder.setValue({
                         fieldId: 'memo',

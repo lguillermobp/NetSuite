@@ -20,6 +20,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 		 * @param context
 		 */
         let itembinloc = [];
+        var typetransaction;
         function onRequest(context) {
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
@@ -60,8 +61,12 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 form.clientScriptModulePath = '/SuiteScripts/receiving/DashboardClient_re.js';
 
                
-
+                try {typetransaction = "purchaseorder";
                 paramPO = GENERALTOOLS.get_PO_value(POID);
+                } catch (e) {
+                    typetransaction = "transferorder";
+                    paramPO = GENERALTOOLS.get_TO_value(POID);
+                }
             
                 entityname= paramPO.data.getValue({fieldId: "entityname"});
                 
@@ -72,6 +77,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                
                 locationso = paramPO.data.getText({fieldId: "location"});
                 locationsoid = paramPO.data.getValue({fieldId: "location"});
+                customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
 
              
                 const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1788&deploy=1&id=${POID}`
@@ -111,7 +117,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 let purcharseorderno = form.addField({
                     id: "custpage_prchaseorderno",
                     type: serverWidget.FieldType.TEXT,
-                    label: "Purchase Order",
+                    label: "Purchase Order/Transfer Order",
                     container : 'fieldgroupid1'
                 });
                 purcharseorderno.updateLayoutType({
@@ -131,13 +137,24 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     container : 'fieldgroupid1'
                 });
 
-                purcharseorderid.updateLayoutType({
-                    layoutType: serverWidget.FieldLayoutType.MIDROW
-                });
+               
                 purcharseorderid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
                 purcharseorderid.defaultValue = POID;
+
+                let typetrans = form.addField({
+                    id: "custpage_typetransaction",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Type Transaction",
+                    container : 'fieldgroupid1'
+                });
+
+               
+                typetrans.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                typetrans.defaultValue = typetransaction;
 
                
                 // Work order status Field
@@ -162,20 +179,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 });
 
                 
-                // wipbin Field
                 
-                let totsel = form.addField({
-                    id: "custpage_totsel",
-                    type: serverWidget.FieldType.TEXT,
-                    label: "total selected",
-                    container : 'fieldgroupid1'
-                });
-                
-                totsel.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-
-   
                 
                 // location Field
                 
@@ -222,6 +226,31 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 vendor.defaultValue = entityname;
 
 
+                let customer = form.addField({
+                    id: "custpage_customer",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "Customer",
+                    container : 'fieldgroupid1'
+                });
+                
+                customer.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                customer.defaultValue = customerpo;
+
+
+                // wipbin Field
+                                
+                let totsel = form.addField({
+                    id: "custpage_totsel",
+                    type: serverWidget.FieldType.TEXT,
+                    label: "total selected",
+                    container : 'fieldgroupid1'
+                });
+
+                totsel.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
 
 
 
@@ -267,6 +296,14 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     label:'Vendor Item'
                 });
                 sl_itemv.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                let sl_project = sublistpm.addField({
+                    id: "custrecordml_project",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Project'
+                });
+                sl_project.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 let sl_itemdesc = sublistpm.addField({
@@ -363,6 +400,11 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                         line: counter,
                         value: result1.itemv+" "
                     });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_project',
+                        line: counter,
+                        value: result1.project+" "
+                    });
                                       
 
                      if (binloc!="ERROR" && binloc!="No use Bin") {
@@ -398,7 +440,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 		
        
         var itemReceipt = record.transform({
-            fromType: record.Type.PURCHASE_ORDER,
+            fromType: typetransaction,
             fromId: POID,
             toType: record.Type.ITEM_RECEIPT,
             isDynamic: true
@@ -419,6 +461,21 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
             var inventoryDetailAvail = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'inventorydetailavail',
+                line: i
+            });
+            var vendorcode = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'custcol_vendorcode',
+                line: i
+            });
+            var vendorcode = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'custcol_vendorcode',
+                line: i
+            });
+            var project = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'custcol_notes',
                 line: i
             });
             var item = itemReceipt.getSublistValue({
@@ -471,7 +528,8 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 
             pagedatas[i] = {
                 "item": item,
-                "itemv": vendorname,
+                "itemv": vendorcode,
+                "project": project,
                 "lineid": lineid,
                 "itemid": itemid,
                 "qty": Math.ceil(requiredQuantity),

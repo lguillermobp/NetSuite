@@ -66,6 +66,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var fieldId = context.fieldId;
         var entity= currentRecord.getValue({ fieldId: 'entity'});
         var entityname= currentRecord.getText({ fieldId: 'entity'});
+        var currancy= currentRecord.getValue({ fieldId: 'currency'});
         log.debug('currentRecord', currentRecord);
         console.log('currentRecord', currentRecord);
         log.debug('entityname', entityname);
@@ -83,6 +84,10 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
             var rate = currentRecord.getCurrentSublistValue({
                 sublistId: sublistId,
                 fieldId: "rate"
+            });
+            var vendorcode = currentRecord.getCurrentSublistValue({
+                sublistId: sublistId,
+                fieldId: "custcol_vendorcode"
             });
             log.debug('rate1', rate);
             if (itemId && rate) {
@@ -133,32 +138,22 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 log.debug('lineCount', lineCount);
 
                 log.debug("lineNumber", lineNumber);
-                if (lineNumber === -1) {
-
-                    itemBodyFields.selectNewLine({sublistId: "itemvendor"});
-                    if (lineCount === 0) {
-                        itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
-                    }
-                    else { 
-                        itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: false});
-                    }
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
-                    itemBodyFields.commitLine({sublistId: "itemvendor"});
-                    itemBodyFields.save({enableSourcing: true});
+                if (lineNumber != -1) {
+                    itemBodyFields.removeLine({sublistId: "itemvendor", line: lineNumber});
+                    
                 }
-                else {
-                    itemBodyFields.removeLine({sublistId: 'itemvendor', line: lineNumber,ignoreRecalc: true});
-
+                    log.debug("entity", entity);
                     itemBodyFields.selectNewLine({sublistId: "itemvendor"});
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
+
+                    if (vendorcode) {
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendorcode", value: vendorcode});
+                    }
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
+                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendorcurrencyid", value: currancy});
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
                     itemBodyFields.commitLine({sublistId: "itemvendor"});
                     itemBodyFields.save({enableSourcing: true});
-                    log.debug('rate2', rate);
-                }
-               
             }
         }
            

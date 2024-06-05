@@ -839,7 +839,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             }),
             search.createColumn({
                 name: "formulanumeric",
-                summary: "SUM",
+                summary: "MAX",
                 formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END"
             }),
             search.createColumn({
@@ -969,7 +969,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     currency=fresult.getValue({name: "formulatext",summary: "MAX"});
         
         
-                    qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
+                    qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "MAX"}));
                 
                     qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
                     qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));

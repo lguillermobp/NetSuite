@@ -18,11 +18,16 @@ define(["N/log","N/record","N/search"],
          */
         function pageInit(context) {
 
+        if (context.currentRecord.getValue({fieldId: 'usebins'})!= true) 
+            {
+
             var currentRecord = context.currentRecord;
             currentRecord.setValue({
                 fieldId: 'usebins',
                 value: true
             });
+
+            }
 
         }
 

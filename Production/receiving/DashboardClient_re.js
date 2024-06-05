@@ -61,18 +61,25 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                     sublistId: "custpage_records",
                     line: i
                 });
+                var binNumber = currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: "custrecordml_bin"
+                });
 
-                selecf=currentRec.getCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_selected'
-                });
-                if (selecf) continue;
-                currentRec.setCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_selected',
-                    value: true,
-                    ignoreFieldChange: false
-                });
+                if (binNumber) 
+                {
+                    selecf=currentRec.getCurrentSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_selected'
+                    });
+                    if (selecf) continue;
+                    currentRec.setCurrentSublistValue({
+                        sublistId: 'custpage_records',
+                        fieldId: 'custrecordml_selected',
+                        value: true,
+                        ignoreFieldChange: false
+                    });
+                }
                
             }
             currentRec.commitLine({
@@ -151,48 +158,67 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 
                 {
 
-                    var locationid = currentRecord.getValue({
-                        fieldId: 'custpage_locationid'
-                    });
-                    
-                    var itemid = currentRecord.getCurrentSublistValue({
-                        sublistId: context.sublistId,
-                        fieldId: "custrecordml_itemid"
-                    });
                     var binNumber = currentRecord.getCurrentSublistValue({
                         sublistId: context.sublistId,
                         fieldId: "custrecordml_bin"
                     });
-                    
-                    paramitem = GENERALTOOLS.get_Item_basic(itemid);
-                    paramdata = paramitem.data;
-                    typerecord=paramdata.recordtype;
 
-                    if (!paramdata.binNumber) {
+                    if (binNumber) 
 
-                        rec = record.load({
-                            type: typerecord,
-                            id: itemid,
-                            isDynamic: true
-                        })
-                    
-                            var lineNumber = rec.findSublistLineWithValue({
-                            sublistId: 'binnumber',
-                            fieldId: 'preferredbin',
-                            value: true
-                        });
-                    
-                        if (lineNumber==-1) {
+                        {
+                        
+
+                            var locationid = currentRecord.getValue({
+                                fieldId: 'custpage_locationid'
+                            });
                             
-                            rec.selectNewLine({sublistId: "binnumber"});
-                            rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: locationid});
-                            rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binnumber", value: binNumber});
-                            rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
-                            rec.commitLine({sublistId: "binnumber"});
-                            var saverec = rec.save();
+                            var itemid = currentRecord.getCurrentSublistValue({
+                                sublistId: context.sublistId,
+                                fieldId: "custrecordml_itemid"
+                            });
+                            var binNumber = currentRecord.getCurrentSublistValue({
+                                sublistId: context.sublistId,
+                                fieldId: "custrecordml_bin"
+                            });
+                            
+                            paramitem = GENERALTOOLS.get_Item_basic(itemid);
+                            paramdata = paramitem.data;
+                            typerecord=paramdata.recordtype;
+
+                            if (!paramdata.binNumber) {
+
+                                rec = record.load({
+                                    type: typerecord,
+                                    id: itemid,
+                                    isDynamic: true
+                                })
+                            
+                                    var lineNumber = rec.findSublistLineWithValue({
+                                    sublistId: 'binnumber',
+                                    fieldId: 'preferredbin',
+                                    value: true
+                                });
+                            
+                                if (lineNumber==-1) {
+                                    
+                                    rec.selectNewLine({sublistId: "binnumber"});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "location", value: locationid});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "binnumber", value: binNumber});
+                                    rec.setCurrentSublistValue({sublistId: "binnumber", fieldId: "preferredbin", value: true});
+                                    rec.commitLine({sublistId: "binnumber"});
+                                    var saverec = rec.save();
+                                }
+                            }
+                            console.log(context.fieldId);
+
                         }
-                    }
-                    console.log(context.fieldId);
+                        else {
+                            currentRecord.setCurrentSublistValue({
+                                sublistId: context.sublistId,
+                                fieldId: "custrecordml_selected",
+                                value: false
+                            });
+                        }
                 }
              
           }
@@ -351,6 +377,9 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             var POID = currentRecord.getValue({
                 fieldId: 'custpage_prchaseorderid'
             });
+            var typetransaction = currentRecord.getValue({
+                fieldId: 'custpage_typetransaction'
+            });
             var memo = currentRecord.getValue({
                 fieldId: 'custpage_memo'
             });
@@ -365,7 +394,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
 
                 // *** USING THE RECORD MODULE ***
                 var itemReceipt = record.transform({
-                    fromType: record.Type.PURCHASE_ORDER,
+                    fromType: typetransaction,
                     fromId: POID,
                     toType: record.Type.ITEM_RECEIPT,
                     isDynamic: true

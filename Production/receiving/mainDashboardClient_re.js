@@ -23,16 +23,18 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             var retval = {};
             log.debug("po",po);
             var fsearch = s.create({
-                type: "purchaseorder",
+                type: "transaction",
                 filters:
                     [
                         ["numbertext","is",po],
                         "AND",
-                        ["type","anyof","PurchOrd"],
+                        ["type","anyof","PurchOrd","TrnfrOrd"], 
                         "AND",
                         ["mainline","is","T"], 
                         "AND", 
-                        ["status","anyof","PurchOrd:D","PurchOrd:E","PurchOrd:B"]
+                        ["status","anyof","PurchOrd:B","PurchOrd:D","PurchOrd:E","TrnfrOrd:F","TrnfrOrd:E"], 
+                        "AND", 
+                        ["type","anyof","PurchOrd","TrnfrOrd"]
                     ],
                 columns:
                     [
@@ -92,11 +94,11 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             else {
                 message.create({
                     title: "Error",
-                    message: "The Purchase Order does not exist or has already been received. Please check the number and try again",
+                    message: "The Purchase Order/Transfer Order does not exist or has already been received. Please check the number and try again",
                     type: message.Type.ERROR,
                     duration: 10000
                 }).show();
-                log.debug("Error", "Manufacturing Order not found");
+                log.debug("Error", "Purchase Order/Transfer Order not found");
             }      
 
         }

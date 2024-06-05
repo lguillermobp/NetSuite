@@ -242,9 +242,9 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     "rightparens": 0
                 }, {
                     "name": "location",
-                    "operator": "noneof",
+                    "operator": "anyof",
                     "values": [
-                        workOrderLocationID
+                        1
                     ],
                     "isor": false,
                     "isnot": false,

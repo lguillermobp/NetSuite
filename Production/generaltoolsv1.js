@@ -521,7 +521,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
     }
 
 
-        function get_PO_value (value){
+    function get_PO_value (value){
 
 
         var paramrec = r.load({
@@ -550,6 +550,37 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
         }
         return retvar;
     }
+
+    function get_TO_value (value){
+
+
+        var paramrec = r.load({
+            type: "transferorder",
+            id: value,
+            isDynamic: false,
+            defaultValues: null
+        });
+
+        if (paramrec)
+        {   var sts="Complated";
+            var records=1;
+        }
+        else
+        {
+            var sts="Error";
+            var records=0;
+        }
+        var retvar= {};
+
+        retvar = {
+            "sts": sts,
+            "date": "",
+            "records": records,
+            "data": paramrec
+        }
+        return retvar;
+    }
+
 
     function get_WO_value (value){
 
@@ -820,7 +851,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
         }
         return retvar;
 
-    }
+        }
 
         function Component (component){
 
@@ -1605,6 +1636,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             get_location_value: get_location_value,
             get_department_value: get_department_value,
             get_PO_value: get_PO_value,
+            get_TO_value: get_TO_value,
             get_WO_value: get_WO_value,
             get_SO_value: get_SO_value,
             get_items_listLastPO: get_items_listLastPO,

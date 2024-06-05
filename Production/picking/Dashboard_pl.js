@@ -1016,9 +1016,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "rightparens": 0
             }, {
                 "name": "location",
-                "operator": "noneof",
+                "operator": "anyof",
                 "values": [
-                    workOrderLocation
+                    1
                 ],
                 "isor": false,
                 "isnot": false,
