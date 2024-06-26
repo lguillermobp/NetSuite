@@ -136,7 +136,9 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     "AND", 
                     ["internalid","anyof",[WO_INTERNAL_ID]], 
                     "AND", 
-                    ["mainline","is","F"]
+                    ["mainline","is","F"],
+                    "AND", 
+                    ["item.preferredbin","is","T"]
                  ],
                 
                 "columns":   [
@@ -172,11 +174,11 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                        summary: "GROUP",
                        formula: "SUBSTR({item.purchasedescription}, 0, 290)"
                     }),
-                    search.createColumn({
-                       name: "binnumber",
-                       join: "item",
-                       summary: "GROUP"
-                    }),
+                   // search.createColumn({
+                   //    name: "binnumber",
+                   //    join: "item",
+                   //    summary: "GROUP"
+                    //}),
                     search.createColumn({
                        name: "internalid",
                        join: "item",
@@ -213,7 +215,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += `<td>${result.getText({name: "item",summary: "GROUP"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item",summary: "GROUP"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "quantity",summary: "SUM"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item",summary: "GROUP"})}</td>`;
+                //workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item",summary: "GROUP"})}</td>`;
+                workOrderLines += `<td> </td>`;
                 workOrderLines += `<td>${result.getValue({name: "formulanumeric",summary: "SUM"})}</td>`;
                 workOrderLines += "</tr>";
                 }

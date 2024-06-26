@@ -900,7 +900,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "AND", 
                 ["internalid","anyof",[WO_INTERNAL_ID]], 
                 "AND", 
-                ["mainline","is","F"]
+                ["mainline","is","F"],                
+                "AND", 
+                ["item.preferredbin","is","T"]
              ],
             
             "columns": 
@@ -937,11 +939,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                    summary: "GROUP",
                    formula: "SUBSTR({item.purchasedescription}, 0, 290)"
                 }),
-                search.createColumn({
-                   name: "binnumber",
-                   join: "item",
-                   summary: "GROUP"
-                }),
+                //search.createColumn({
+                //   name: "binnumber",
+                //   join: "item",
+                //   summary: "GROUP"
+                //}),
                 search.createColumn({
                    name: "internalid",
                    join: "item",
@@ -970,7 +972,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
-                "binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
+                "binnumberd":" "
+                //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
             };
             if (result.getValue({name: "formulanumeric",summary: "SUM"})>0) 
             {
@@ -984,7 +987,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtyneeded": result.getValue({name: "quantity",summary: "SUM"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
                 "onhand": 0,
                 "memo": "memo",
-                "binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
+                "binnumberd":" "
+                //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
                 }
                 j++;
             }

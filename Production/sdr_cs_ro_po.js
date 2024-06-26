@@ -29,7 +29,7 @@
 
               
 
-                 if (internalid==7531)
+                 if (internalid==7802)
                  {
                          var lineCount = datarec.getLineCount({
                                  sublistId: 'item'
@@ -51,15 +51,27 @@
                                         fieldId: 'quantity'
                                 });
 
+                                
+                                datarec.setCurrentSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'commitmentfirm',
+                                        value: false,
+                                        ignoreFieldChange: true
+                                });
 
+
+
+                                
                                 log.debug("qty",qty);
+
+                                /*
                                 datarec.setCurrentSublistValue({
                                          sublistId: 'item',
                                          fieldId: 'isclosed',
                                          value: false,
                                          ignoreFieldChange: true
                                  });
-                                  
+                                */
                                  
                                  datarec.commitLine({
                                          sublistId: 'item'

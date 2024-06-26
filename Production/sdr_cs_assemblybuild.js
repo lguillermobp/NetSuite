@@ -6,7 +6,7 @@
  */
 define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"],
 
-    function(log, record,email,message, nDialog,runtime, GENERALTOOLS) {
+    function(log, r,email,message, nDialog,runtime, GENERALTOOLS) {
 
         /**
          * Function to be executed after page is initialized.
@@ -25,23 +25,11 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
                 log.debug("context.currentRecord",context.currentRecord);
                 var currentRecord = context.currentRecord;
 
-                task = currentRecord.getValue({fieldId: "custbody2"});
-                createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
-                log.debug("task",task);
-                log.debug("createdfrom",createdfrom);
-                if (task && createdfrom)
-                {
-                paramschedule = GENERALTOOLS.getScheduleParams(task, createdfrom); 
-                log.debug("paramschedule",paramschedule);
-                paramdata = paramschedule.data; 
-                if (paramdata)  
-                        {
-                        log.debug("paramdata",paramdata);
-                        internalid = paramdata.getValue({name: "internalid"});
-                        log.debug("internalid",internalid);
-                        currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
-                        }
-                }
+                account = currentRecord.getValue({fieldId: "account"});
+                
+                log.debug("account",account);
+                
+                currentRecord.setValue({fieldId: "account", value: '1312'});
                
         }
         /**
@@ -57,20 +45,6 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
          * @since 2015.2
          */
         function fieldChanged(context) {
-
-            var memo = context.currentRecord.getValue({fieldId: "memo"});
-
-            if (memo=="commit")
-                {
-                    var reallocate = record.create({
-                        type: record.Type.REALLOCATE_ITEM,
-                        isDynamic: true
-                    });
-
-                    log.debug("reallocate",reallocate);
-                    console.log("reallocate",reallocate);
-
-                }
 
 
                
@@ -211,9 +185,7 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
 
                 var currentRecord = context.currentRecord;
 
-                task = currentRecord.getValue({fieldId: "custbody2"});
-                log.debug("task",task);
-
+            
                 return true;
 
         }

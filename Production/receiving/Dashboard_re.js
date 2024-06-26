@@ -403,7 +403,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     sublistpm.setSublistValue({
                         id: 'custrecordml_project',
                         line: counter,
-                        value: result1.project+" "
+                        value: result1.project.substring(0, 298)+" "
                     });
                                       
 

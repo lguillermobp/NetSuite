@@ -18,19 +18,19 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          * @since 2015.2
          */
 
-        var pendingaprovests;
+        
         function pageInit(context) {
 
             var currRec = context.currentRecord;
             log.debug("context.mode",context.mode);
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
-            var paramemp = GENERALTOOLS.get_employee_value(userID);
-            pendingaprovests=paramemp.data.getValue({fieldId: "custentity_invoicestspa"});
-            log.debug("pendingaprovests",pendingaprovests);
-            if (pendingaprovests) { currRec.setValue('approvalstatus', "1"); }
-
-
+            var podocnum = currRec.getValue({fieldId: 'podocnum'});
+            if (podocnum) {
+            
+            currRec.setValue({fieldId: 'custbody_purchaseorder', value: podocnum});
+            }
+            
 
         }
 
@@ -284,8 +284,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          * @since 2015.2
          */
         function saveRecord(context) {
-            var currRec = context.currentRecord;
-            if (pendingaprovests) { currRec.setValue('documentstatus', "D"); }
+            
             return true;
 
 
@@ -293,7 +292,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
         return {
             pageInit: pageInit,
-            fieldChanged: fieldChanged,
+            //fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
             //lineInit: lineInit,

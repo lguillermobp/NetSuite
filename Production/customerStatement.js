@@ -25,18 +25,18 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                     type: "transaction",
                     filters:
                     [
-                       ["type","anyof","CustDep","SalesOrd"], 
-                       "AND", 
-                       [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","anyof","CustDep"],"AND",["mainline","is","T"]]], 
-                       "AND", 
-                       [["mainname","anyof",CUSTOMER]]
+                        ["type","anyof","CustDep","SalesOrd","Journal"], 
+                        "AND", 
+                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","T"]],"OR",[["type","anyof","CustDep","Journal"],"AND",["mainline","is","T"]]],
+                        "AND", 
+                        [["entity","anyof",CUSTOMER]]
                     ],
                     columns:
                     [
                        "mainline",
                        "type",
                        "tranid",
-                       "mainname",
+                       "entity",
                        "billaddress",
                        "createdby",
                        "trandate",
