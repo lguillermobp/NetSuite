@@ -521,6 +521,94 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
     }
 
 
+    function get_item_value_new (value){
+
+        var paramitem = get_Item_basic(value);
+        var paramdata = paramitem.data;
+        var typerecord=paramdata.recordtype;
+
+        try {
+            var paramrec = r.load({
+            type: typerecord,
+            id: value,
+            isDynamic: false,
+            defaultValues: null
+        });
+            log.debug("paramrec",paramrec);
+        }
+        catch(err) {
+            try {
+            var paramrec = r.load({
+                type: "noninventoryitem",
+                id: value,
+                isDynamic: false,
+                defaultValues: null
+            });
+                log.debug("paramrec",paramrec);
+            }
+            catch(err) {
+                try {
+                    var paramrec = r.load({
+                        type: "lotnumberedassemblyitem",
+                        id: value,
+                        isDynamic: false,
+                        defaultValues: null
+                    });
+                    log.debug("paramrec",paramrec);
+                }
+                catch(err) {
+                    try {
+                        var paramrec = r.load({
+                            type: "assemblyitem",
+                            id: value,
+                            isDynamic: false,
+                            defaultValues: null
+                        });
+                        log.debug("paramrec",paramrec);
+                    }
+                    catch(err) { try {
+                        var paramrec = r.load({
+                            type: "otherchargeitem",
+                            id: value,
+                            isDynamic: false,
+                            defaultValues: null
+                        });
+                        log.debug("paramrec",paramrec);
+                    }
+                    catch(err) {
+                        log.debug("err",err);
+                    }
+                    }
+
+
+
+                }
+            }
+        }
+
+
+
+        if (paramrec)
+        {   var sts="Completed";
+            var records=1;
+        }
+        else
+        {
+            var sts="Error";
+            var records=0;
+        }
+        var retvar= {};
+
+        retvar = {
+            "sts": sts,
+            "date": "",
+            "records": records,
+            "data": paramrec
+        }
+        return retvar;
+    }
+
+
     function get_PO_value (value){
 
 
@@ -1626,6 +1714,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             get_bom_list: get_bom_list,
             get_kits_list: get_kits_list,
             get_item_value: get_item_value,
+            get_item_value_new: get_item_value_new,
             get_Item_basic: get_Item_basic,
             get_employee_value: get_employee_value,
             get_param_value: get_param_value,

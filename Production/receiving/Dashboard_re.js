@@ -72,6 +72,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 
                 PONo= paramPO.data.getValue({fieldId: "tranid"});
                 POsts= paramPO.data.getValue({fieldId: "status"});
+                POmemo= paramPO.data.getValue({fieldId: "memo"});
     
                 log.audit("Posts", POsts);
                
@@ -172,13 +173,13 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 purchaseordersts.defaultValue = POsts;
 
            
-                let memo = form.addField({
+                let memof = form.addField({
                     id: "custpage_memo",
                     label: "MEMO",
                     type: serverWidget.FieldType.TEXT,
                 });
 
-                
+                memof.defaultValue = POmemo;
                 
                 
                 // location Field
@@ -383,7 +384,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     sublistpm.setSublistValue({
                         id: 'custrecordml_itemdesc',
                         line: counter,
-                        value: result1.memo+" "
+                        value: result1.memo.substring(0, 298)+" "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
@@ -419,7 +420,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     sublistpm.setSublistValue({
                         id: 'custrecordml_selected',
                         line: counter,
-                        value: selected 
+                        value: "F" 
                         
                     });
                     

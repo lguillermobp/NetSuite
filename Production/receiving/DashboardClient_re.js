@@ -68,23 +68,25 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
 
                 if (binNumber) 
                 {
-                    selecf=currentRec.getCurrentSublistValue({
-                        sublistId: 'custpage_records',
-                        fieldId: 'custrecordml_selected'
-                    });
-                    if (selecf) continue;
+                    // selecf=currentRec.getCurrentSublistValue({
+                    //     sublistId: 'custpage_records',
+                    //     fieldId: 'custrecordml_selected'
+                    // });
+                    // if (selecf) continue;
                     currentRec.setCurrentSublistValue({
                         sublistId: 'custpage_records',
                         fieldId: 'custrecordml_selected',
                         value: true,
-                        ignoreFieldChange: false
+                        ignoreFieldChange: true
                     });
+                    currentRec.commitLine({
+                        sublistId: 'custpage_records'
+                    });
+                    
                 }
                
             }
-            currentRec.commitLine({
-                sublistId: 'custpage_records'
-            });
+            
             
         }
         function unmarkall() {
@@ -101,21 +103,23 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                     sublistId: "custpage_records",
                     line: i
                 });
-                selecf=currentRec.getCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_selected'
-                });
-                if (!selecf) continue;
+                // selecf=currentRec.getCurrentSublistValue({
+                //     sublistId: 'custpage_records',
+                //     fieldId: 'custrecordml_selected'
+                // });
+                // if (!selecf) continue;
                 currentRec.setCurrentSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_selected',
                     value: false,
-                    ignoreFieldChange: false
+                    ignoreFieldChange: true
                 });
+                currentRec.commitLine({
+                    sublistId: 'custpage_records'
+                });
+                
             }
-            currentRec.commitLine({
-                sublistId: 'custpage_records'
-            });
+            
             
         }
 
@@ -220,6 +224,31 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             });
                         }
                 }
+
+                if (context.fieldId == 'custrecordml_selected') 
+                
+                    {
+                        var selec = currentRecord.getCurrentSublistValue({
+                            sublistId: context.sublistId,
+                            fieldId: "custrecordml_selected"
+                        });
+                        var binNumber = currentRecord.getCurrentSublistValue({
+                            sublistId: context.sublistId,
+                            fieldId: "custrecordml_bin"
+                        });
+                        if (selec && !binNumber) 
+                        {
+                             currentRecord.setCurrentSublistValue({
+                                 sublistId: context.sublistId,
+                                 fieldId: "custrecordml_selected",
+                                 value: false
+                             });
+                        }
+
+
+
+
+                    }
              
           }
   

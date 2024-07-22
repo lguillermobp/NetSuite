@@ -3,13 +3,12 @@
  * @NApiVersion 2.1
  */
 
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/generaltoolsv1.js"], function (record, search, runtime,log, GENERALTOOLS) {
     var session = runtime.getCurrentSession();
 
     function beforeLoad(context) {
         const currentRecordId = context.newRecord.id;
-
-       
+        log.audit({title: "context.type", details: context.type});
 
         if (context.type === context.UserEventType.VIEW) {
             // ================================================================================
@@ -23,6 +22,28 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
                 functionName: `window.open('${printSuitelet}');`
             })
         }
+
+        if (context.type === context.UserEventType.CREATE) {
+
+            itemId = context.newRecord.getValue({fieldId: "assemblyitem"});
+
+            log.audit({title: "itemId", details: itemId});
+
+            if (itemId) {
+
+            paramitem = GENERALTOOLS.get_item_value_new(itemId);
+            paramdata = paramitem.data;
+            department = paramdata.getValue({fieldId: "department"});
+            log.audit({title: "department", details: department});
+
+            if (department)
+            {
+                context.newRecord.setValue({fieldId: "department", value: department});
+                
+            }
+           
+            }
+        }
     }
 
     function beforeSubmit(context) {
@@ -31,60 +52,14 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         // ================================================================================
         const currentRecordId = context.newRecord.id;
 
-        if (context.type === context.UserEventType.CREATE) {
-            const soId = session.get({name: "soid"});
-            if (soId) {
-                const salesOrderBodyFields = search.lookupFields({
-                    id: soId,
-                    type: search.Type.SALES_ORDER,
-                    columns: ["otherrefnum", "custbody_bkmn_req_ship_date"]
-                })
+        
 
-                context.newRecord.setText({
-                    fieldId: "custbody_bkmn_wo_cust_po_num",
-                    text: salesOrderBodyFields.otherrefnum
-                });
-
-                context.newRecord.setText({
-                    fieldId: "custbody_bkmn_wo_so_req_ship_date",
-                    text: salesOrderBodyFields.custbody_bkmn_req_ship_date
-                });
-            }
-        }
-
-        if (context.type === context.UserEventType.EDIT) {
-            try {
-                let currentRecordBodyFields = search.lookupFields({
-                    id: currentRecordId,
-                    type: search.Type.WORK_ORDER,
-                    columns: ["createdfrom"]
-                });
-
-                if (currentRecordBodyFields.createdfrom[0].value) {
-                    const salesOrderBodyFields = search.lookupFields({
-                        id: currentRecordBodyFields.createdfrom[0].value,
-                        type: search.Type.SALES_ORDER,
-                        columns: ["otherrefnum", "custbody_bkmn_req_ship_date"]
-                    });
-
-                    context.newRecord.setText({
-                        fieldId: "custbody_bkmn_wo_cust_po_num",
-                        text: salesOrderBodyFields.otherrefnum
-                    });
-
-                    context.newRecord.setText({
-                        fieldId: "custbody_bkmn_wo_so_req_ship_date",
-                        text: salesOrderBodyFields.custbody_bkmn_req_ship_date
-                    });
-                }
-            } catch (e) {
-            }
-        }
+       
     }
 
     return {
-        beforeLoad: beforeLoad
-       // beforeSubmit: beforeSubmit
+        beforeLoad: beforeLoad,
+        beforeSubmit: beforeSubmit
     }
 })
 

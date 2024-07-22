@@ -395,8 +395,8 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     fieldId: 'binnumber',
                                     value: binlocationid
                                 });
-                            }
-                            catch(e) { console.log("error",e);}
+                                }
+                                catch(e) { console.log("error",e);}
                                 console.log("wpbinlocationid",wpbinlocationid);
                                 
                                     subrec.setCurrentSublistValue({
@@ -406,17 +406,20 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 });
                                 
                                 console.log("wpbinlocationid",wpbinlocationid);
-                                
+                                console.log("i",i);
 
                                 // Save the line in the subrecord's sublist.
+                                try {
                                 subrec.commitLine({
                                     sublistId: 'inventoryassignment'
                                 });
-
-
+                                } catch(e) { console.log("error",e);}  
+                                
+                                try {
                                 invtransf.commitLine({
                                     sublistId: 'inventory'
                                 });
+                                } catch(e) { console.log("error",e);}
 
                                 
                             }

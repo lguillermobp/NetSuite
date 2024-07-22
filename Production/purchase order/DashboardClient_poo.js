@@ -10,71 +10,27 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
      * @param error
      */
     function (runtime,currentRecord, error,log,record, s,message,  _) {
-        function pageInit() {
+
+        var countpos = 0;
+        function pageInit(context) {
+
+            var currentRecord = context.currentRecord;
+
+            var sublistCount = currentRecord.getLineCount({
+                sublistId: 'custpageppd_records'
+            });
+
+             currentRecord.setValue({
+                fieldId: "custpage_html",
+                value: "Total POs will be generated: "+ sublistCount
+            });
+            countpos = sublistCount;
+            console.log("Totalrecord: ",sublistCount);
+
+
         }
 
-        function markall() {
-            var currentRec = currentRecord.get();
-            var count = currentRec.getLineCount({
-                sublistId: 'custpage_records'
-            });
-
-            for(var i=0;i<count;i++) {
-
-                currentRec.selectLine({
-                    sublistId: "custpage_records",
-                    line: i
-                });
-
-                selecf=currentRec.getCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit'
-                });
-                if (selecf) continue;
-                currentRec.setCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit',
-                    value: true,
-                    ignoreFieldChange: false
-                });
-               
-            }
-            currentRec.commitLine({
-                sublistId: 'custpage_records'
-            });
-            
-        }
-        function unmarkall() {
-            
-            var currentRec = currentRecord.get();
-            var count = currentRec.getLineCount({
-                sublistId: 'custpage_records'
-            });
-            
-            for(var i=0;i<count;i++) {
-
-
-                currentRec.selectLine({
-                    sublistId: "custpage_records",
-                    line: i
-                });
-                selecf=currentRec.getCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit'
-                });
-                if (!selecf) continue;
-                currentRec.setCurrentSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit',
-                    value: false,
-                    ignoreFieldChange: false
-                });
-            }
-            currentRec.commitLine({
-                sublistId: 'custpage_records'
-            });
-            
-        }
+        
 /**
          * Function to be executed when field is changed.
          *
@@ -88,52 +44,82 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
          * @since 2015.2
          */
         function fieldChanged(context) {
-           
+            var countpo=0;
             var currentRecord = context.currentRecord;
-            
             if (context.sublistId == 'custpageppd_records') 
-                if (context.fieldId == 'custrecordml_omit')
-                    {
-                        ppdpo=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_ppdpo'});
-                        omitppd=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_omit'});
-
-                        var count = currentRecord.getLineCount({
-                            sublistId: 'custpage_records'
-                        });
-                        
-                        for(var i=0;i<count;i++) {
-            
-            
-                            currentRecord.selectLine({
-                                sublistId: "custpage_records",
-                                line: i
-                            });
-
-                            ppdporec=currentRecord.getCurrentSublistValue({
-                                sublistId: 'custpage_records',
-                                fieldId: 'custrecordml_ppdpo'
-                            });
-
-                            if (ppdporec!=ppdpo) continue;
+                {
+                    if (context.fieldId == 'custrecordml_omit')
+                        {
+                            ppdpo=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_ppdpo'});
+                            omitppd=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_omit'});
                             
-                            currentRecord.setCurrentSublistValue({
-                                sublistId: 'custpage_records',
-                                fieldId: 'custrecordml_omit',
-                                value: omitppd,
-                                ignoreFieldChange: false
-                            });
-                            currentRecord.commitLine({
+                            var count = currentRecord.getLineCount({
                                 sublistId: 'custpage_records'
                             });
-                        }
-                        
-
-                    }
-
+                            
+                            for(var i=0;i<count;i++) {
                 
-                {
+                
+                                currentRecord.selectLine({
+                                    sublistId: "custpage_records",
+                                    line: i
+                                });
+    
+                                ppdporec=currentRecord.getCurrentSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_ppdpo'
+                                });
+                                selecf=currentRecord.getCurrentSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_omit'
+                                });
+    
+                                if (ppdporec!=ppdpo) continue;
+                                
+                                currentRecord.setCurrentSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_omit',
+                                    value: omitppd,
+                                    ignoreFieldChange: false
+                                });
+                                currentRecord.commitLine({
+                                    sublistId: 'custpage_records'
+                                });
+                            }
+                            var countppd = currentRecord.getLineCount({
+                                sublistId: 'custpageppd_records'
+                            });
+                            var countpo=0;
+                            for(var i=0;i<countppd;i++) 
+                                {
+                
+                
+                                currentRecord.selectLine({
+                                    sublistId: "custpageppd_records",
+                                    line: i
+                                });
+    
+                               
+                                selecf=currentRecord.getCurrentSublistValue({
+                                    sublistId: 'custpageppd_records',
+                                    fieldId: 'custrecordml_omit'
+                                });
+                                 if (!selecf) countpo++;
+                                
+                                
+                                }
+                            currentRecord.setValue({
+                                fieldId: "custpage_html",
+                                value: "Total POs will be generated: "+ countpo
+                            });
+    
+                        }
+    
                     
-                }
+                    
+                        
+                    }
+          
              
           }
   
@@ -163,7 +149,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             var totpo = 0;
 
             for (var i = 0; i < sublistCount; i++) {
-
+                
                 var omit = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_omit',
@@ -171,6 +157,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 });
                
                 if (omit) continue;
+                
 
                 if (isfirst) {
                     var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',
@@ -405,7 +392,8 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 purchaseOrder.commitLine({
                     sublistId: 'item'
                 });
-                console.log("Record No: ",i);
+                console.log("Record No: ",i+" - "+vendorid);
+                
                 
             }
             if (savingpo) {purchaseOrder.save();savingpo=false;totpo++}
@@ -450,7 +438,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     line: i
                 });
                
-                if (omit) continue; 
+                if (omit) continue;
 
                 var ppdpo = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
@@ -605,11 +593,9 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
             var currentRec = currentRecord.get();
 
-            var sections = currentRec.getValue({
-                fieldId: "custpage_section"
-            });
-            var customers = currentRec.getValue({
-                fieldId: "custpage_customers"
+            
+            var prodline = currentRec.getValue({
+                fieldId: "custpage_productionline"
             });
             var vendors = currentRec.getValue({
                 fieldId: "custpage_vendors"
@@ -617,14 +603,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
             // Set value for custentity_customerssalected field
             employeeRecord.setValue({
-                fieldId: "custentity_customerssalected",
-                value: customers
+                fieldId: "custentity_prodlineselected",
+                value: prodline
             });
-             // Set value for custentity_customerssalected field
-            employeeRecord.setValue({
-                fieldId: "custentity_sectionsselected",
-                value: sections
-            });
+             
             employeeRecord.setValue({
                 fieldId: "custentity_vendorsselected",
                 value: vendors
@@ -660,8 +642,6 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         }
         return {
             pageInit: pageInit,
-            unmarkall: unmarkall,
-            markall: markall,
             refresh: refresh,
             onButtonClick: onButtonClick,
             process: process,

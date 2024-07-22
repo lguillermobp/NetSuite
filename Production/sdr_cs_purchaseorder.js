@@ -138,10 +138,14 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 log.debug('lineCount', lineCount);
 
                 log.debug("lineNumber", lineNumber);
-                if (lineNumber != -1) {
-                    itemBodyFields.removeLine({sublistId: "itemvendor", line: lineNumber});
+
+
+                if (lineNumber == -1) {
+
+                // if (lineNumber != -1) {
+                //     itemBodyFields.removeLine({sublistId: "itemvendor", line: lineNumber});
                     
-                }
+                // }
                     log.debug("entity", entity);
                     itemBodyFields.selectNewLine({sublistId: "itemvendor"});
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
@@ -154,6 +158,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                     itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
                     itemBodyFields.commitLine({sublistId: "itemvendor"});
                     itemBodyFields.save({enableSourcing: true});
+                }
             }
         }
            

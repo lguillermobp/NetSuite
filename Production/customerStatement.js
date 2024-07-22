@@ -23,37 +23,79 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                 const CUSTOMER = Number(context.request.parameters.customer);
                 var rs = search.create({
                     type: "transaction",
+                    settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
                     filters:
                     [
                         ["type","anyof","CustDep","SalesOrd","Journal"], 
                         "AND", 
-                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","T"]],"OR",[["type","anyof","CustDep","Journal"],"AND",["mainline","is","T"]]],
+                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","anyof","CustDep","Journal"],"AND",["mainline","is","T"]]],
                         "AND", 
-                        [["entity","anyof",CUSTOMER]]
+                        [["name","anyof",CUSTOMER]], 
+                        "AND", 
+                        ["amount","notequalto","0.00"]
                     ],
                     columns:
                     [
-                       "mainline",
-                       "type",
-                       "tranid",
-                       "entity",
-                       "billaddress",
-                       "createdby",
-                       "trandate",
-                       "billeddate",
-                       search.createColumn({
-                          name: "datecreated",
-                          sort: search.Sort.DESC
-                       }),
-                       "item",
-                       "memo",
-                       "quantity",
-                       "rate",
-                       "amount",
-                       "quantitybilled",
-                       "createdfrom",
-                       "accounttype",
-                       "custcol_saledescription"
+                        search.createColumn({
+                            name: "type",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "tranid",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "mainname",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "billaddress",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "createdby",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "trandate",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "memomain",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "creditamount",
+                            summary: "SUM"
+                         }),
+                         search.createColumn({
+                            name: "entity",
+                            summary: "GROUP"
+                         }),
+                        search.createColumn({
+                            name: "altname",
+                            join: "customer",
+                            summary: "GROUP"
+                        }),
+                         search.createColumn({
+                            name: "debitamount",
+                            summary: "SUM"
+                         }),
+                         search.createColumn({
+                            name: "formulacurrency",
+                            summary: "SUM",
+                            formula: "CASE WHEN {type}='Sales Contract'  THEN {amount}  ELSE {amount}*-1  END"
+                         }),
+                         search.createColumn({
+                            name: "type",
+                            join: "item",
+                            summary: "GROUP"
+                         }),
+                         search.createColumn({
+                            name: "formulatext",
+                            summary: "GROUP",
+                            formula: "CASE WHEN {type}='Sales Contract' THEN CASE WHEN  {item.type} = 'Service' then 'Upgrade' ELSE 'Sales Contract' END ELSE  {memo} END"
+                         })
                     ]
                     }).run();
 

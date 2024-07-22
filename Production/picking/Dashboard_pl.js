@@ -900,55 +900,48 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "AND", 
                 ["internalid","anyof",[WO_INTERNAL_ID]], 
                 "AND", 
-                ["mainline","is","F"],                
-                "AND", 
-                ["item.preferredbin","is","T"]
+                ["mainline","is","F"]
              ],
             
             "columns": 
             [
                 
-                search.createColumn({
-                   name: "internalid",
-                   summary: "GROUP"
-                }),
-                search.createColumn({
-                   name: "item",
-                   summary: "GROUP"
-                }),
-                search.createColumn({
-                   name: "purchasedescription",
-                   join: "item",
-                   summary: "GROUP"
-                }),
-                search.createColumn({
-                   name: "quantity",
-                   summary: "SUM"
-                }),
-                search.createColumn({
-                   name: "quantitycommitted",
-                   summary: "SUM"
-                }),
-                search.createColumn({
-                   name: "formulanumeric",
-                   summary: "SUM",
-                   formula: "CASE WHEN NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.quantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END"
-                }),
-                search.createColumn({
-                   name: "formulatext",
-                   summary: "GROUP",
-                   formula: "SUBSTR({item.purchasedescription}, 0, 290)"
-                }),
-                //search.createColumn({
-                //   name: "binnumber",
-                //   join: "item",
-                //   summary: "GROUP"
-                //}),
-                search.createColumn({
-                   name: "internalid",
-                   join: "item",
-                   summary: "GROUP"
-                })
+             search.createColumn({
+                name: "internalid",
+                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "item",
+                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "purchasedescription",
+                join: "item",
+                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "quantity",
+                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "quantitycommitted",
+                summary: "SUM"
+            }),
+            search.createColumn({
+                name: "formulanumeric",
+                summary: "SUM",
+                formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END else 0 end "
+            }),
+            search.createColumn({
+                name: "formulatext",
+                summary: "GROUP",
+                formula: "SUBSTR({item.purchasedescription}, 0, 290)"
+            }),
+            search.createColumn({
+                name: "internalid",
+                join: "item",
+                summary: "GROUP"
+            })
              ]
         }).run().each(function (result) {
             lineItemIds.push(result.getValue({
@@ -962,12 +955,12 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             log.audit("item " , result.getText({name: "item",summary: "GROUP"}));
             log.audit("backo " , result.getValue({name: "formulanumeric",summary: "SUM"}));
             log.audit("qtytrn " , qtytrn);
-            log.audit("qty " , result.getValue({name: "quantity",summary: "SUM"}));
+            log.audit("qty " , result.getValue({name: "quantity",summary: "GROUP"}));
 
            
             lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
                 "line":line,
-                "qty":result.getValue({name: "quantity",summary: "SUM"}),
+                "qty":result.getValue({name: "quantity",summary: "GROUP"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
@@ -975,7 +968,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binnumberd":" "
                 //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
             };
-            if (result.getValue({name: "formulanumeric",summary: "SUM"})>0) 
+            if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0) 
             {
             pagedatasbo[j] = {
                 "lineNumber": line,
@@ -984,7 +977,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocation": " ",
                 "qty": result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "binlocationqty": 0,
-                "qtyneeded": result.getValue({name: "quantity",summary: "SUM"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
+                "qtyneeded": result.getValue({name: "quantity",summary: "GROUP"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
                 "onhand": 0,
                 "memo": "memo",
                 "binnumberd":" "
@@ -1029,17 +1022,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "leftparens": 0,
                 "rightparens": 0
             },
-            {
-                "name": "binnumber",
-                "operator": "noneof",
-                "values": [
-                    "@NONE@"
-                ],
-                "isor": false,
-                "isnot": false,
-                "leftparens": 0,
-                "rightparens": 0
-            }
+            
             ],
             "columns": [
                 search.createColumn({

@@ -92,6 +92,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             var currentRecord = context.currentRecord;
             
             if (context.sublistId == 'custpageppd_records') 
+            {
                 if (context.fieldId == 'custrecordml_omit')
                     {
                         ppdpo=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_ppdpo'});
@@ -131,7 +132,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     }
 
                 
-                {
+                
                     
                 }
              

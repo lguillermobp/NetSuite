@@ -17,7 +17,7 @@
         <macro id="nlheader">
             <table class="header" style="width: 100%;"><tr>
 	<td align="left"><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="float: left; margin: 2px" /></#if></td>
-	<td align="right"><span class="name">${results[0].entity}</span></td>
+	<td align="right"><span class="name">${results[0].altname}</span></td>
 	</tr>
 	<tr>
 	<td align="right" colspan="2"><span class="title">Statement</span></td>
@@ -122,28 +122,25 @@
 <thead>
 	<tr>
 	<th colspan="2">Type</th>
-	<th>Document</th>
-	<th>Date</th>
+	<th width="93">Document</th>
+	<th width="108">Date</th>
 	
-	<th>Description</th>
+	<th width="156">Description</th>
 	
-	<th>Amount</th>
+	<th width="109">Amount</th>
 	</tr>
 </thead>
 <tbody>
 </#if>
 <#assign monto = 0>
-<#if result.type == "Customer Deposit">
-<#assign monto = result.amount * -1>
-<#else>
-<#assign monto = result.amount>
-</#if>
+<#assign monto = result.formulacurrency>
+
     <tr>
 	<td colspan="2">${result.type}</td>
 	<td>${result.tranid}</td>
 	<td>${result.trandate}</td>
 	
-	<td>${result.memo}</td>
+	<td>${result.formulatext}</td>
 	<td align="right">${monto?string.currency}</td>
     <#assign totalw = totalw + monto>
 	</tr>

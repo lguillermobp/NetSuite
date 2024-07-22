@@ -339,7 +339,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     });
 
                     if (!vendorsid[result1.preferredvendorid]) {qtylead="0"}
-                    else {qtylead=vendorsid[result1.preferredvendorid].leadtime}
+                    else {qtylead=vendorsid[result1.preferredvendorid].leadtime;vcurrency=vendorsid[result1.preferredvendorid].currency}
 
                     log.debug("result1.leadtime",result1.leadtime);
                     sublistpm.setSublistValue({
@@ -1395,7 +1395,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             [
                 "internalid",
                 "entityid",
-                "predicteddays"
+                "predicteddays",
+                "currency"
             ]
                 });
 
@@ -1413,7 +1414,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 vendorsid[fresult.getValue({name: "internalid"})]= { 
                     "name": fresult.getValue({name: "entityid"}),
-                    "leadtime": fresult.getValue({name: "predicteddays"})
+                    "leadtime": fresult.getValue({name: "predicteddays",
+                    "currency": fresult.getValue({name: "currency"})}
+                    )
                 }
 
 			})
