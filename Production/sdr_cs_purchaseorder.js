@@ -4,7 +4,9 @@
  * @NModuleScope SameAccount
  */
 
-define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"], function(log, record, search, nDialog,runtime, GENERALTOOLS) {
+define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js","N/email"], function(log, record, search, nDialog,runtime, GENERALTOOLS, email) {
+    
+    var sendemailok = false;
     function pageInit(context) {
         // Code to execute when the page loads
         var currentRecord = context.currentRecord;
@@ -36,6 +38,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var sublistId = context.sublistId
         var fieldId = context.fieldId;
 
+        log.debug("fieldId", fieldId);
+
         var entityname= currentRecord.getValue({ fieldId: 'entityname'});
 
         if (fieldId === 'custbody_vendorshipmethod') {
@@ -55,7 +59,19 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
             });
             currentRecord.setValue({ fieldId: 'custbody_vendorcurriership', value: carrierValue});
             
-}
+        }
+
+        if (fieldId === 'approvalstatus') {
+
+
+            var statusRef= currentRecord.getValue({ fieldId: 'approvalstatus'});
+            log.debug("statusRef", statusRef);
+            if (statusRef=="2") {
+                sendemailok=true;
+            }
+               
+            
+        }
             
 
 }
@@ -167,14 +183,50 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
     }
 
     function saveRecord(context) {
+
         // Code to execute when the record is saved
+        var currentRecord = context.currentRecord;
+        var vendorid = currentRecord.getValue({ fieldId: "entity" });
+        var internalid = currentRecord.getValue({ fieldId: "id" });
+        var recordTypeId = currentRecord.getValue({ fieldId: "recordType" });
+
+        var vendorRecord = record.load({ type: 'vendor', id: vendorid, isDynamic: false });
+        var emailvendor = vendorRecord.getValue({ fieldId: 'email' });
+        var sendEmail = vendorRecord.getValue({ fieldId: 'custentity_sendemail' });
+
+        log.debug("sendEmail", sendEmail);
+        log.debug("sendemailok", sendemailok);
+        log.debug("internalid", internalid);
+        log.debug("recordTypeId", recordTypeId);
+
+
+        if (sendEmail && sendemailok) {
+        
+        // Send email to vendor
+        var subject = "Purchase Order";
+        var body = "Here is our Purchase Order";
+        var userObj = runtime.getCurrentUser();
+        var userID = userObj.id;
+
+        email.send({
+            author: userID, // ID of the user sending the email
+            recipients: vendorid, // ID of the vendor
+            subject: subject,
+            body: body,
+            relatedRecords : {
+                transactionId : internalid
+            }
+        });
+
+        }
+        return true;
     }
 
     return {
         pageInit: pageInit,
         fieldChanged: fieldChanged,
         sublistChanged: sublistChanged,
-        printrn: printrn
-        // saveRecord: saveRecord
+        printrn: printrn,
+        saveRecord: saveRecord
     };
 });

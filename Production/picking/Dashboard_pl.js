@@ -930,7 +930,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             search.createColumn({
                 name: "formulanumeric",
                 summary: "SUM",
-                formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity}+ NVL({quantitycommitted}, 0))  ELSE 0 END else 0 end "
+                formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity})  ELSE 0 END else 0 end "
             }),
             search.createColumn({
                 name: "formulatext",
@@ -975,7 +975,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "item": result.getText({name: "item",summary: "GROUP"}),
                 "itemdesc": result.getValue({name: "formulatext",summary: "GROUP"}),
                 "binlocation": " ",
-                "qty": result.getValue({name: "formulanumeric",summary: "SUM"}),
+                "qty": Math.ceil(result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn),
                 "binlocationqty": 0,
                 "qtyneeded": result.getValue({name: "quantity",summary: "GROUP"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
                 "onhand": 0,

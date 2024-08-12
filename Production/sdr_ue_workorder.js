@@ -9,6 +9,7 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
     function beforeLoad(context) {
         const currentRecordId = context.newRecord.id;
         log.audit({title: "context.type", details: context.type});
+        wostatus = context.newRecord.getValue({fieldId: "status"});
 
         if (context.type === context.UserEventType.VIEW) {
             // ================================================================================
@@ -21,6 +22,18 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
                 label: "Print BOM ECD",
                 functionName: `window.open('${printSuitelet}');`
             })
+
+            if (wostatus == "Released" || wostatus == "In Progress") {
+                const printSuitelet1 = `/app/site/hosting/scriptlet.nl?script=1626&deploy=1&idwo=${currentRecordId}`
+
+                context.form.addButton({
+                    id: "custpage_ticket", 
+                    label: "Picking",
+                    functionName: `window.open('${printSuitelet1}');`
+                })
+            }
+
+            
         }
 
         if (context.type === context.UserEventType.CREATE) {

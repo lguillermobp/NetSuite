@@ -26,9 +26,9 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                     settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
                     filters:
                     [
-                        ["type","anyof","CustDep","SalesOrd","Journal"], 
+                        ["type","anyof","CustDep","Journal","CustPymt","SalesOrd","Estimate"], 
                         "AND", 
-                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","anyof","CustDep","Journal"],"AND",["mainline","is","T"]]],
+                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["mainline","is","T"]]], 
                         "AND", 
                         [["name","anyof",CUSTOMER]], 
                         "AND", 
@@ -84,7 +84,7 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                          search.createColumn({
                             name: "formulacurrency",
                             summary: "SUM",
-                            formula: "CASE WHEN {type}='Sales Contract'  THEN {amount}  ELSE {amount}*-1  END"
+                            formula: "CASE WHEN {type}in('Sales Contract','Quote')  THEN {amount}  ELSE {amount}*-1  END"
                          }),
                          search.createColumn({
                             name: "type",
@@ -92,10 +92,15 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                             summary: "GROUP"
                          }),
                          search.createColumn({
-                            name: "formulatext",
-                            summary: "GROUP",
-                            formula: "CASE WHEN {type}='Sales Contract' THEN CASE WHEN  {item.type} = 'Service' then 'Upgrade' ELSE 'Sales Contract' END ELSE  {memo} END"
-                         })
+                           name: "formulatext",
+                           summary: "GROUP",
+                           formula: "CASE WHEN {type}='Sales Contract' THEN  'Basic Model'  ELSE  CASE WHEN {type}='Payment' THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE {memo} END END END"
+                        }),
+                        search.createColumn({
+                           name: "formulatext",
+                           summary: "GROUP",
+                           formula: "CASE WHEN {type}='Sales Contract' THEN  'Basic Model'  ELSE  CASE WHEN {type}in('Payment','Customer Deposit','Journal') THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE CASE WHEN {type}='Quote' THEN  'Upgrade'  ELSE {memo} END END  END END"
+                        })
                     ]
                     }).run();
 

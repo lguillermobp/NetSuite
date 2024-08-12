@@ -1,6 +1,7 @@
 <?xml version="1.0"?><!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
 <pdf>
 <head>
+<title>Statement ${results[0].altname}</title>
 	<link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
 	<#if .locale == "zh_CN">
 		<link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
@@ -121,7 +122,7 @@
     <#assign proccess = 1>
 <thead>
 	<tr>
-	<th colspan="2">Type</th>
+	<th colspan="2">Category</th>
 	<th width="93">Document</th>
 	<th width="108">Date</th>
 	
@@ -136,7 +137,7 @@
 <#assign monto = result.formulacurrency>
 
     <tr>
-	<td colspan="2">${result.type}</td>
+	<td colspan="2">${result.formulatext_1}</td>
 	<td>${result.tranid}</td>
 	<td>${result.trandate}</td>
 	
@@ -150,8 +151,8 @@
 </tbody>
 <tfoot>
     <tr>
-	<td colspan="5">Balance</td>
-	<td align="right" >${totalw?string.currency}</td>
+	<th colspan="5">Balance</th>
+	<th align="right" >${totalw?string.currency}</th>
 	</tr>
 </tfoot>
 </#if>
