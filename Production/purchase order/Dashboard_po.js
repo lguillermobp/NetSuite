@@ -802,9 +802,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
              "AND", 
             ["sum(formulanumeric: CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END)","notequalto","0"],
             "AND", 
-            ["custbody_tasksc.custrecord_so_sc_task","noneof","@NONE@"], 
-            "AND", 
-            ["internalid","anyof","53692","53693","53694"]
+            ["custbody_tasksc.custrecord_so_sc_task","noneof","@NONE@"]
   
         ],
         columns:
@@ -1170,9 +1168,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             "AND", 
             ["status","anyof","WorkOrd:B","WorkOrd:D"],
             "AND", 
-            ["item.vendor","anyof","@NONE@"], 
-            "AND", 
-            ["internalid","anyof","53692","53693","53694"]
+            ["item.vendor","anyof","@NONE@"]
         ],
         columns:
         [   

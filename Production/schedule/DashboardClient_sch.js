@@ -21,18 +21,57 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         
             console.log("htmltext",htmltext);
         
+            var productionline= currRec.getValue({ fieldId: 'custpage_productionline'});
             // call RenderPriorityPrintPDF.js (1941)
-            var url = "/app/site/hosting/scriptlet.nl?script=1941&deploy=1";
-            url += "&fieldfilename=" + fieldfilename;
+            var url = "/app/site/hosting/scriptlet.nl?script=1616&deploy=1";
+            url += "&productionline=" + productionline;
+            
            
-            //window.open(url, "_blank")
+            window.open(url, "_self")
         }
 
       
- 
+  /**
+         * Function to be executed when field is changed.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         * @param {string} scriptContext.fieldId - Field name
+         * @param {number} scriptContext.lineNum - Line number. Will be undefined if not a sublist or matrix field
+         * @param {number} scriptContext.columnNum - Line number. Will be undefined if not a matrix field
+         *
+         * @since 2015.2
+         */
+    function fieldChanged(context) {
+
+        var currentRecord = context.currentRecord;
+        var fieldId = context.fieldId;
+
+        log.debug("fieldId", fieldId);
+        console.log("fieldId",fieldId);
+
+        var productionline= currentRecord.getValue({ fieldId: 'custpage_productionline'});
+
+        if (fieldId === 'custpage_productionline') {
+
+            log.debug("productionline", productionline);
+            console.log("productionline",productionline);
+
+        }
+
+
+    }
+    function changenext(id,sts) {
+        var currRec = currentRecord.get();
+        console.log("id",id);
+        console.log("sts",sts);
+    }
   
         return {
             pageInit: pageInit,
-            process: process
+            process: process,
+            fieldChanged: fieldChanged,
+            changenext: changenext
         }
     })

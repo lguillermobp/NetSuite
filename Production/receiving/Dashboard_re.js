@@ -253,8 +253,6 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
-
-
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',
                     type : serverWidget.SublistType.INLINEEDITOR,
@@ -340,6 +338,14 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 lineid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
+                let listinventoryDetailAvail = sublistpm.addField({
+                    id: "custrecordml_inventorydetailavail",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Avail Inventory Detail'
+                });
+                listinventoryDetailAvail.updateDisplayType({
+                     displayType: serverWidget.FieldDisplayType.HIDDEN
+                 });
 
                
                 let sl_bint =sublistpm.addField({
@@ -348,10 +354,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                     label:'Bin Location',
                     source: "bin"
                 });
-                
-                
-                
-                
+                   
                 sublistpm.addField({
                     id: 'custrecordml_selected',
                     label: 'Selected',
@@ -423,8 +426,14 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                         value: "F" 
                         
                     });
+
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_inventorydetailavail',
+                        line: counter,
+                        value: result1.inventoryDetailAvail 
+                        
+                    });
                     
-                   
                     counter++;
                 
 				})
@@ -456,7 +465,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
             });
             var QuantityO = itemReceipt.getSublistValue({
                 sublistId: 'item',
-                fieldId: 'itemquantity',
+                fieldId: 'quantityremaining',
                 line: i
             });
             var inventoryDetailAvail = itemReceipt.getSublistValue({
@@ -464,6 +473,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 fieldId: 'inventorydetailavail',
                 line: i
             });
+            
             var vendorcode = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'custcol_vendorcode',

@@ -37,7 +37,14 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var currentRecord = context.currentRecord;
         startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
         internalidsc = currentRecord.getValue({ fieldId: "custrecord_salecontract" });
-        seq = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
+        pl = currentRecord.getValue({ fieldId: "custrecord_so_sc_productionline" });
+        seq1 = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
+
+        var taskrecord = record.load({
+            type: 'customrecord_scheduletasks',
+            id: seq1
+        });
+        var seq = taskrecord.getValue({ fieldId: "custrecord_sc_tasksseq" });
 
         if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 
         {
@@ -60,7 +67,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             log.debug("final",final);
             dayspushed = Math.abs(final - initial) + 1;
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
-            pushsch(internalid, dayspushed,seq,internalidsc);
+            pushsch(internalid, dayspushed,seq,internalidsc,pl);
         }
 
         return true;
@@ -80,8 +87,9 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var m = strdate.getMonth() + 1;
         var d = strdate.getDate();
         datetofind = m + "/" + d + "/" + y;
-
+        log.debug("datetofind",datetofind);
         initial = parseInt(ecddays.indexOf(datetofind));
+        log.debug("initial",initial);
 
         if (initial==-1)      {return strdate;}
         
@@ -150,8 +158,13 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         return newenddate;
     }
 
-    function pushsch(internalid, dayspushed,seq,internalidscc) {
+    function pushsch(internalid, dayspushed,seq,internalidscc,pl) {
         log.debug("oldstartdate",oldstartdate);
+        log.debug("pl",pl);
+        log.debug("internalid",internalid);
+        log.debug("dayspushed",dayspushed);
+        log.debug("seq",seq);
+        log.debug("internalidscc",internalidscc);
         var y = oldstartdate.getFullYear();
         var m = oldstartdate.getMonth() + 1;
         var d = oldstartdate.getDate();
@@ -164,9 +177,11 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 "AND", 
                 ["internalid","noneof",internalid], 
                 "AND", 
-                ["custrecord_so_sc_startdate","after",datetofind], 
+                ["custrecord_so_sc_startdate","onorafter",datetofind], 
                 "AND", 
-                ["custrecord_so_sc_task.custrecord_sc_tasksseq","greaterthanorequalto",seq]
+                ["custrecord_so_sc_task.custrecord_sc_tasksseq","greaterthanorequalto",seq],
+                "AND",
+                ["custrecord_so_sc_productionline","anyof",pl]
             ],
             columns:
             [

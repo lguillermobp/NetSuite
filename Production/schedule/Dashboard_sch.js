@@ -19,7 +19,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		/**
 		 *
 		 * @param context
+         * 
 		 */
+        var prodline;
+        var tdhoy = new Date();
+        var y = tdhoy.getFullYear();
+        var m = tdhoy.getMonth() + 1;
+        var d = tdhoy.getDate();
+        var tdhoydate = m + "/" + d + "/" + y;
         function onRequest(context) {
 
             if (context.request.method === 'GET') {
@@ -35,6 +42,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     functionName: "process()"
                 });
 
+                prodline = context.request.parameters.productionline;
+
                 var productionline = form.addField({
                     id : 'custpage_productionline',
                     type : serverWidget.FieldType.SELECT,
@@ -45,6 +54,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     productionline.updateLayoutType({
                         layoutType: serverWidget.FieldLayoutType.ENDROW
                     });
+
+                    if (prodline) { productionline.defaultValue = prodline; }
     
                 let htmlField = form.addField({
                     id: "custpage_html",
@@ -53,14 +64,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
                 
                 htmlField.defaultValue = tabladib();
-    
 
-                
                 context.response.writePage(form);
-            } else {
-              
-            
-            }
+            } 
     }
 	function tabladib() {
 
@@ -75,9 +81,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     " .tb tbody td, .tb thead th {width: 100%; border-right: 1px solid black; }" +
                     " .tb th, .tb td { padding:5px; border: solid 1px #777; text-align: center; } " +
                     " .tb th { border-collapse: collapse; background-color: lightblue}"  +
-                    " #tbdaysr, #tbdays, #tbdaysm {writing-mode: vertical-rl;  text-orientation: mixed} " +
+                    " #tbdaysr, #tbdays, #tbdaysm, #tbdaysh {writing-mode: vertical-rl;  text-orientation: mixed} " +
                     " #tbdaysr { background-color: red} #tbdayse { background-color: #DADADA}" +
-                    " #taskwot { background-color: #ffff00} #taskwlate { background-color: #ff9900}" +
+                    " #tbdaysh { background-color: #95CBF3} #taskwlate { background-color: #ff9900} " +
+                    " #taskwot { background-color: #ffff00} #tasktoday { background-color: #95CBF3};" +
                     " #tasknots { background-color: #ff0000} #taskdone { background-color: #00e600} " +
                     " #months {bgcolor: '#757575';  color: #FAFAFA; background-color: #6D6D6D; font-style: italic; font-size: medium; } " +
                     "  </style> ";
@@ -97,12 +104,23 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var colspan=0;
         for (let i = 0; i < ecddays.length; i++) {
             datelist=new Date(ecddays[i]);
+            var y = datelist.getFullYear();
+            var m = datelist.getMonth() + 1;
+            var d = datelist.getDate();
+            datelistdate = m + "/" + d + "/" + y;
             if (datelist.getDay() == 1) {
                 tabla += "<th id='tbdaysr'>"+ ecddays[i] + "</th>";
             }
             else {
+                if (datelistdate == tdhoydate) {
+                    tabla += "<th id='tbdaysh'>"+ ecddays[i] + "</th>";
+                }
+                else {
                 tabla += "<th id='tbdays'>"+ ecddays[i] + "</th>";
+                }
             }
+           
+            
             if (datelist.getMonth() != mesp) 
             {
                 mes.push(mesp +";" +colspan);
@@ -155,7 +173,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
     }
 
         function findCases(tabla) {
-
+            if (prodline==null) {prodline=1;}
 
 		var fsearch = search.create({
 			type: "customrecord_so_scheduletasks",
@@ -163,7 +181,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             [
                 ["custrecord_salecontract.mainline","is","T"], 
                 "AND", 
-                ["custrecord_so_sc_productionline","anyof","1"], 
+                ["custrecord_so_sc_productionline","anyof",prodline], 
                 "AND", 
                 ["custrecord_so_sc_startdate","onorafter",ecddays[0]]
             ],
@@ -285,8 +303,19 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     columtotal+=colspan;
                     tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
                 }
+
+                var d1 = new Date(datetofind); 
+                var d2 = new Date(tdhoydate); 
+  
+                var diff = d2.getTime() - d1.getTime();
+                var daydiff = diff / (1000 * 60 * 60 * 24);
+                log.audit("daydiff: ",daydiff);
+                log.audit("datetofind: ",datetofind);
+                if (daydiff<=fresult.getValue({name: "custrecord_sc_soduration"}) && daydiff>-1) {classtask="tasktoday";}
                 
-                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a></td>";
+                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
+                //tabla += "<a href='#' onclick='javascript:changenext(\""+ fresult.getValue({name: "internalid"}) +"\",\""+ fresult.getValue({name: "custrecord_so_sc_status"}) + "\")'> [N] </a>";
+                tabla += "</td>"
                 columtotal+=parseInt(fresult.getValue({name: "custrecord_sc_soduration"}));
             
 			})
@@ -342,10 +371,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         log.debug("td",td);
 
         var newstartdate=new Date(td);
-        newstartdate.setDate(td.getDate()-30);
+        newstartdate.setDate(td.getDate()-60);
 
         shstartdate=new Date(td);
-        shstartdate.setDate(td.getDate()-30);
+        shstartdate.setDate(td.getDate()-60);
 
         log.debug("newstartdate",newstartdate);
 
@@ -367,6 +396,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         
        
     }
+    
     return {
         onRequest: onRequest
     };

@@ -232,10 +232,18 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             sublistId: context.sublistId,
                             fieldId: "custrecordml_selected"
                         });
+                        var inventorydetailavail = currentRecord.getCurrentSublistValue({
+                            sublistId: context.sublistId,
+                            fieldId: "custrecordml_inventorydetailavail"
+                        });
+                        console.log("inventorydetailavail",inventorydetailavail);
+
                         var binNumber = currentRecord.getCurrentSublistValue({
                             sublistId: context.sublistId,
                             fieldId: "custrecordml_bin"
                         });
+
+                        if (inventorydetailavail == "T") {
                         if (selec && !binNumber) 
                         {
                              currentRecord.setCurrentSublistValue({
@@ -244,9 +252,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                  value: false
                              });
                         }
-
-
-
+                    }
 
                     }
              

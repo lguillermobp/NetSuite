@@ -4,6 +4,7 @@
  */
 define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
     function(record, log, GENERALTOOLS) {
+        var salecontract;
         function each(params) {
             var currentRecord = record.load({
                 type: params.type,
@@ -11,35 +12,55 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 isDynamic: true
             });
             
-            task = currentRecord.getValue({fieldId: "custbody_task"});
+            task = currentRecord.getText({fieldId: "custbody_task"});
+            assembly= currentRecord.getValue({fieldId: "assemblyitem"});
             createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
-            if (createdfrom == 46356 || createdfrom == 46357 || createdfrom == 46358 || createdfrom == 45781 || createdfrom == 46083 || createdfrom == 45955) { 
+            if (createdfrom == 11485) { 
 
+                salecontract = record.load({
+                    type: 'salesorder',
+                    id: createdfrom,
+                    isDynamic: true
+                });
+                productionline = salecontract.getValue({fieldId: "custbody_productionline"});
+                currentRecord.setValue({fieldId: "custbody_productionline", value: productionline});
+
+                var lineNumber = salecontract.findSublistLineWithValue({
+                    sublistId: 'item',
+                    fieldId: 'item',
+                    value: assembly
+                });
+                log.debug("lineNumber",lineNumber);
+
+                var parmassambly = record.load({
+                    type: 'assemblyitem',
+                    id: assembly,
+                    isDynamic: true
+                });
                 log.debug("taskb",task);
+                task = parmassambly.getText({fieldId: "custitem_task"});
 
-                if (task =='SL - Base Vehicle Title')
-                {
-                    task = 'CL -Base Vehicle Title / Parts Dispatch - STAGE 0';
+                if (lineNumber != -1) {
+                    
+                
 
-                }
-                if (task =='SL - PARTS DISP. Diff Parts Stg 0')
-                {
-                    task = 'CL -Base Vehicle Title / Parts Dispatch - STAGE 0';
-                }
-                if (task =='SL - PARTS DISP. ROLLER DT')
-                {
-                    task = 'CL -Parts Dispatch - STAGE 1';
-                }
-                if (task =='SL - PARTS DISP,. UPH, COS, ELEC')
-                {
-                    task = 'CL -Parts Dispatch - STAGE 1';
-                }
-                if (task =='SL - QC Inspection P4')
-                {
-                    task = 'CL -PHASE 6 - FINAL COSMETICS (20 ISSUES) +FINAL LINE QC INSPECTION';
-                }
+                salecontract.selectLine({
+                    sublistId: 'item',
+                    line: lineNumber
+                });
+                salecontract.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'custcol_taskid',
+                    value: task,
+                    ignoreFieldChange: true
+                });
+                salecontract.commitLine({
+                    sublistId: 'item'
+                });
+            }
                 currentRecord.setValue({fieldId: "custbody_task", value: task});
                 log.debug("taska",task);
+                salecontract.save();
             }
             
             log.debug("createdfrom",createdfrom);
@@ -66,6 +87,7 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
             }
             
         }
+        
 
         return {
             each: each
