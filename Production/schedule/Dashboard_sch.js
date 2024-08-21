@@ -24,9 +24,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var prodline;
         var tdhoy = new Date();
         var y = tdhoy.getFullYear();
-        var m = tdhoy.getMonth() + 1;
-        var d = tdhoy.getDate();
+        var m = ('0'+(tdhoy.getMonth()+1)).slice(-2)
+        var d = ('0'+(tdhoy.getDate())).slice(-2)
         var tdhoydate = m + "/" + d + "/" + y;
+        var tdhoydatey = y + "/" + m + "/" + d;
         function onRequest(context) {
 
             if (context.request.method === 'GET') {
@@ -107,6 +108,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             var y = datelist.getFullYear();
             var m = datelist.getMonth() + 1;
             var d = datelist.getDate();
+            var m = ('0'+(datelist.getMonth()+1)).slice(-2)
+            var d = ('0'+(datelist.getDate())).slice(-2)
+            
             datelistdate = m + "/" + d + "/" + y;
             if (datelist.getDay() == 1) {
                 tabla += "<th id='tbdaysr'>"+ ecddays[i] + "</th>";
@@ -173,7 +177,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
     }
 
         function findCases(tabla) {
-            if (prodline==null) {prodline=1;}
+            if (prodline==null || prodline=='') {prodline=1;}
 
 		var fsearch = search.create({
 			type: "customrecord_so_scheduletasks",
@@ -248,6 +252,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     var y = startdate.getFullYear();
                     var m = startdate.getMonth() + 1;
                     var d = startdate.getDate();
+                    var m = ('0'+(startdate.getMonth()+1)).slice(-2)
+                    var d = ('0'+(startdate.getDate())).slice(-2)
+                    
                     datetofind = m + "/" + d + "/" + y;
                     initial = parseInt(ecddays.indexOf(datetofind));
                     log.debug("initial",initial);
@@ -270,6 +277,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     var y = startdate.getFullYear();
                     var m = startdate.getMonth() + 1;
                     var d = startdate.getDate();
+                    var m = ('0'+(startdate.getMonth()+1)).slice(-2)
+                    var d = ('0'+(startdate.getDate())).slice(-2)
                     datetofind = m + "/" + d + "/" + y;
                     initial = parseInt(ecddays.indexOf(datetofind));
                     if (initial==-1)      {colspan=0;}
@@ -294,7 +303,20 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var y = startdate.getFullYear();
                 var m = startdate.getMonth() + 1;
                 var d = startdate.getDate();
+                
+                var m = ('0'+(startdate.getMonth()+1)).slice(-2)
+                var d = ('0'+(startdate.getDate())).slice(-2)
                 datetofind = m + "/" + d + "/" + y;
+                datetofindy = y + "/" + m + "/" + d;
+                enddate= new Date(fresult.getValue({name: "custrecord_so_sc_enddate"}));
+                var y = enddate.getFullYear();
+                var m = enddate.getMonth() + 1;
+                var d = enddate.getDate();
+                
+                var m = ('0'+(enddate.getMonth()+1)).slice(-2)
+                var d = ('0'+(enddate.getDate())).slice(-2)
+                datetoend = m + "/" + d + "/" + y;
+                datetoendy = y + "/" + m + "/" + d;
                 initial = parseInt(ecddays.indexOf(datetofind));
                 if (initial==-1)      {colspan=0;}
                 else {colspan=initial-columtotal;}
@@ -303,15 +325,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     columtotal+=colspan;
                     tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
                 }
-
-                var d1 = new Date(datetofind); 
-                var d2 = new Date(tdhoydate); 
-  
-                var diff = d2.getTime() - d1.getTime();
-                var daydiff = diff / (1000 * 60 * 60 * 24);
-                log.audit("daydiff: ",daydiff);
-                log.audit("datetofind: ",datetofind);
-                if (daydiff<=fresult.getValue({name: "custrecord_sc_soduration"}) && daydiff>-1) {classtask="tasktoday";}
+                
+                if (tdhoydatey>=datetofindy && tdhoydatey<=datetoendy) {
+                    log.audit("tdhoydatey",tdhoydatey);
+                    log.audit("datetofindy",datetofindy);
+                    log.audit("datetoendy",datetoendy);
+                    classtask="tasktoday";}
                 
                 tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
                 //tabla += "<a href='#' onclick='javascript:changenext(\""+ fresult.getValue({name: "internalid"}) +"\",\""+ fresult.getValue({name: "custrecord_so_sc_status"}) + "\")'> [N] </a>";
@@ -359,7 +378,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
                 custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
 
-                ecdholydays[i]=custrecord_blockdate;
+                vstartdate= new Date(custrecord_blockdate);
+                var y = vstartdate.getFullYear();
+                var m = vstartdate.getMonth() + 1;
+                var d = vstartdate.getDate();
+                var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
+                var d = ('0'+(vstartdate.getDate())).slice(-2)
+                datetofind = m + "/" + d + "/" + y;
+                ecdholydays[i]=datetofind;
                 i++;
                 
             });
@@ -387,6 +413,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             var y = newstartdate.getFullYear();
             var m = newstartdate.getMonth() + 1;
             var d = newstartdate.getDate();
+            var m = ('0'+(newstartdate.getMonth()+1)).slice(-2)
+            var d = ('0'+(newstartdate.getDate())).slice(-2)
             datetofind = m + "/" + d + "/" + y;
             initial = parseInt(ecdholydays.indexOf(datetofind));
             if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
