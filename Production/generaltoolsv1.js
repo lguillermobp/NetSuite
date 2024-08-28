@@ -1703,7 +1703,149 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
 
         }
 
+        function calcenddate(prodline) {
 
+            var schedulelast = s.create({
+                type: "customrecord_so_scheduletasks",
+                filters:
+                [
+                   ["custrecord_salecontract.mainline","is","T"], 
+                   "AND", 
+                   ["custrecord_so_sc_task.custrecord_sc_days","equalto","0"]
+                ],
+                columns:
+                [
+                   s.createColumn({
+                      name: "custrecord_so_sc_productionline",
+                      summary: "GROUP"
+                   }),
+                   s.createColumn({
+                      name: "custrecord_so_sc_startdate",
+                      summary: "MAX"
+                   }),
+                   s.createColumn({
+                      name: "custrecord_so_sc_enddate",
+                      summary: "MAX"
+                   }),
+                   s.createColumn({
+                      name: "custrecord_sc_soduration",
+                      summary: "MAX"
+                   })
+                ]
+             });
+             if (prodline.length>0) {
+                schedulelast.filters.push(s.createFilter({
+                    name: "custrecord_so_sc_productionline",
+                    operator: "anyof",
+                    values: prodline
+                }));
+                console.log("prodline",prodline);
+                
+            }
+            var pagedData = schedulelast.runPaged({
+                "pageSize" : 1000
+            });
+
+            var enddate;
+            var startdate;
+            var duration;
+            pagedData.pageRanges.forEach(function (pageRange) {
+
+                var page = pagedData.fetch({index: pageRange.index});
+                   
+                page.data.forEach(function (fresult) {
+
+                    enddate=fresult.getValue({name: "custrecord_so_sc_enddate",summary: "MAX"});
+                    startdate=fresult.getValue({name: "custrecord_so_sc_startdate",summary: "MAX"});
+                    duration= parseInt(fresult.getValue({name: "custrecord_sc_soduration",summary: "MAX"}));
+
+                })
+            });
+            
+            strdate = enddate;
+            var dt = new Date(strdate);
+            var strdate = dt;
+            
+            var ecddays=[]
+            pecddays();
+            var y = strdate.getFullYear();
+            var m = strdate.getMonth() + 1;
+            var d = strdate.getDate();
+            datetofind = m + "/" + d + "/" + y;
+            
+            initial = parseInt(ecddays.indexOf(datetofind));
+            
+    
+            if (initial==-1)      {return strdate;}
+            
+            newenddate=new Date(ecddays[initial+duration+1]);
+    
+            function pecddays() {
+    
+                var ecdholydays=[];
+            
+                var fsearch = s.create({
+                    type: "customrecord_blocksofdays",
+                    columns:
+                    [
+                       "internalid",
+                       s.createColumn({
+                          name: "custrecord_blockdate",
+                          sort: s.Sort.ASC
+                       }),
+                       "custrecord_blockno",
+                       "name",
+                       "custrecord_sequence"
+                    ]
+                });
+        
+        
+                var pagedData = fsearch.runPaged({
+                    "pageSize" : 1000
+                });
+                var i=1;
+                pagedData.pageRanges.forEach(function (pageRange) {
+                    var page = pagedData.fetch({index: pageRange.index});
+                    page.data.forEach(function (fresult1) {
+                        
+                        custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
+                        custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
+        
+                        ecdholydays[i]=custrecord_blockdate;
+                        i++;
+                        
+                    });
+                    
+                });
+                
+                const td = new Date();
+                var newstartdate=new Date(td);
+                newstartdate.setDate(td.getDate()-50);
+                
+        
+                for (i=1;i<300;i++)
+                {
+                    newstartdate.setDate(newstartdate.getDate()+1);
+                    
+                    if (newstartdate.getDay() == 0) {i--;continue;}
+                    if (newstartdate.getDay() == 6) {i--;continue;}
+                    
+                    var y = newstartdate.getFullYear();
+                    var m = newstartdate.getMonth() + 1;
+                    var d = newstartdate.getDate();
+                    datetofind = m + "/" + d + "/" + y;
+                    
+                    initial = parseInt(ecddays.indexOf(datetofind));
+                    if (initial!=-1)      {i--;continue;}
+                    ecddays[i]=datetofind;
+                    
+                }
+                
+            }
+    
+    
+            return newenddate;
+        }
 
 
 
@@ -1731,7 +1873,9 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             get_items_listLastPO: get_items_listLastPO,
             get_items_components: get_items_components,
             get_item_informations: get_item_informations,
-            get_items_listInventory: get_items_listInventory };
+            get_items_listInventory: get_items_listInventory,
+            calcenddate: calcenddate
+        };
 
 
 

@@ -5,7 +5,7 @@
  */
 var ecddays = [];
 var ecdholydays = [];
-define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function(s, currentRecord, log, record,dialog) {
+define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
 
         datarec=context.currentRecord;
@@ -18,6 +18,24 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog"], function
     }
 
     function fieldChanged(context) {
+
+        var currentRecord = context.currentRecord;
+        var fieldId = context.fieldId;
+        log.debug("fieldId",fieldId);
+        if (fieldId == "custbody_productionline") {
+            var invdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
+            var prodline = currentRecord.getValue({ fieldId: "custbody_productionline" });
+
+            if (invdate.length==0) {
+                
+                invdate = GENERALTOOLS.calcenddate(prodline);
+                log.debug("invdate",invdate);}
+
+                currentRecord.setValue({fieldId: "custbody_invoicedate",   value: invdate });
+                log.debug("enddate",invdate);
+            }
+
+
         // Code to be executed when a field value changes
     }
 

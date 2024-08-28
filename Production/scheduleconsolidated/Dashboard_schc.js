@@ -86,7 +86,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     " #tbdaysr { background-color: red} #tbdayse { background-color: #DADADA}" +
                     " #tbdaysh { background-color: #95CBF3} #taskwlate { background-color: #ff9900} " +
                     " #taskwot { background-color: #ffff00} #tasktoday { background-color: #95CBF3};" +
-                    " #tasknots { background-color: #ff0000} #taskdone { background-color: #00e600} " +
+                    " #tasknots { background-color: #ff0000} #taskdone { background-color: #00e600} #taskfuture { background-color: white}" +
                     " #months {bgcolor: '#757575';  color: #FAFAFA; background-color: #6D6D6D; font-style: italic; font-size: medium; } " +
                     "  </style> ";
 
@@ -270,7 +270,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else {colspan=initial;}
                     tabla += "<tr>";
                     tabla += "<th style='text-align: left;'>"+ "<strong>" +fresult.getText({name: "custrecord_so_sc_productionline"})+"</strong>" + " - " + fresult.getValue({name: "custrecord_sc_task",join: "CUSTRECORD_SO_SC_TASK"}) +"</th>";
-                    tabla += "<td id='tbdayse' colspan='"+ initial +"'></td>";
+                    if (initial!=0) {tabla += "<td id='tbdayse' colspan='"+ initial +"'></td>";}
+                    //tabla += "<td id='tbdayse' colspan='"+ initial +"'></td>";
                     columtotal+=colspan;
                     log.debug("colspan",colspan);
                     
@@ -296,7 +297,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     tabla += "</tr>";
                     tabla += "<tr>";
                     tabla += "<th style='text-align: left;'>"+ "<strong>" +fresult.getText({name: "custrecord_so_sc_productionline"})+"</strong>"+ " - " +fresult.getValue({name: "custrecord_sc_task",join: "CUSTRECORD_SO_SC_TASK"}) +"</th>";
-                    tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
+                    if (colspan!=0) {tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";}
+                    //tabla += "<td id='tbdayse' colspan='"+ colspan +"'></td>";
                     columtotal=colspan;
 
                     task=fresult.getValue({name: "custrecord_so_sc_productionline"})+ " - " +fresult.getValue({name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
@@ -339,6 +341,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     log.audit("datetofindy",datetofindy);
                     log.audit("datetoendy",datetoendy);
                     classtask="tasktoday";}
+
+                if (datetofindy>tdhoydatey) {classtask="taskfuture";}
                 
                 tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
                 //tabla += "<a href='#' onclick='javascript:changenext(\""+ fresult.getValue({name: "internalid"}) +"\",\""+ fresult.getValue({name: "custrecord_so_sc_status"}) + "\")'> [N] </a>";
