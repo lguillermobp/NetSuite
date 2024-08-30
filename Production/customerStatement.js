@@ -26,13 +26,13 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                     settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
                     filters:
                     [
-                        ["type","anyof","CustDep","Journal","CustPymt","SalesOrd","Estimate"], 
+                        [[["type","anyof","CustDep","Journal","CustPymt","SalesOrd"]],"OR",[["type","anyof","Estimate"],"AND",["custbody_quoteapproved","is","T"]]], 
+                        "AND", 
+                        ["amount","notequalto","0.00"], 
                         "AND", 
                         [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["mainline","is","T"]]], 
                         "AND", 
-                        [["name","anyof",CUSTOMER]], 
-                        "AND", 
-                        ["amount","notequalto","0.00"]
+                        ["name","anyof",CUSTOMER]
                     ],
                     columns:
                     [
