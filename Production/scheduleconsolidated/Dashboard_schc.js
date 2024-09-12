@@ -374,7 +374,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                }),
                "custrecord_blockno",
                "name",
-               "custrecord_sequence"
+               "custrecord_sequence",
+               "custrecord_recurrent"
             ]
         });
 
@@ -389,6 +390,60 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
                 custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
+                custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
+
+                if (custrecord_recurrent) 
+                    {custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);}
+                
+
+                function getMonday(d,tc) 
+                {
+                    //return d;
+                    log.debug("custrecord_blockdate",custrecord_blockdate);
+                    log.debug("custrecord_recurrent",custrecord_recurrent);
+                    const today = new Date();
+                    let montha = today.getMonth() + 1;
+                    const myArray = d.split("/");
+                    
+                    if ((myArray[0]-montha)<-3) {yeara=today.getFullYear()+1;}
+                    else                        {yeara=today.getFullYear();}
+                    log.debug("(myArray[0]-montha",(myArray[0]-montha));
+                    mes = [31,28,31,30,31,30,31,31,30,31,30,31]
+
+                    if (tc==1) 
+                    {
+                    d = myArray[0]+"-01-"+yeara;
+                    d = new Date(d);
+                    var day = d.getDay();
+                    
+                    diff = d.getDate()  +  (day <= 1 ? (1 - day) :  (8 - day)); // adjust when day is sunday
+                    }
+                    if (tc==2) 
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() == 0 ? 7 : d.getDay());
+                    
+                    diff = d.getDate()  +  (1 - day); // adjust when day is sunday
+                    }
+                    if (tc==3)
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() < 4 ? 7 + d.getDay(): d.getDay());
+                    
+                    diff = d.getDate()  +  (4 - day); // adjust when day is sunday
+                    }
+                    if (tc==4)
+                        {
+                        d = myArray[0]+"-"+myArray[1]+"-"+yeara;
+                        d = new Date(d);
+                        diff = d.getDate(); // adjust when day is sunday
+                        }
+
+                    return new Date(d.setDate(diff));
+                    
+                }       
 
                 vstartdate= new Date(custrecord_blockdate);
                 var y = vstartdate.getFullYear();

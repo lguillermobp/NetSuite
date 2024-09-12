@@ -460,7 +460,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 sublistpm.addField({
                     id: "custrecordml_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty'
                 });
                 sublistpm.addField({
@@ -490,7 +490,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 
                 sublistpm.addField({
                     id: "custrecordml_qtyb",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty Bin Location'
                 });
                 
@@ -600,7 +600,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
                 sublistbo.addField({
                     id: "custrecordbo_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty'
                 });
                
@@ -789,7 +789,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
                 sublisttr.addField({
                     id: "custrecordtr_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty'
                 });
                 sublisttr.addField({

@@ -48,20 +48,19 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
 
         if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 
         {
-            log.debug("startdate",startdate);
-            log.debug("oldstartdate",oldstartdate);
+            
             var internalid = currentRecord.getValue({ fieldId: "id" });
 
             var y = oldstartdate.getFullYear();
-            var m = oldstartdate.getMonth() + 1;
-            var d = oldstartdate.getDate();
+            var m = ('0'+(oldstartdate.getMonth()+1)).slice(-2)
+            var d = ('0'+(oldstartdate.getDate())).slice(-2)
             datetofind = m + "/" + d + "/" + y;
             initial = parseInt(ecddays.indexOf(datetofind));
             log.debug("initial",initial);
 
             var y = startdate.getFullYear();
-            var m = startdate.getMonth() + 1;
-            var d = startdate.getDate();
+            var m = ('0'+(startdate.getMonth()+1)).slice(-2)
+            var d = ('0'+(startdate.getDate())).slice(-2)
             datetofind = m + "/" + d + "/" + y;
             final = parseInt(ecddays.indexOf(datetofind));
             log.debug("final",final);
@@ -84,12 +83,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         if (ecddays.length==0) {pecddays();}
 
         var y = strdate.getFullYear();
-        var m = strdate.getMonth() + 1;
-        var d = strdate.getDate();
+        var m = ('0'+(strdate.getMonth()+1)).slice(-2)
+        var d = ('0'+(strdate.getDate())).slice(-2)
         datetofind = m + "/" + d + "/" + y;
-        log.debug("datetofind",datetofind);
+        
         initial = parseInt(ecddays.indexOf(datetofind));
-        log.debug("initial",initial);
+        
 
         if (initial==-1)      {return strdate;}
         
@@ -111,7 +110,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                    }),
                    "custrecord_blockno",
                    "name",
-                   "custrecord_sequence"
+                   "custrecord_sequence",
+                   "custrecord_recurrent"
                 ]
             });
     
@@ -126,6 +126,66 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     
                     custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
                     custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
+                    custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
+
+                if (custrecord_recurrent) 
+                    {
+                        custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);
+                        vstartdate= new Date(custrecord_blockdate);
+                        var y = vstartdate.getFullYear();
+                        var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
+                        var d = ('0'+(vstartdate.getDate())).slice(-2)
+                        custrecord_blockdate = m + "/" + d + "/" + y;
+                    }
+                
+                function getMonday(d,tc) 
+                {
+                    //return d;
+                    log.debug("d",d);
+                    log.debug("tc",tc);
+                    const today = new Date();
+                    var montha = today.getMonth() + 1;
+                    const myArray = d.split("/");
+                    
+                    if ((myArray[0]-montha)<-3) {yeara=today.getFullYear()+1;}
+                    else                        {yeara=today.getFullYear();}
+                    log.debug("(myArray[0]-montha",(myArray[0]-montha));
+                    mes = [31,28,31,30,31,30,31,31,30,31,30,31]
+
+                    if (tc==1) 
+                    {
+                    d = myArray[0]+"-01-"+yeara;
+                    d = new Date(d);
+                    var day = d.getDay();
+                    
+                    diff = d.getDate()  +  (day <= 1 ? (1 - day) :  (8 - day)); // adjust when day is sunday
+                    }
+                    if (tc==2) 
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() == 0 ? 7 : d.getDay());
+                    
+                    diff = d.getDate()  +  (1 - day); // adjust when day is sunday
+                    }
+                    if (tc==3)
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() < 4 ? 7 + d.getDay(): d.getDay());
+                    
+                    diff = d.getDate()  +  (4 - day); // adjust when day is sunday
+                    }
+                    if (tc==4)
+                        {
+                        d = myArray[0]+"-"+myArray[1]+"-"+yeara;
+                        d = new Date(d);
+                        diff = d.getDate(); // adjust when day is sunday
+                        }
+
+                    return new Date(d.setDate(diff));
+                    
+                }       
     
                     ecdholydays[i]=custrecord_blockdate;
                     i++;
@@ -135,7 +195,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             });
             const td = new Date();
             var newstartdate=new Date(td);
-            newstartdate.setDate(td.getDate()-50);
+            newstartdate.setDate(td.getDate()-90);
     
             for (i=1;i<300;i++)
             {
@@ -144,8 +204,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 if (newstartdate.getDay() == 6) {i--;continue;}
     
                 var y = newstartdate.getFullYear();
-                var m = newstartdate.getMonth() + 1;
-                var d = newstartdate.getDate();
+                var m = ('0'+(newstartdate.getMonth()+1)).slice(-2)
+                var d = ('0'+(newstartdate.getDate())).slice(-2)
                 datetofind = m + "/" + d + "/" + y;
                 initial = parseInt(ecdholydays.indexOf(datetofind));
                 if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
@@ -238,10 +298,11 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             page.data.forEach(function (fresult1) {
 
                 internalidm = fresult1.getValue({ name: "Internalid" });
-                log.debug("internalidm",internalidm);
-                log.debug("dayspushed",dayspushed);
+                
                 internalidsc=fresult1.getValue({ name: "internalid",join: "CUSTRECORD_SALECONTRACT"});
                 seqss=fresult1.getValue({ name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
+                log.debug("internalidsc",internalidsc);
+                log.debug("seqss",seqss);
 
                 if (seq!=seqss) {changing=false;seq=seqss}
                 if (internalidscc==internalidsc) {changing=true;}
@@ -265,7 +326,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                     });
 
                     // Set the value of custrecord_so_sc_startdate field
-                    log.debug("newstartdate",newstartdate);
+                    
                     scheduleTaskRecord.setValue({
                         fieldId: 'custrecord_so_sc_startdate',
                         value: newstartdate

@@ -316,7 +316,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 
                 let sl_qtyo =sublistpm.addField({
                     id: "custrecordml_qtyo",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty Original'
                 });
                 sl_qtyo.updateDisplayType({
@@ -325,7 +325,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
 
                 sublistpm.addField({
                     id: "custrecordml_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Qty'
                 });
                 

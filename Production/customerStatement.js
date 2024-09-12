@@ -94,12 +94,12 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                          search.createColumn({
                            name: "formulatext",
                            summary: "GROUP",
-                           formula: "CASE WHEN {type}='Sales Contract' THEN  'Basic Model'  ELSE  CASE WHEN {type}='Payment' THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE {memo} END END END"
+                           formula: "CASE WHEN ({type}='Sales Contract' and {item.type}='Assembly') THEN  'Basic Model'  ELSE CASE WHEN ({type}='Sales Contract' and {item.type}<>'Assembly') THEN  {memo}  ELSE CASE WHEN {type}in('Payment','Customer Deposit','Journal') THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE CASE WHEN {type}='Quote' THEN  'Upgrade'  ELSE {memo} END END  END END END"
                         }),
                         search.createColumn({
                            name: "formulatext",
                            summary: "GROUP",
-                           formula: "CASE WHEN {type}='Sales Contract' THEN  'Basic Model'  ELSE  CASE WHEN {type}in('Payment','Customer Deposit','Journal') THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE CASE WHEN {type}='Quote' THEN  'Upgrade'  ELSE {memo} END END  END END"
+                           formula: "CASE WHEN ({type}='Sales Contract' and {item.type}='Assembly') THEN  'Basic Model'  ELSE CASE WHEN ({type}='Sales Contract' and {item.type}<>'Assembly') THEN  'Services'  ELSE CASE WHEN {type}in('Payment','Customer Deposit','Journal') THEN  'Payment'  ELSE CASE WHEN {type}='Invoice' THEN  'Invoice'  ELSE CASE WHEN {type}='Quote' THEN  'Upgrade'  ELSE {memo} END END  END END END"
                         })
                     ]
                     }).run();
