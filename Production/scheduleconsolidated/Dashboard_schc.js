@@ -343,8 +343,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     classtask="tasktoday";}
 
                 if (datetofindy>tdhoydatey) {classtask="taskfuture";}
-                
-                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
+                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='*'  onClick='MyWindow=window.open(\"https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"})+ " \",\"MyWindow\",\"width=1200,height=800\"); return false; '>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a>";
+
+                //tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
                 //tabla += "<a href='#' onclick='javascript:changenext(\""+ fresult.getValue({name: "internalid"}) +"\",\""+ fresult.getValue({name: "custrecord_so_sc_status"}) + "\")'> [N] </a>";
                 tabla += "</td>"
                 columtotal+=parseInt(fresult.getValue({name: "custrecord_sc_soduration"}));
