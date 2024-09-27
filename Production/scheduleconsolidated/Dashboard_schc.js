@@ -85,7 +85,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     " #tbdaysr, #tbdays, #tbdaysm, #tbdaysh {writing-mode: vertical-rl;  text-orientation: mixed} " +
                     " #tbdaysr { background-color: red} #tbdayse { background-color: #DADADA}" +
                     " #tbdaysh { background-color: #95CBF3} #taskwlate { background-color: #ff9900} " +
-                    " #taskwot { background-color: #ffff00} #tasktoday { background-color: #95CBF3};" +
+                    " #taskwot { background-color: #ffff00} #tasktoday { background-color: #95CBF3}" +
                     " #tasknots { background-color: #ff0000} #taskdone { background-color: #00e600} #taskfuture { background-color: white}" +
                     " #months {bgcolor: '#757575';  color: #FAFAFA; background-color: #6D6D6D; font-style: italic; font-size: medium; } " +
                     "  </style> ";
@@ -183,8 +183,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "customrecord_so_scheduletasks",
             filters:
             [
-                ["custrecord_salecontract.mainline","is","T"], 
+                ["custrecord_salecontract.mainline","is","T"],
                 "AND", 
+                ["custrecord_salecontract.custbody_clientinhold","is","F"],
+                "AND",
                 ["custrecord_so_sc_task.custrecord_tasksconsolidated","anyof",prodline], 
                 "AND", 
                 ["custrecord_so_sc_startdate","onorafter",ecddays[0]]
@@ -234,6 +236,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }),
                 search.createColumn({
                    name: "custbody_appf_veh_model",
+                   join: "CUSTRECORD_SALECONTRACT"
+                }),
+                search.createColumn({
+                   name: "custbody_clientinhold",
                    join: "CUSTRECORD_SALECONTRACT"
                 })
             ]
@@ -308,6 +314,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if (fresult.getValue({name: "custrecord_so_sc_status"})=="2") {classtask="taskwlate";}
                 if (fresult.getValue({name: "custrecord_so_sc_status"})=="3") {classtask="tasknots";}
                 if (fresult.getValue({name: "custrecord_so_sc_status"})=="4") {classtask="taskdone";}
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="5") {classtask="taskfuture";}
 
                 startdate= new Date(fresult.getValue({name: "custrecord_so_sc_startdate"}));
                 var y = startdate.getFullYear();
@@ -337,13 +344,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
                 
                 if (tdhoydatey>=datetofindy && tdhoydatey<=datetoendy) {
-                    log.audit("tdhoydatey",tdhoydatey);
-                    log.audit("datetofindy",datetofindy);
-                    log.audit("datetoendy",datetoendy);
+                    
                     classtask="tasktoday";}
 
-                if (datetofindy>tdhoydatey) {classtask="taskfuture";}
-                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='*'  onClick='MyWindow=window.open(\"https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"})+ " \",\"MyWindow\",\"width=1200,height=800\"); return false; '>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a>";
+                if (fresult.getValue({name: "custrecord_so_sc_status"})=="4") {classtask="taskdone";}
+
+                //if (datetofindy>tdhoydatey) {classtask="taskfuture";}
+                if (fresult.getValue({name: "custbody_clientinhold",join: "CUSTRECORD_SALECONTRACT"})) {onhold="*-HOLD-* <hr/>";}
+                else {onhold="";}
+
+                tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='*'  onClick='MyWindow=window.open(\"https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"})+ " \",\"MyWindow\",\"width=1200,height=800\"); return false; '>"+ onhold + fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a>";
 
                 //tabla += "<td id='"+classtask+"' colspan='"+ fresult.getValue({name: "custrecord_sc_soduration"}) +"'><a href='https://5896209.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1313&id="+ fresult.getValue({name: "internalid"}) +"' target='_blank'>"+ fresult.getText({name: "entity",join: "CUSTRECORD_SALECONTRACT"}) +"<br/> (" + fresult.getText({name: "custbody_appf_veh_model",join: "CUSTRECORD_SALECONTRACT"}) +") </a><br/> ";
                 //tabla += "<a href='#' onclick='javascript:changenext(\""+ fresult.getValue({name: "internalid"}) +"\",\""+ fresult.getValue({name: "custrecord_so_sc_status"}) + "\")'> [N] </a>";
@@ -465,10 +475,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         log.debug("td",td);
 
         var newstartdate=new Date(td);
-        newstartdate.setDate(td.getDate()-60);
+        newstartdate.setDate(td.getDate()-50);
 
         shstartdate=new Date(td);
-        shstartdate.setDate(td.getDate()-60);
+        shstartdate.setDate(td.getDate()-50);
 
         log.debug("newstartdate",newstartdate);
 

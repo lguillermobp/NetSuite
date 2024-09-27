@@ -121,11 +121,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 customer.defaultValue = customersselected;
 
-                    customer.updateBreakType({
-                        breakType : serverWidget.FieldBreakType.STARTCOL
-                    });
-                    
+                customer.updateBreakType({
+                    breakType : serverWidget.FieldBreakType.STARTCOL
+                });
 
+                
                 var sections = form.addField({
                     id: "custpage_section",
                     type: serverWidget.FieldType.TEXT,

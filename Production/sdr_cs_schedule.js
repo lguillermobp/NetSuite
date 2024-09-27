@@ -68,6 +68,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
             pushsch(internalid, dayspushed,seq,internalidsc,pl);
         }
+        window.opener.location.reload(false);
 
         return true;
     }
@@ -195,7 +196,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             });
             const td = new Date();
             var newstartdate=new Date(td);
-            newstartdate.setDate(td.getDate()-90);
+            newstartdate.setDate(td.getDate()-100);
     
             for (i=1;i<300;i++)
             {

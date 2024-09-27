@@ -1778,7 +1778,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             if (initial==-1)      {return strdate;}
             log.audit("initial",initial);
             log.audit("duration",duration);
-            newenddate=new Date(ecddays[initial+duration+1]);
+            newenddate=new Date(ecddays[initial+duration]);
             log.audit("ecddays",ecddays);
             log.audit("newenddate",newenddate);
     
