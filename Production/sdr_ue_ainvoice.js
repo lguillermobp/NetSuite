@@ -14,6 +14,7 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
      */
     function beforeLoad(context) {
         log.debug("context",context);
+        const currentRecordId = context.newRecord.id;
 
         if (context.type === context.UserEventType.VIEW) {
             var entity = context.newRecord.getValue({fieldId: 'custrecord_ai_customer'});
@@ -26,10 +27,39 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
                 functionName: "window.open('" + printSuitelet + "');"
             })
 
-            
+            const printSuitelet1 = "/app/site/hosting/scriptlet.nl?script=2106&deploy=1&id="+currentRecordId
+
+                context.form.addButton({
+                    id: "custpage_print", 
+                    label: "PRINT",
+                    functionName: "window.open('" + printSuitelet1 + "');"
+                })
             
 
         }
+        if(context.type == "edit") 
+            {
+
+            
+            var form = context.form;
+            
+            form.clientScriptModulePath = "./sdr_cs_ainvoice.js";
+
+            sublist = form.getSublist({id: 'customrecord_aid'});
+            log.debug("sublist",sublist);
+
+            if (sublist) {
+                sublist.addButton({
+                    id: 'custpage_refresh',
+                    label: 'Copy from Statement',
+                    functionName: 'copystatement()'
+                });
+            }
+            
+            
+            
+           
+          }
 
 
         // Your code logic here

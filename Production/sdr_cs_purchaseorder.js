@@ -106,6 +106,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 fieldId: "custcol_vendorcode"
             });
             log.debug('rate1', rate);
+            /*
             if (itemId && rate) {
                 paramitem = GENERALTOOLS.get_Item_basic(itemId);
                 paramdata = paramitem.data;
@@ -146,7 +147,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                     value: entityname
                 });
                 errorv="F";
-            } catch (err) {errorv="V";}
+                } catch (err) {errorv="V";}
             if (errorv!="V") {
                 var lineCount = itemBodyFields.getLineCount({
                     sublistId: 'itemvendor'
@@ -176,8 +177,9 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                     itemBodyFields.save({enableSourcing: true});
                 }
             }
+            
         }
-           
+           */
        }
 
     }

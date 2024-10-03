@@ -17,7 +17,9 @@ define(['N/log', 'N/search', 'N/record'],
             [
                 [[["formulatext: CASE WHEN  NVL({item.quantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN 'YES'  ELSE 'NO' END","contains","YES"],"AND",["type","anyof","WorkOrd"],"AND",["mainline","is","F"],"AND",["status","anyof","WorkOrd:B","WorkOrd:D","WorkOrd:A"]],"OR",[["custbody_totalitemsbo","greaterthan","0"],"AND",["type","anyof","WorkOrd"],"AND",["mainline","is","T"]]], 
                 "AND", 
-                ["sum(formulanumeric: sum(CASE WHEN  {mainline}='*' THEN 0  ELSE 1 END)-{custbody_totalitemsbo})","notequalto","0"]
+                ["sum(formulanumeric: sum(CASE WHEN  {mainline}='*' THEN 0  ELSE 1 END)-{custbody_totalitemsbo})","notequalto","0"], 
+                "AND", 
+                ["item.type","anyof","Assembly","InvtPart"]
               ],
             columns:
             [

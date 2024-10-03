@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+  <head>
+    <style>
+
+		table {
+			font-size: 9pt;
+			table-layout: fixed;
+            width: 100%;
+		}
+         th {
+             font-weight: bold;
+             font-size: 8pt;
+             vertical-align: middle;
+             padding: 5px 6px 3px;
+             background-color: #e3e3e3;
+             color: #333333;
+         }
+         td {
+             padding: 4px 6px;
+         }
+		 td p { align:left }
+         b {
+             font-weight: bold;
+             color: #333333;
+         }
+         table.header td {
+             padding: 0;
+             font-size: 10pt;
+         }
+         table.footer td {
+             padding: 0;
+             font-size: 8pt;
+         }
+         table.itemtable th {
+             padding-bottom: 10px;
+             padding-top: 10px;
+         }
+         table.body td {
+             padding-top: 2px;
+         }
+         td.addressheader {
+             font-weight: bold;
+             font-size: 8pt;
+             padding-top: 6px;
+             padding-bottom: 2px;
+         }
+         td.address {
+             padding-top: 0;
+         }
+         span.name {
+             font-size: 22pt;
+         }
+      	span.title {
+             font-size: 20pt;
+         }
+         span.number {
+             font-size: 16pt;
+         }
+         div.remittanceSlip {
+             width: 100%;
+             /* To ensure minimal height of remittance slip */
+             height: 200pt;
+             page-break-inside: avoid;
+             page-break-after: avoid;
+         }
+         hr {
+             border-top: 1px dashed #d3d3d3;
+             width: 100%;
+             color: #ffffff;
+             background-color: #ffffff;
+             height: 1px;
+         }
+</style>
+<macrolist>
+        <macro id="nlheader">
+            <table class="header" style="width: 100%;"><tr>
+            <td align="left"><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="float: left; margin: 2px" /></#if></td>
+            <td align="right" colspan="2"><span class="title">Invoice: ${results[0].name}</span></td>
+            </tr>
+           
+            </table>
+                     <br/>
+            <table width="100%" border="1">
+            <tbody>
+            <tr>
+            <th width="10%" scope="row">Customer</th>
+            <td width="61%"><strong>${results[0].custrecord_ai_customer}</strong></td>
+			<th width="12%" scope="row">Date</th>
+            <td width="17%">${results[0].custrecord_ai_date}</td>
+            
+            </tr>
+            <tr>
+            <th width="10%" scope="row">Description</th>
+            <td width="61%">${results[0].custrecord_ai_description}</td>
+            <th scope="row">Due Date</th>
+            <td>${results[0].custrecord_ai_duedata}</td>
+            </tr>
+            <tr>
+            <th scope="row">Memo:</th>
+            <td>${results[0].custrecord_ai_memo}<br/>
+                ${results[0].custrecord_memo1}<br/>
+                ${results[0].custrecord_memo2}</td>
+            <th scope="row">Amount</th>
+            <td>${results[0].custrecord_ai_amount}</td>
+            </tr>
+            </tbody>
+        </table>
+        </macro>
+        <macro id="nlfooter">
+            <table class="footer" style="width: 100%;"><tr>
+            <td align="right"><pagenumber/> of <totalpages/></td>
+            </tr></table>
+        </macro>
+    </macrolist>
+  </head>
+  <body header="nlheader" header-height="22%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+    <table>
+      <#list results as result>
+        <#if result_index == 0>
+          <thead>
+            <tr>
+                <th width="75%">Description </th>
+	            <th width="25%">Amount</th>
+            </tr>
+          </thead>
+        </#if>
+        <tr>
+            <td>${result.custrecord_aid_description}</td>
+	        <td>${result.custrecord_aid_amount}</td>
+        </tr>
+      </#list>
+    </table>
+  </body>
+</pdf>

@@ -5,7 +5,7 @@
 var ecddays = [];
 var ecdholydays = [];
 var shstartdate = "";
-define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log'],
+define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/search", "N/file", "N/error",'N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
 	/**
 	 *
 	 * @param serverWidget
@@ -15,7 +15,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 	 * @param base
 	 * @param _
 	 */
-	function (file, redirect, runtime,serverWidget,record, search, file, error,log) {
+	function (file, redirect, runtime,serverWidget,record, search, file, error,log, GENERALTOOLS) {
 		/**
 		 *
 		 * @param context
@@ -474,12 +474,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
         const td = new Date();
         log.debug("td",td);
-
+        var paramrec = GENERALTOOLS.get_paramnew_value('0701');
+        var daysp= paramrec.data.getValue({name: "custrecordparams_value"});
         var newstartdate=new Date(td);
-        newstartdate.setDate(td.getDate()-50);
+        newstartdate.setDate(td.getDate()-daysp);
 
         shstartdate=new Date(td);
-        shstartdate.setDate(td.getDate()-50);
+        shstartdate.setDate(td.getDate()-daysp);
 
         log.debug("newstartdate",newstartdate);
 

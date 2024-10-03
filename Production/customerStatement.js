@@ -30,7 +30,7 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                         "AND", 
                         ["amount","notequalto","0.00"], 
                         "AND", 
-                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["mainline","is","T"]]], 
+                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["custbody_recognize","is","F"],"AND",["mainline","is","T"]]], 
                         "AND", 
                         ["name","anyof",CUSTOMER]
                     ],
