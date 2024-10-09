@@ -18,7 +18,7 @@
              color: #333333;
          }
          td {
-             padding: 4px 6px;
+             padding: 2px 4px;
          }
 		 td p { align:left }
          b {
@@ -102,7 +102,7 @@
             <td>${results[0].custrecord_ai_memo}<br/>
                 ${results[0].custrecord_memo1}<br/>
                 ${results[0].custrecord_memo2}</td>
-            <th scope="row">Amount</th>
+            <th scope="row">Please Pay:</th>
             <td>${results[0].custrecord_ai_amount}</td>
             </tr>
             </tbody>
@@ -125,11 +125,22 @@
 	            <th width="25%">Amount</th>
             </tr>
           </thead>
+          <#assign typo = result.custrecord_typeofdetail>
         </#if>
-        <tr>
-            <td>${result.custrecord_aid_description}</td>
-	        <td>${result.custrecord_aid_amount}</td>
-        </tr>
+        <#if result.custrecord_typeofdetail!=typo>  <tr><td colspan="2"><hr/></td> </tr>
+            <#assign typo = result.custrecord_typeofdetail>
+
+               
+            </#if>
+
+            <tr>
+            <#if result.custrecord_typeofdetail!=' ' && result.custrecord_aid_amount==0 > <td><strong>${result.custrecord_aid_description}</strong></td> 
+            <#else> <td>${result.custrecord_aid_description}</td> 
+            </#if>
+	        <td align="right">${result.custrecord_aid_amount}</td>
+            </tr>
+
+
       </#list>
     </table>
   </body>

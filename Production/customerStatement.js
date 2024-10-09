@@ -26,13 +26,15 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                     settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
                     filters:
                     [
-                        [[["type","anyof","CustDep","Journal","CustPymt","SalesOrd"]],"OR",[["type","anyof","Estimate"],"AND",["custbody_quoteapproved","is","T"]]], 
+                        [[["type","anyof","CustDep","Journal","CustPymt","SalesOrd","CustInvc"]],"OR",[["type","anyof","Estimate"],"AND",["custbody_quoteapproved","is","T"]]], 
                         "AND", 
                         ["amount","notequalto","0.00"], 
                         "AND", 
-                        [[["type","anyof","SalesOrd"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["custbody_recognize","is","F"],"AND",["mainline","is","T"]]], 
+                        [[["type","anyof","SalesOrd"],"AND",["status","noneof","SalesOrd:H"],"AND",["mainline","is","F"]],"OR",[["type","noneof","SalesOrd"],"AND",["custbody_recognize","is","F"],"AND",["custcol_excludestatement","is","F"],"AND",["mainline","is","T"]]],  
                         "AND", 
-                        ["name","anyof",CUSTOMER]
+                        ["name","anyof",CUSTOMER], 
+                        "AND",
+                        ["trandate","onorafter","1/15/2024"]
                     ],
                     columns:
                     [
@@ -84,7 +86,7 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                          search.createColumn({
                             name: "formulacurrency",
                             summary: "SUM",
-                            formula: "CASE WHEN {type}in('Sales Contract','Quote')  THEN {amount}  ELSE {amount}*-1  END"
+                            formula: "CASE WHEN {type}in('Sales Contract','Quote','Quote','Invoice')  THEN {amount}  ELSE {amount}*-1  END"
                          }),
                          search.createColumn({
                             name: "type",

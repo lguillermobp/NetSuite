@@ -3,7 +3,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidget) {
+define(["N/runtime",'N/record','N/log','N/ui/serverWidget'], function(runtime,record, log,serverWidget) {
     
     /**
      * Function triggered before a record is submitted.
@@ -15,58 +15,29 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
     function beforeLoad(context) {
         log.debug("context",context);
         const currentRecordId = context.newRecord.id;
+        var userObj = runtime.getCurrentUser();
+		var userID = userObj.id;
+		var userPermission = userObj.getPermission({	name : 'TRAN_JOURNALAPPRV'	});
+		autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
+        
 
         if (context.type === context.UserEventType.VIEW) {
-            var entity = context.newRecord.getValue({fieldId: 'custrecord_ai_customer'});
-
-            const printSuitelet = "/app/site/hosting/scriptlet.nl?script=1618&deploy=1&customer=" + entity;
-
-            context.form.addButton({
-                id: "custpage_gml",
-                label: "Customer Statement",
-                functionName: "window.open('" + printSuitelet + "');"
-            })
-
-            const printSuitelet1 = "/app/site/hosting/scriptlet.nl?script=2106&deploy=1&id="+currentRecordId
-
-                context.form.addButton({
-                    id: "custpage_print", 
-                    label: "PRINT",
-                    functionName: "window.open('" + printSuitelet1 + "');"
-                })
+           
             
 
         }
-        if(context.type == "edit") 
+        if(context.type == "create") 
             {
-
-            var quote = context.newRecord.getValue({fieldId: 'custrecord_quote'});
-            var form = context.form;
-            log.debug("form",form);
-           
-               
-            form.clientScriptModulePath = "./sdr_cs_ainvoice.js";
-
-            sublist = form.getSublist({id: 'customrecord_aid'});
-            log.debug("sublist",sublist);
-
-            form.addButton({
-                id: 'custpage_refresh',
-                label: 'Copy from Statement',
-                functionName: 'copystatement()'
-            });
-            if (quote) 
-                {
-                form.addButton({
-                    id: 'custpage_refresh1',
-                    label: 'Copy from Quote',
-                    functionName: 'copyquote()'
-                });
+                log.debug("context.type",context.type);
+                log.debug("autAB",autAB);
+                if (autAB=="FULL") {
+                    context.newRecord.setValue({fieldId: 'approved', value: true});
                 }
-            
-            
-           
-          }
+                else {
+                    context.newRecord.setValue({fieldId: 'approved', value: false});
+                }
+          
+            }
 
 
         // Your code logic here

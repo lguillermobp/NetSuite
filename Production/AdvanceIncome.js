@@ -22,7 +22,7 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
 
                 const ADVINV = Number(context.request.parameters.id);
                 var rs = search.create({
-                  type: "customrecord1556",
+                  type: "customrecord_ai",
                   filters:
                   [
                      ["internalid","anyof",ADVINV]
@@ -38,16 +38,32 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                      "custrecord_memo2",
                      "custrecord_ai_description",
                      search.createColumn({
-                        name: "custrecord158",
-                        join: "CUSTRECORD158"
+                        name: "custrecord_tpd_sequence",
+                        join: "CUSTRECORD_AI",
+                        sort: search.Sort.ASC
+                     }),
+                     search.createColumn({
+                        name: "custrecord_typeofdetail",
+                        join: "CUSTRECORD_AI",
+                        sort: search.Sort.ASC
+                     }),
+                     search.createColumn({
+                        name: "custrecord_ai",
+                        join: "CUSTRECORD_AI"
                      }),
                      search.createColumn({
                         name: "custrecord_aid_description",
-                        join: "CUSTRECORD158"
+                        join: "CUSTRECORD_AI"
                      }),
                      search.createColumn({
                         name: "custrecord_aid_amount",
-                        join: "CUSTRECORD158"
+                        join: "CUSTRECORD_AI"
+                     }),
+                     "internalid",
+                     search.createColumn({
+                        name: "internalid",
+                        join: "CUSTRECORD_AI",
+                        sort: search.Sort.ASC
                      })
                   ]
                     }).run();
