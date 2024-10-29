@@ -29,12 +29,73 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
 
         }
+        function markall() {
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
 
+            for(var i=0;i<count;i++) {
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit'
+                });
+                if (selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit',
+                    value: true,
+                    ignoreFieldChange: false
+                });
+               
+            }
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
+        }
+        function unmarkall() {
+            
+            var currentRec = currentRecord.get();
+            var count = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+            console.log("Totalrecord: ",count);
+            for(var i=0;i<count;i++) {
+
+
+                currentRec.selectLine({
+                    sublistId: "custpage_records",
+                    line: i
+                });
+                selecf=currentRec.getCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit'
+                });
+                if (!selecf) continue;
+                currentRec.setCurrentSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit',
+                    value: false,
+                    ignoreFieldChange: false
+                });
+            }
+            currentRec.commitLine({
+                sublistId: 'custpage_records'
+            });
+            
+        }
         
 /**
          * Function to be executed when field is changed.
          *
-         * @param {Object} scriptContext
+         * @param {Object} scriptContext 
          * @param {Record} scriptContext.currentRecord - Current form record
          * @param {string} scriptContext.sublistId - Sublist name
          * @param {string} scriptContext.fieldId - Field name
@@ -646,6 +707,8 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             onButtonClick: onButtonClick,
             process: process,
             processppd: processppd,
-            fieldChanged: fieldChanged
+            fieldChanged: fieldChanged,
+            markall: markall,
+            unmarkall: unmarkall
         }
     })

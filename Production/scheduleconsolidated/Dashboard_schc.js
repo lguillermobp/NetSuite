@@ -488,7 +488,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
         log.debug("newstartdate",newstartdate);
 
-        for (i=0;i<270;i++)
+        for (i=0;i<400;i++)
         {
             newstartdate.setDate(newstartdate.getDate()+1);
             if (newstartdate.getDay() == 0) {i--;continue;}

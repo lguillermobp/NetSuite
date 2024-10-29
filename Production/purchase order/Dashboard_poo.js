@@ -292,6 +292,17 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: 'Omit',
                     type: serverWidget.FieldType.CHECKBOX
                 });
+                sublistpm.addButton({
+                    id: 'custpage_markmark',
+                    label: 'Mark all',
+                    functionName: "markall()"
+                });
+                sublistpm.addButton({
+                    id: 'custpage_unmarkmark',
+                    label: 'Unmark all',
+                    functionName: "unmarkall()"
+                });
+
                
 
                 var resultscurr= currencies();
@@ -414,8 +425,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
                         line: counter,
-                        value: (result1.qty)
-                      //  value: (result1.qty-result1.qtya-result1.qtypo)
+                        value: (result1.qtybuy)
+                        //value: (result1.qty-result1.qtya-result1.qtypo)
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_total',
@@ -461,6 +472,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_memo',
                         line: counter,
                         value: result1.memo.substring(0, 298)
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_omit',
+                        line: counter,
+                        value: result1.omit
                     });
                    
                     counter++;
@@ -736,6 +752,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 search.createColumn({
                    name: "custrecord_so_sc_task",
                    join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                   name: "quantityavailable",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "quantityonorder",
+                   join: "CUSTRECORD_PPD_ITEM"
                 })
             ]
         });
@@ -774,6 +798,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var isfirsttime=true;
         var qtytot=0;
         var qtytota=0;
+        var qtytotpo=0;
         var memo="";
         var memoidt="";
         var section;
@@ -822,7 +847,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                     //ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task;
               
-                    
+                    if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
+                    else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
+                    qtybuy=qtytot;
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
 					"section": section,
@@ -840,9 +867,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 					"qty": qtytot,
                     "qtya": qtytota,
                     "qtypo": qtytotpo,
+                    "qtybuy": qtybuy,
+                    "omit": omit,
                     "nobatching": nobatchingt,
                     "leadtime": leadtime,
-                    "total": (qtytot) * price,
+                    "total": (qtybuy) * price,
                     //"total": (qtytot-qtytota) * price,
                     "memo": memo,
                     "customer": memoidt
@@ -867,7 +896,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "taskd": taskd,
                                 "taskds": taskds,
                                 "productionline": productionline,
-                                "total":(qtytot) * price,
+                                "total":(qtybuy) * price,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
@@ -889,7 +918,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "taskd": taskd,
                                 "taskds": taskds,
                                 "productionline": productionline,
-                                "total":Number((qtytot) * price)+qtytrn,
+                                "total":Number((qtybuy) * price)+qtytrn,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
@@ -903,6 +932,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     
                     qtytot=0;
                     qtytota=0;
+                    qtytotpo=0;
                     memo="";
                     procesar="N";
                     if (nobatching)    {ppdpot="V"+preferredvendorid+"C"+memoid+"S"+task;}
@@ -940,11 +970,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
     
     
                 qtytot+=Number(fresult.getValue({name: "custrecord_ppd_quantity"}));
-            
-               // qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
-              //  qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
-                qtytota=0;
-                qtytotpo=0;
+                qtytota=Number(fresult.getValue({name: "quantityavailable",join: "CUSTRECORD_PPD_ITEM"}));
+                qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "CUSTRECORD_PPD_ITEM"}));
+                //qtytota=0;
+                //qtytotpo=0;
                 memo+=fresult.getText({name: "custrecord_ppd_customer"})+"; ";
                 memoid=fresult.getValue({name: "custrecord_ppd_customer"});
 			})
@@ -953,7 +982,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		});
         if (procesar=="Y")
             {  
-                
+                if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
+                    else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
+                qtybuy=qtytot;
                 pagedatas[i] = {
                 "ppdpo": ppdpot,
                 "section": section,
@@ -970,16 +1001,21 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "price": price,
                 "currency": currency,
                 "qty": qtytot,
+                "qtybuy": qtybuy,
+                "omit": omit,
                 "leadtime": leadtime,
                 "qtya": qtytota,
                 "qtypo": qtytotpo,
-                "total": (qtytot) * price,
+                "total": (qtybuy) * price,
                 //"total": (qtytot-qtytota) * price,
                 "memo": memo,
                 "customer": memoidt
                 }
 
                 i++;
+
+                if (omit=="F") 
+                    {
 
                 var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpot);
                     
@@ -991,7 +1027,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "taskd": taskd,
                                 "taskds": taskds,
                                 "productionline": productionline,
-                                "total":(qtytot) * price,
+                                "total":(qtybuy) * price,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
@@ -1013,7 +1049,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "taskd": taskd,
                                 "taskds": taskds,
                                 "productionline": productionline,
-                                "total":Number((qtytot) * price)+qtytrn,
+                                "total":Number((qtybuy) * price)+qtytrn,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
@@ -1023,6 +1059,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 };
                            
                         }
+                    }
             }
             
             summarypos = _.orderBy(summarypos, ["ppdpo"], ["asc"]);

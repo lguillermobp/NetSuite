@@ -6,9 +6,9 @@
  *
  */
 var country;
-define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/record","N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", "/SuiteScripts/Modules/generaltoolsv1.js"],
 
-    function(runtime,email,dialog,message,log, r, GENERALTOOLS) {
+    function(record,runtime,email,dialog,message,log, r, GENERALTOOLS) {
 
         /**
          * Function to be executed after page is initialized.
@@ -45,14 +45,29 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          */
         function fieldChanged(context) {
 
-            if (context.fieldId == 'custbody_saleorder') {
+            var currentRecord = context.currentRecord;
+            var fieldId = context.fieldId;
 
-                var currRec = context.currentRecord;
-                SOID = currRec.getValue({fieldId: "custbody_saleorder"});
-                log.debug("SOID", SOID);
-                var paramso = GENERALTOOLS.get_SO_value(SOID);
-                var itemsook = searchsoitems(paramso.data, currRec);
+            log.debug("fieldId", fieldId);
+
+            if (fieldId === 'custbody_vendorshipmethod') {
+
+
+                var idcarrier= currentRecord.getValue({ fieldId: 'custbody_vendorshipmethod'});
+                
+                var vendorShipMethodRecord = record.load({
+                    type: 'customrecord_vendorshipmethod',
+                    id: idcarrier,  
+                    isDynamic: false
+                });
+
+                var carrierValue = vendorShipMethodRecord.getValue({
+                    fieldId: 'custrecord_vendorshippcarrier'
+                });
+                currentRecord.setValue({ fieldId: 'custbody_vendorcurriership', value: carrierValue});
+                
             }
+
         }
 
         /**
@@ -129,7 +144,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          */
         function validateLine(context) {
 
-
+/*
             if (context.sublistId == "item") {
 
                 var order = context.currentRecord;
@@ -162,6 +177,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
 
             }
+                */
             return true;
         }
 
@@ -196,8 +212,6 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
         }
 
 
-
-
         /**
          * Validation function to be executed when record is saved.
          *
@@ -215,54 +229,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
         }
 
-        function searchsoitems(paramso,context) {
-
-
-            var order = paramso;
-            var rec = context;
-
-            var itemIndex = 0;
-            var itemCount = order.getLineCount({
-                "sublistId": "item"
-            });
-            var today5 = new Date();
-            today5.setDate(today5.getDate() + 5);
-            log.debug("today5", today5);
-
-            while (itemIndex < itemCount) {
-
-
-                var item = order.getSublistValue({
-                    sublistId: 'item',
-                    fieldId: 'item',
-                    "line": itemIndex
-                });
-                var quantity = order.getSublistValue({
-                    sublistId: 'item',
-                    fieldId: 'quantity',
-                    "line": itemIndex
-                });
-                log.debug("item", item);
-                //rec.insertLine({sublistId: "item", line: itemIndex});
-                rec.selectNewLine({sublistId: "item"});
-                rec.setCurrentSublistValue({sublistId: "item", fieldId: "item", value: item});
-                rec.setCurrentSublistValue({sublistId: "item", fieldId: "units", value: "1"});
-                rec.setCurrentSublistValue({sublistId: "item", fieldId: "quantity", value: quantity});
-                rec.setCurrentSublistValue({sublistId: "item", fieldId: "expectedreceiptdate", value: today5});
-
-                try {
-                    rec.commitLine({sublistId: "item", ignoreRecalc: false});
-
-                } catch (e) {
-                    log.error("Not able to save new License Plate - " + e.name, e.message);
-                    return;
-                }
-
-
-                itemIndex++;
-            }
-            return true;
-        }
+   
 
         return {
             pageInit: pageInit,

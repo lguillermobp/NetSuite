@@ -91,6 +91,13 @@
             <td width="17%">${results[0].custrecord_ai_date}</td>
             
             </tr>
+             <tr>
+            <th width="10%" scope="row">Address</th>
+            <td width="61%"><strong>${results[0].address}</strong></td>
+			<th width="12%" scope="row"></th>
+            <td width="17%"></td>
+            
+            </tr>
             <tr>
             <th width="10%" scope="row">Description</th>
             <td width="61%">${results[0].custrecord_ai_description}</td>
@@ -115,7 +122,7 @@
         </macro>
     </macrolist>
   </head>
-  <body header="nlheader" header-height="22%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+  <body header="nlheader" header-height="27%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
     <table>
       <#list results as result>
         <#if result_index == 0>

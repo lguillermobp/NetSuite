@@ -251,7 +251,7 @@ function lookcdq(sc, cd) {
             fieldId: "custrecord_ai",
             value: sc 
         });
-        description = "QUOTE:";
+        description = "UPGRADES:";
         newTaskRecord.setValue({
             fieldId: "custrecord_aid_description",
             value: description 

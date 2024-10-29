@@ -18,7 +18,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var currentRecord = context.currentRecord;
         var fieldId = context.fieldId;
         log.debug("fieldId",fieldId);
-        if (fieldId == "custrecord_so_sc_startdate") {
+        if (fieldId == "custrecord_so_sc_startdate1111") {
             var startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
             var duration = currentRecord.getValue({ fieldId: "custrecord_sc_soduration" });
             log.debug("startdate",startdate);

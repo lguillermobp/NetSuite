@@ -64,6 +64,10 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                         name: "internalid",
                         join: "CUSTRECORD_AI",
                         sort: search.Sort.ASC
+                     }),
+                     search.createColumn({
+                        name: "address",
+                        join: "CUSTRECORD_AI_CUSTOMER"
                      })
                   ]
                     }).run();

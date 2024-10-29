@@ -4,6 +4,7 @@
  * @NModuleScope SameAccount
  */
 var ecddays = [];
+var ecdmonths = [];
 var ecdholydays = [];
 define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
@@ -14,7 +15,6 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         var po = datarec.getValue({
             fieldId: "otherrefnum"
         });
-        log.debug("po",po);
     }
 
     function fieldChanged(context) {
@@ -108,8 +108,13 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                }),
                "custrecord_sc_task",
                "custrecord_sc_days",
+               "custrecord_months",
                "custrecord_duration",
-               "internalid"
+               "internalid",
+               s.createColumn({
+                  name: "custrecord_monthlycal",
+                  join: "CUSTRECORD_SC_PRODUCTIONLINE"
+               })
 
             ]
         });
@@ -118,10 +123,13 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         var m = ('0'+(shipdate.getMonth()+1)).slice(-2)
         var d = ('0'+(shipdate.getDate())).slice(-2)
         datetofind = m + "/" + d + "/" + y;
+        mdatetofind = y + "/" + m;
         
         log.debug("datetofind",datetofind);
         initial = parseInt(ecddays.indexOf(datetofind));
-        final = parseInt(ecddays.indexOf(datetofind));
+        var minitial = GENERALTOOLS.getIndexOfInArray(ecdmonths, mdatetofind);
+        console.log("minitial",minitial);
+        
         log.debug("initial",initial);
 
         var pagedData = fsearch.runPaged({
@@ -137,7 +145,9 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 var task = fresult1.getValue({ name: "custrecord_sc_task" });
                 var taskname = fresult1.getText({ name: "custrecord_sc_task" });
                 var days = (parseInt(fresult1.getValue({ name: "custrecord_sc_days" }))*-1);
+                var months = parseInt(fresult1.getValue({ name: "custrecord_months" }));
                 var duration = parseInt(fresult1.getValue({ name: "custrecord_duration" })); 
+                var monthlycal = fresult1.getValue({ name: "custrecord_monthlycal", join: "CUSTRECORD_SC_PRODUCTIONLINE" });
 
                 log.debug("task",task);
 
@@ -161,11 +171,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 fieldId: "custrecord_so_sc_tasksgroup",
                 value: taskGroup 
             });
-            log.debug("taskGroup",taskGroup);
-            newTaskRecord.setValue({
-                fieldId: "custrecord_soduration",
-                value: duration 
-            });
+            
             newTaskRecord.setValue({
                 fieldId: "custrecord_so_sc_status",
                 value: "5"
@@ -177,17 +183,34 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
             console.log("initial",initial);
             console.log("days",days);
             var noadd="N"
-            if (initial==-1)      {initial=1;days=0;noadd="Y"}
-            else
-            {
-                if (initial<days)      {days=0;noadd="Y"}
+            if (monthlycal==1) 
+                           
+            { 
+                if (minitial==-1)      {minitial=1;months=0;noadd="Y"}
+                else
+                {
+                    if (minitial<months)      {months=0;noadd="Y"}
+                }
+                newstartdate=new Date(ecdmonths[minitial+months].datefirst);
+                newenddate=new Date(ecdmonths[minitial+months].datelast);
+                duration=ecdmonths[minitial+months].days;
             }
-            
+            else 
+            {
+
+                if (initial==-1)      {initial=1;days=0;noadd="Y"}
+                else
+                {
+                    if (initial<days)      {days=0;noadd="Y"}
+                }
+                newstartdate=new Date(ecddays[initial-days-duration+1]);
+                newenddate=new Date(ecddays[initial-days]);
+
+            }
 
             log.debug("initial-days+duration",(initial-days+duration-1));
 
-            newstartdate=new Date(ecddays[initial-days-duration+1]);
-            newenddate=new Date(ecddays[initial-days]);
+            
  
            // var newstartdate=new Date(shipdate);
             //newstartdate.setDate(newstartdate.getDate()-days);
@@ -195,20 +218,17 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
             //var newenddate=new Date(newstartdate);
            // newenddate.setDate(newenddate.getDate()+duration);
 
-           console.log("newstartdate",newstartdate);
-           console.log("newenddate",newenddate);
-
-            log.debug("newstartdate",newstartdate);
-            log.debug("newenddate",newenddate);
-
 
             if (noadd=="N") 
             {
 
                 try{
 
-            
-
+                log.debug("taskGroup",taskGroup);
+                newTaskRecord.setValue({
+                    fieldId: "custrecord_sc_soduration",
+                    value: duration 
+                });
                 newTaskRecord.setValue({
                     fieldId: "custrecord_so_sc_startdate",
                     value: newstartdate 
@@ -240,9 +260,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
             type: "customrecord_so_scheduletasks",
             filters:
             [
-                ["custrecord_salecontract","anyof",sc], 
-                "AND", 
-                ["custrecord_so_sc_productionline","anyof",pl]
+                ["custrecord_salecontract","anyof",sc]
             ],
             columns:
             [
@@ -266,6 +284,10 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                     name: "custrecord_sc_tasksseq",
                     join: "CUSTRECORD_SO_SC_TASK",
                     sort: s.Sort.ASC
+                }),
+                s.createColumn({
+                   name: "custrecord_monthlycal",
+                   join: "CUSTRECORD_SO_SC_PRODUCTIONLINE"
                 })
             ]
                     });
@@ -379,7 +401,6 @@ function lookcd(sc, cd) {
    
 }
 
-
 function lookcdsc(sc, cd) {
     
     var fsearch = s.create({
@@ -459,9 +480,6 @@ function lookcdsc(sc, cd) {
 
 
 }
-
-
-
 
     function pecddays() {
         
@@ -564,12 +582,15 @@ function lookcdsc(sc, cd) {
 
         const td = new Date();
         log.debug("td",td);
+        firstt=true;
+        var t=0;
+        var dur=0;
 
         var newstartdate=new Date(td);
         newstartdate.setDate(td.getDate()-100);
         log.debug("newstartdate",newstartdate);
 
-        for (i=1;i<300;i++)
+        for (i=1;i<400;i++)
         {
             newstartdate.setDate(newstartdate.getDate()+1);
             if (newstartdate.getDay() == 0) {i--;continue;}
@@ -581,9 +602,42 @@ function lookcdsc(sc, cd) {
             datetofind = m + "/" + d + "/" + y;
             initial = parseInt(ecdholydays.indexOf(datetofind));
             if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
+            if (firstt) 
+                {
+                    pyearamonth = y + "/" + m;
+                    firstt=false;
+                    pyearamonthl=datetofind;
+                } 
+            
+            yearamonth = y + "/" + m;
+
             log.debug("datetofind",datetofind)
             ecddays[i]=datetofind;
+
+            if (yearamonth!=pyearamonth)
+                {   
+                    ecdmonths[t]=
+                   {
+                        "month": pyearamonth,
+                        "datefirst": pyearamonthl,
+                        "datelast": pyearamonthf,
+                        "days": dur
+                    } 
+                    
+                    datetofind;
+                    t++;
+                    dur=0;
+                    pyearamonthl=datetofind;
+                    pyearamonth=yearamonth;
+                
+                }
+
+                pyearamonthf=datetofind;
+                dur++;
+
+           
         }
+        console.log("ecdmonths",ecdmonths);
         
        
     }

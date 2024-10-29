@@ -1902,12 +1902,28 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             return newenddate;
         }
 
-
+        function getIndexOfInArray(arrayOfString, valueToIndex) {
+            var index = -1;
+            console.log("arrayOfString",arrayOfString);
+            console.log("valueToIndex",valueToIndex);
+            arrayOfString.filter(
+                function (a, i) {
+                console.log("a",a.month);
+                console.log("i",i);
+                    if (a.month == valueToIndex) index = i;
+                    return a.month == valueToIndex;
+                }
+            )
+            console.log(index);
+            return index;
+            
+        }
 
         return {
             findassembly: findassembly,
             delassembly: delassembly,
             getScheduleParams: getScheduleParams,
+            getIndexOfInArray: getIndexOfInArray,
             get_bom_list: get_bom_list,
             get_kits_list: get_kits_list,
             get_item_value: get_item_value,

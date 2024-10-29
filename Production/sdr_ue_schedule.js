@@ -30,7 +30,7 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
     function afterSubmit(context) {
 
         if(context.type == "edit") {
-            window.close();
+            
         }
         // Your code logic here
     }
