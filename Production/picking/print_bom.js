@@ -16,7 +16,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
      * @returns {{onRequest: onRequest}}
      */
     function (search, file, render, runtime, format, xml,log,  _) {
-        var workOrderLocation;
+        var workOrderLocation; 
         var workOrderLocationID;
         var transferred=[];
         function onRequest(context) {
@@ -176,6 +176,11 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         name: "internalid",
                         join: "item",
                         summary: "GROUP"
+                    }),
+                    search.createColumn({
+                       name: "custitem_binforpicking",
+                       join: "item",
+                       summary: "GROUP"
                     })
                  ]
             }).run().each(function (result) {
@@ -200,6 +205,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 "qtyc":qtytrn,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
+                "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 };
 
                 if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0) {
@@ -308,7 +314,8 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "datecreated": result.getValue({name: "datecreated", join: "inventoryNumber"}),
                         "onhand": Number(result.getValue({name: "onhand"})),
                         "available": lineNumbers[result.getText({name: "item"})].qtyc,
-                        "qtyneeded": lineNumbers[result.getText({name: "item"})].qty - lineNumbers[result.getText({name: "item"})].qtyc,
+                        "qtyneeded": lineNumbers[result.getText({name: "item"})].qty - lineNumbers[result.getText({name: "item"})].qtyc,    
+                        "binforpicking": lineNumbers[result.getText({name: "item"})].binforpicking,
                     });
                    
                 }
@@ -328,8 +335,9 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 inventoryBalanceLines += `<td>${result.item}</td>`
                 inventoryBalanceLines += `<td>${result.itemdesc}</td>`
                 inventoryBalanceLines += `<td>${result.binnumber}</td>`
-                inventoryBalanceLines += `<td>${result.qtyneeded}</td>`
+                inventoryBalanceLines += `<td>${result.qty}</td>`
                 inventoryBalanceLines += `<td>${result.onhand}</td>`
+                inventoryBalanceLines += `<td>${result.binforpicking}</td>`
                 inventoryBalanceLines += "<td></td>";
                 inventoryBalanceLines += "</tr>";
             }

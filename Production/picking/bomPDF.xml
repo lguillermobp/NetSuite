@@ -101,13 +101,14 @@
         <div style = "page-break-after:always;"></div>
         <table style="width: 100%; margin-top: 10px;">
             <tr>
-                <th width="4%">Line</th>
-                <th width="16%">Item</th>
-                <th width="44%">Desc.</th>
+                 <th width="3%">Line</th>
+                <th width="14%">Item</th>
+                <th width="37%">Desc.</th>
                 <th width="12%">Bin</th>
-                <th width="6%">QTY</th>
+                <th width="7%">QTY</th>
                 <th width="7%">On Hand</th>
-                <th width="11%"># Picked</th>
+                <th width="14%">Bin for Picking</th>
+                <th width="6%"># Picked</th>
             </tr>
             [INVENTORY_BALANCE]
         </table>

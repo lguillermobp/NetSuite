@@ -445,8 +445,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 });
 
 
-
-
                 sublistpm.addField({
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
@@ -493,7 +491,20 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     type: serverWidget.FieldType.FLOAT,
                     label:'Qty Bin Location'
                 });
-                
+
+                sublistpm.addField({
+                    id: "custrecordml_binforpicking",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Bin for picking'
+                });
+                /*
+                let sl_bint =sublistpm.addField({
+                    id: "custrecordml_binforpicking",
+                    type: serverWidget.FieldType.SELECT,
+                    label:'Bin for picking',
+                    source: "customlist_binforpicking"
+                });
+                */
                 sublistpm.addField({
                     id: 'custrecordml_selected',
                     label: 'Selected',
@@ -557,7 +568,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.qtyb 
                     });
-
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_binforpicking',
+                        line: counter,
+                        value: result1.binforpicking+" "
+                    });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_selected',
                         line: counter,
@@ -941,6 +956,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 name: "internalid",
                 join: "item",
                 summary: "GROUP"
+            }),
+            search.createColumn({
+               name: "custitem_binforpicking",
+               join: "item",
+               summary: "GROUP"
             })
              ]
         }).run().each(function (result) {
@@ -965,7 +985,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
-                "binnumberd":" "
+                "binnumberd":" ",
+                "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
             };
             if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0) 
@@ -1120,6 +1141,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocationqty": result.binlocationqty,
                 "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
                 "onhand": result.onhand,
+                "binforpicking": lineNumbers[result.item].binforpicking,
                 "memo": "memo"
                 }
 
@@ -1140,6 +1162,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocationqty": result.binlocationqty,
                 "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
                 "onhand": result.onhand,
+                "binforpicking": lineNumbers[result.item].binforpicking,
                 "memo": "memo"
                 }
 

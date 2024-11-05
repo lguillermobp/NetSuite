@@ -1734,7 +1734,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
                 ]
              });
              if (prodline.length>0) {
-                schedulelast.filters.push(s.createFilter({
+                schedulelast.filters.push(s.createFilter({ 
                     name: "custrecord_so_sc_productionline",
                     operator: "anyof",
                     values: prodline
