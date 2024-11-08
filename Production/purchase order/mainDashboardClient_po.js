@@ -17,89 +17,9 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             log.debug("context",context);
 
         }
-        function get_PO_internalID(po) {
-
-            var internalid;
-            var retval = {};
-            log.debug("po",po);
-            var fsearch = s.create({
-                type: "transaction",
-                filters:
-                    [
-                        ["numbertext","is",po],
-                        "AND",
-                        ["type","anyof","PurchOrd","TrnfrOrd"], 
-                        "AND",
-                        ["mainline","is","T"], 
-                        "AND", 
-                        ["status","anyof","PurchOrd:B","PurchOrd:D","PurchOrd:E","TrnfrOrd:F","TrnfrOrd:E"], 
-                        "AND", 
-                        ["type","anyof","PurchOrd","TrnfrOrd"]
-                    ],
-                columns:
-                    [
-                        "mainline",
-                        "tranid",
-                        "internalid"
-                    ]
-            });
-
-            var pagedData = fsearch.runPaged({
-                "pageSize": 1000
-            });
-            log.debug("pagedData",pagedData);
-            pagedData.pageRanges.forEach(function (pageRange) {
-                log.debug("pageRange",pageRange);
-               var page = pagedData.fetch({index: pageRange.index});
-
-               page.data.forEach(function (fresult) {
-                log.debug("fresult",fresult);
-
-                    internalid = fresult.getValue({name: "internalid"});
-                    retval = {
-                       "internalid": internalid
-                    }
-
-                });
-
-            })
-
-            return retval;
-        }
+    
         function saveRecord(context) {
-            var currRec = context.currentRecord;
-
-            var po = currRec.getValue({fieldId: "purchaseorder"});
-
-            var script = 'customscript_dashboard_re';
-            var deployment = 'customdeploy1';
-            var parameters = "";
-
-            var suiteletURL = url.resolveScript({
-                scriptId:script,
-                deploymentId: deployment,
-                returnExternalUrl: false
-            });
-            var retval=get_PO_internalID(po);
-
-            if (retval.internalid) {
-                var idpo=retval.internalid;
-                
-                suiteletURL += "&idpo=" + idpo;
-                log.debug("suiteletURL",suiteletURL);
-
-                window.open(suiteletURL, "_blank");
-                return true;
-            }
-            else {
-                message.create({
-                    title: "Error",
-                    message: "The Purchase Order/Transfer Order does not exist or has already been received. Please check the number and try again",
-                    type: message.Type.ERROR,
-                    duration: 10000
-                }).show();
-                log.debug("Error", "Purchase Order/Transfer Order not found");
-            }      
+           
 
         }
 

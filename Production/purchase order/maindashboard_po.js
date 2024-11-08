@@ -7,16 +7,17 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
     const onRequest = (scriptContext) => {
         if (scriptContext.request.method === 'GET') {
             let form = serverWidget.createForm({
-                title: 'Receiving Dashboard'
+                title: 'PPD Purchase Order'
             });
 
-            form.clientScriptModulePath = '/SuiteScripts/receiving/mainDashboardClient_re.js';
+            form.clientScriptModulePath = '/SuiteScripts/purchase order/mainDashboardClient_po.js';
 
-            let field = form.addField({
-                id: 'purchaseorder',
-                type: serverWidget.FieldType.TEXT,
-                label: 'Purchase Order'
-            });
+            var ppdid = form.addField({
+                id: "custpage_ppdid",
+                type: serverWidget.FieldType.SELECT,
+                label: "PPD ID",
+                source: "customlist_ppdid"
+                });
 
             form.addSubmitButton({
                 label: 'Submit'
@@ -26,8 +27,5 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
         } 
     }
   
-
-
     return {onRequest}
 });
-
