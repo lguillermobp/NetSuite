@@ -63,9 +63,16 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                
                 try {typetransaction = "purchaseorder";
                 paramPO = GENERALTOOLS.get_PO_value(POID);
+                locationso = paramPO.data.getText({fieldId: "location"});
+                locationsoid = paramPO.data.getValue({fieldId: "location"});
+                customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
                 } catch (e) {
                     typetransaction = "transferorder";
                     paramPO = GENERALTOOLS.get_TO_value(POID);
+                    log.audit("paramPO",paramPO);
+                    locationso = paramPO.data.getText({fieldId: "transferlocation"});
+                    locationsoid = paramPO.data.getValue({fieldId: "transferlocation"});
+                    customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
                 }
             
                 entityname= paramPO.data.getValue({fieldId: "entityname"});
@@ -76,10 +83,6 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
     
                 log.audit("Posts", POsts);
                
-                locationso = paramPO.data.getText({fieldId: "location"});
-                locationsoid = paramPO.data.getValue({fieldId: "location"});
-                customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
-
              
                 const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1788&deploy=1&id=${POID}`
                

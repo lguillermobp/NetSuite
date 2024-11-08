@@ -261,6 +261,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'Quantity'
                 });
                 sublistpm.addField({
+                    id: "custrecordml_pounit",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Purchase Unit'
+                });
+                sublistpm.addField({
                     id: "custrecordml_price",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Price Vendor'
@@ -426,6 +431,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_qtypo',
                         line: counter,
                         value: result1.qtypo
+                    });
+                    tpounit=sublistpm.setSublistValue({
+                        id: 'custrecordml_pounit',
+                        line: counter,
+                        value: result1.unitpurchase
+                    });
+                    tpounit.updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.HIDDEN
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
@@ -898,6 +911,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "formulatext",
                 summary: "GROUP",
                 formula: "{custbody_tasksc.custrecord_so_sc_task}"
+             }),
+             search.createColumn({
+                name: "purchaseunit",
+                join: "item",
+                summary: "GROUP"
              })
             ]
         });
@@ -989,6 +1007,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "MAX"}));
                 
                     qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
+                    unitpurchase=fresult.getText({name: "purchaseunit",join: "item",summary: "GROUP"});
                     qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
                     memo=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"});
                     memoid=fresult.getValue({name: "internalid",join: "customerMain",summary: "GROUP"});
@@ -1015,6 +1034,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "qtypo": qtytotpo,
                     "leadtime": leadtime,
                     "total": (qtytot) * price,
+                    "unitpurchase": unitpurchase,
                     //"total": (qtytot-qtytota) * price,
                     "memo": memo,
                     "customer": memoid
@@ -1098,6 +1118,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "qtya": qtytota,
                 "qtypo": qtytotpo,
                 "total": (qtytot) * price,
+                "unitpurchase": unitpurchase,
                 //"total": (qtytot-qtytota) * price,
                 "memo": memo,
                 "customer": memoid
@@ -1224,6 +1245,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "quantityonorder",
                 join: "item",
                 summary: "MAX"
+             }),
+             search.createColumn({
+                name: "purchaseunit",
+                join: "item",
+                summary: "GROUP"
              })
         ]
         });

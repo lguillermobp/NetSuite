@@ -240,6 +240,30 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.INTEGER,
                     label:'Quantity'
                 });
+                tpounit=sublistpm.addField({
+                    id: "custrecordml_pounit",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'unit purchase'
+                });
+                tpounit.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                tbaunit=sublistpm.addField({
+                    id: "custrecordml_baunit",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'unit Base'
+                });
+                tbaunit.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                tunitrate=sublistpm.addField({
+                    id: "custrecordml_unitrate",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'unit Rate'
+                });
+                tunitrate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
                 sublistpm.addField({
                     id: "custrecordml_price",
                     type: serverWidget.FieldType.FLOAT,
@@ -307,7 +331,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 var resultscurr= currencies();
                
-                
 
                 // loop through each line, skipping the header
                 
@@ -413,6 +436,22 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.qty
                     });
                     sublistpm.setSublistValue({
+                        id: 'custrecordml_pounit',
+                        line: counter,
+                        value: result1.unitpurchase+" "
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_baunit',
+                        line: counter,
+                        value: result1.unitbase+" "
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_unitrate',
+                        line: counter,
+                        value: result1.unitrate
+                    });
+                    log.debug("unitrate",result1.unitrate);
+                    sublistpm.setSublistValue({
                         id: 'custrecordml_qtya',
                         line: counter,
                         value: result1.qtya
@@ -481,10 +520,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    
                     counter++;
                 
-                
 				})
 
-                
 
                 //======================================================================================================
 
@@ -698,7 +735,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
     }
 	function findCases1() {
 		var pagedatas=[];
-
+        var resultsunitm= unitm();
 		var fsearch = search.create({
 			type: "customrecord_ppd",
             filters:
@@ -736,6 +773,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "custrecord_ppd_amount",
                 "custrecord_ppd_amountdollar",
                 "custrecord_ppd_date",
+                "custrecord_purchaseunit",
                 "created",
                 "custrecord_ppd_duedate",
                 "custrecord_ppd_id",
@@ -759,6 +797,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }),
                 search.createColumn({
                    name: "quantityonorder",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "purchaseunit",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "unitstype",
                    join: "CUSTRECORD_PPD_ITEM"
                 })
             ]
@@ -850,6 +896,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
                     else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
                     qtybuy=qtytot;
+
+                    unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
 					"section": section,
@@ -860,6 +908,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "productionline": productionline,
                     "preferredvendor": preferredvendort,
                     "preferredvendorid": preferredvendoridt,
+                    "unitpurchase": unitpurchase,
+                    "unitbase": unitbase,
+                    "unitrate": unitrate,
 					"item": item,
                     "itemid": itemid,
 					"price": price,
@@ -965,6 +1016,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 preferredvendorid=fresult.getValue({name: "custrecord_ppd_vendor"});
                 item=fresult.getText({name: "custrecord_ppd_item"});
                 itemid=fresult.getValue({name: "custrecord_ppd_item"});
+                unitpurchase=fresult.getText({name: "purchaseunit",join: "CUSTRECORD_PPD_ITEM"});
+                unitbase=fresult.getText({name: "unitstype",join: "CUSTRECORD_PPD_ITEM"});
                 price=fresult.getValue({name: "custrecord_ppd_price"});
                 currency=fresult.getText({name: "custrecord_ppd_currency"});
     
@@ -985,6 +1038,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
                     else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
                 qtybuy=qtytot;
+
+                unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
                 pagedatas[i] = {
                 "ppdpo": ppdpot,
                 "section": section,
@@ -997,6 +1052,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "preferredvendorid": preferredvendoridt,
                 "nobatching": nobatchingt,
                 "item": item,
+                "unitpurchase": unitpurchase,
+                "unitbase": unitbase,
+                "unitrate": unitrate,
                 "itemid": itemid,
                 "price": price,
                 "currency": currency,
@@ -1106,6 +1164,44 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		});
 
 		return pagedatascurr;
+	}
+
+    function unitm() {
+		var pagedatasunitm=[];
+
+		var fsearch = search.create({
+			type: "unitstype",
+            filters:
+            [
+            ],
+            columns:
+            [
+                "internalid",
+                "baseunit",
+                "name",
+                "conversionrate",
+                "unitname",
+                "pluralname"
+            ]
+                });
+
+		var pagedData = fsearch.runPaged({
+			"pageSize" : 1000
+		});
+
+
+		pagedData.pageRanges.forEach(function (pageRange) {
+
+			var page = pagedData.fetch({index: pageRange.index});
+            
+
+			page.data.forEach(function (fresult) {
+
+                pagedatasunitm[fresult.getValue({name: "name"})+"/"+fresult.getValue({name: "unitname"})] = fresult.getValue({name: "conversionrate"});
+			})
+		});
+
+		return pagedatasunitm;
 	}
 
     return {

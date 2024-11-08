@@ -266,7 +266,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                         });
                         purchaseOrder.setText({
                             fieldId: 'custbody_productionline',
-                            text: productionline // Replace with the internal ID of the vendor
+                            text: productionline.trim() // Replace with the internal ID of the vendor
                         });
                         purchaseOrder.setText({
                             fieldId: 'custbody_task',
@@ -358,7 +358,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     });
                     purchaseOrder.setText({
                         fieldId: 'custbody_productionline',
-                        text: productionline // Replace with the internal ID of the vendor
+                        text: productionline.trim() // Replace with the internal ID of the vendor
                     });
                     purchaseOrder.setValue({
                         fieldId: 'trandate',
@@ -407,6 +407,11 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     fieldId: 'custrecordml_qty',
                     line: i
                 });
+                var unitrate = currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_unitrate',
+                    line: i
+                });
 
                 var price = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
@@ -431,6 +436,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     fieldId: 'item',
                     value: itemid // Replace with the internal ID of the item
                 });
+
+                if (unitrate==0) {unitrate=1;}
+                
+                qty=Math.ceil(qty/unitrate);
 
                 purchaseOrder.setCurrentSublistValue({
                     sublistId: 'item',
@@ -551,7 +560,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 });
                 PPD.setText({
                     fieldId: 'custrecord_ppd_productionline',
-                    text: productionline // Replace with the internal ID of the vendor
+                    text: productionline.trim() // Replace with the internal ID of the vendor
                 });
                 
                 PPD.setValue({

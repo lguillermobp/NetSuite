@@ -203,7 +203,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             
 
                         var purchaseOrder = record.create({
-                            type: record.Type.PURCHASE_ORDER,
+                            type: record.Type.PURCHASE_ORDER, 
                             isDynamic: true
                         });
 
@@ -361,6 +361,11 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     line: i
                 });
 
+                var unitpurchase= currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_pounit',
+                    line: i
+                });
                 var price = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_price',
@@ -390,7 +395,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     fieldId: 'quantity',
                     value: qty // Set the quantity
                 });
-
+                
                 purchaseOrder.setCurrentSublistValue({
                     sublistId: 'item',
                     fieldId: 'rate',
@@ -542,7 +547,11 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     fieldId: 'custrecordml_qty',
                     line: i
                 });
-
+                var unitpurchase= currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_pounit',
+                    line: i
+                });
                 var price = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_price',
@@ -560,6 +569,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 PPD.setValue({
                     fieldId: 'custrecord_ppd_quantity',
                     value: qty // Set the transaction memo
+                });
+                PPD.setValue({
+                    fieldId: 'custrecord_purchaseunit',
+                    value: unitpurchase // Set the transaction memo
                 });
                 PPD.setValue({
                     fieldId: 'custrecord_ppd_price',
