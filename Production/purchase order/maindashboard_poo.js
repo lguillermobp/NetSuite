@@ -7,10 +7,10 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
     const onRequest = (scriptContext) => {
         if (scriptContext.request.method === 'GET') {
             let form = serverWidget.createForm({
-                title: 'PPD Purchase Order'
+                title: 'PPD Purchase Order Generator'
             });
 
-            form.clientScriptModulePath = '/SuiteScripts/purchase order/mainDashboardClient_po.js';
+            form.clientScriptModulePath = '/SuiteScripts/purchase order/mainDashboardClient_poo.js';
 
             var ppdid = form.addField({
                 id: "custpage_ppdid",

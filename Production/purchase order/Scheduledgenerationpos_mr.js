@@ -11,64 +11,81 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
 
         var getInputData = function getInputData(context) {
 
-            var batchcode = runtime.getCurrentScript().getParameter({
-                name: 'custscriptbatchcode'
+            var PPDID = runtime.getCurrentScript().getParameter({
+                name: 'ppdid'
             });
 
             var fsearch = search.create({
                 type: "customrecord_ppd",
                 filters:
                 [
-                   
+                    ["custrecord_ppd_id","anyof",PPDID]
                  ],
                 
                 columns:
                 [
-                    "custrecord_ppd_productionline",
-                    "custrecord_ppd_task",
-                    search.createColumn({
-                        name: "custrecord_so_sc_startdate",
-                        join: "CUSTRECORD_PPD_TASK"
-                    }),
-                    search.createColumn({
-                        name: "custrecord_so_sc_enddate",
-                        join: "CUSTRECORD_PPD_TASK"
-                    }),
-                    "custrecord_ppd_leadtime",
-                    search.createColumn({
-                        name: "custrecord_ppd_vendor",
-                        sort: search.Sort.ASC
-                    }),
-                    search.createColumn({
-                        name: "custrecord_ppd_item",
-                        sort: search.Sort.ASC
-                    }),
-                    search.createColumn({
-                        name: "custrecord_ppd_customer",
-                        sort: search.Sort.ASC
-                    }),
-                    "custrecord_ppd_quantity",
-                    "custrecord_ppd_currency",
-                    "custrecord_ppd_amount",
-                    "custrecord_ppd_amountdollar",
-                    "custrecord_ppd_date",
-                    "created",
-                    "custrecord_ppd_duedate",
-                    "custrecord_ppd_id",
-                    "custrecord_ppd_price",
-                    "custrecord_ppd_status",
-                    search.createColumn({
-                       name: "custentity_noppdbatching",
-                       join: "CUSTRECORD_PPD_VENDOR"
-                    }),
-                    search.createColumn({
-                       name: "internalid",
-                       join: "CUSTRECORD_PPD_TASK"
-                    }),
-                    search.createColumn({
-                       name: "custrecord_so_sc_task",
-                       join: "CUSTRECORD_PPD_TASK"
-                    })
+                   "custrecord_ppd_productionline",
+                "custrecord_ppd_task",
+                search.createColumn({
+                    name: "custrecord_so_sc_startdate",
+                    join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                    name: "custrecord_so_sc_enddate",
+                    join: "CUSTRECORD_PPD_TASK"
+                }),
+                "custrecord_ppd_leadtime",
+                search.createColumn({
+                    name: "custrecord_ppd_vendor",
+                    sort: search.Sort.ASC
+                }),
+                search.createColumn({
+                    name: "custrecord_ppd_item",
+                    sort: search.Sort.ASC
+                }),
+                search.createColumn({
+                    name: "custrecord_ppd_customer",
+                    sort: search.Sort.ASC
+                }),
+                "custrecord_ppd_quantity",
+                "custrecord_ppd_currency",
+                "custrecord_ppd_amount",
+                "custrecord_ppd_amountdollar",
+                "custrecord_ppd_date",
+                "custrecord_purchaseunit",
+                "created",
+                "custrecord_ppd_duedate",
+                "custrecord_ppd_id",
+                "custrecord_ppd_price",
+                "custrecord_ppd_status",
+                search.createColumn({
+                   name: "custentity_noppdbatching",
+                   join: "CUSTRECORD_PPD_VENDOR"
+                }),
+                search.createColumn({
+                   name: "internalid",
+                   join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                   name: "custrecord_so_sc_task",
+                   join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                   name: "quantityavailable",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "quantityonorder",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "purchaseunit",
+                   join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "unitstype",
+                   join: "CUSTRECORD_PPD_ITEM"
+                })
                 ]
             });
           

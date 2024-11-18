@@ -52,13 +52,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     functionName: "refresh("+userObj.id+")"
                 });
 
-               
+                var ppdid = form.addField({
+                    id: "custpage_ppdid",
+                    type: serverWidget.FieldType.SELECT,
+                    label: "PPD ID",
+                    source: "customlist_ppdid"
+                    });
 
-                let datepos = form.addField({
-                    id: "custpage_date",
-                    label: "PO Date",
-                    type: serverWidget.FieldType.DATE,
-                });
+                
                 let memo = form.addField({
                     id: "custpage_memo",
                     label: "MEMO",
@@ -260,10 +261,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.INTEGER,
                     label:'Quantity'
                 });
-                sublistpm.addField({
+                tunitpo=sublistpm.addField({
                     id: "custrecordml_pounit",
                     type: serverWidget.FieldType.TEXT,
                     label:'Purchase Unit'
+                });
+                tunitpo.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
                 sublistpm.addField({
                     id: "custrecordml_price",
@@ -437,9 +441,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.unitpurchase
                     });
-                    tpounit.updateDisplayType({
-                        displayType: serverWidget.FieldDisplayType.HIDDEN
-                    });
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
                         line: counter,

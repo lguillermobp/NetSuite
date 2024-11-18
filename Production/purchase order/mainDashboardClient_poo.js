@@ -17,9 +17,52 @@ define(['N/search',"N/ui/message","N/runtime","N/currentRecord", "N/error", "N/l
             log.debug("context",context);
 
         }
-    
+        function godashboard() {
+            var script = 'customscript_maindashboard';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
+
+            window.open(suiteletURL, "_self");
+
+        }
         function saveRecord(context) {
+            var currRec = context.currentRecord;
+
+            var ppd = currRec.getValue({fieldId: "custpage_ppdid"});
+
+            var script = 'customscript_dashboard_poo';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
            
+
+            if (ppd) { 
+                suiteletURL += "&ppd=" + ppd;
+                log.debug("suiteletURL",suiteletURL);
+
+                window.open(suiteletURL, "_blank");
+                return true;
+            }
+            else {
+                message.create({
+                    title: "Error",
+                    message: "The PPD does not exist. Please check the code and try again",
+                    type: message.Type.ERROR,
+                    duration: 10000
+                }).show();
+                log.debug("Error", "The PPD does not exist. Please check the code and try again");
+            }      
 
         }
 

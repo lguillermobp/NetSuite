@@ -61,11 +61,12 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 form.clientScriptModulePath = '/SuiteScripts/receiving/DashboardClient_re.js';
 
                
-                try {typetransaction = "purchaseorder";
-                paramPO = GENERALTOOLS.get_PO_value(POID);
-                locationso = paramPO.data.getText({fieldId: "location"});
-                locationsoid = paramPO.data.getValue({fieldId: "location"});
-                customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
+                try {
+                    typetransaction = "purchaseorder";
+                    paramPO = GENERALTOOLS.get_PO_value(POID);
+                    locationso = paramPO.data.getText({fieldId: "location"});
+                    locationsoid = paramPO.data.getValue({fieldId: "location"});
+                    customerpo = paramPO.data.getText({fieldId: "custbody_customer"});
                 } catch (e) {
                     typetransaction = "transferorder";
                     paramPO = GENERALTOOLS.get_TO_value(POID);

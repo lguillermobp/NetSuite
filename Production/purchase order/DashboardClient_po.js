@@ -434,7 +434,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 fieldId: "custpage_date"
             });
             var memoh = currentRec.getValue({
-                fieldId: "custpage_memo"
+                fieldId: "custpage_ppdid"
             });
 
             var sublistCount = currentRec.getLineCount({
@@ -442,8 +442,6 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             });
             console.log("Totalrecord: ",sublistCount);
 
-            log.debug("custpageDate",custpageDate);
-            log.debug("sublistCount",sublistCount);
             var totpo = 0;
 
             console.log("Record No: ",sublistCount);

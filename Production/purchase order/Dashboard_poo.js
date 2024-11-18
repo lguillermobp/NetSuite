@@ -22,10 +22,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var sectionsselected;
         var summarypos=[];
         var vendorsid=[];
+        var PPDID;
         function onRequest(context) {
 
             var userObj = runtime.getCurrentUser();
-            var paramemp = GENERALTOOLS.get_employee_value(userObj.id);
+            var paramemp = GENERALTOOLS.get_employee_value(userObj.id); 
             customersselected=paramemp.data.getValue({fieldId: "custentity_customerssalected"});
             sectionsselected=paramemp.data.getValue({fieldId: "custentity_sectionsselected"});
             vendorsselected=paramemp.data.getValue({fieldId: "custentity_vendorsselected"});
@@ -36,6 +37,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		    // autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
 
             if (context.request.method === 'GET') {
+
+                
+                PPDID = context.request.parameters.ppd;
         
                 let form = serverWidget.createForm({
                     title: `Purchase Order Generating Tool`
@@ -54,7 +58,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
 
                
-
+                var ppdid = form.addField({
+                    id: "custpage_ppdid",
+                    type: serverWidget.FieldType.SELECT,
+                    label: "PPD ID",
+                    source: "customlist_ppdid"
+                    });
+                ppdid.defaultValue = PPDID;
+                ppdid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
                 let datepos = form.addField({
                     id: "custpage_date",
                     label: "PO Date",
@@ -740,7 +753,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "customrecord_ppd",
             filters:
             [
-               
+                ["custrecord_ppd_id","anyof",PPDID]
              ],
             
             columns:
