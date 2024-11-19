@@ -35,6 +35,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		    // autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
 
             if (context.request.method === 'GET') {
+
+                PPDID = context.request.parameters.ppd;
         
                 let form = serverWidget.createForm({
                     title: `PPD Generating Tool`
@@ -51,6 +53,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: 'Refresh records',
                     functionName: "refresh("+userObj.id+")"
                 });
+                form.addButton({
+                    id: 'custpage_buttonback', //always prefix with 'custpage_'
+                    label: 'Dashboard', //label of the button
+                    functionName: 'godashboard'
+                });
 
                 var ppdid = form.addField({
                     id: "custpage_ppdid",
@@ -58,7 +65,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: "PPD ID",
                     source: "customlist_ppdid"
                     });
-
+                    ppdid.defaultValue = PPDID;
+                    ppdid.updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.DISABLED
+                    });
                 
                 let memo = form.addField({
                     id: "custpage_memo",
@@ -73,7 +83,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.INLINEHTML,
                 });
                 
-    
     
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',

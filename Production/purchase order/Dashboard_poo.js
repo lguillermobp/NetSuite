@@ -56,7 +56,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: 'Refresh records',
                     functionName: "refresh("+userObj.id+")"
                 });
-
+                form.addButton({
+                    id: 'custpage_buttonback', //always prefix with 'custpage_'
+                    label: 'Dashboard', //label of the button
+                    functionName: 'godashboard'
+                });
                
                 var ppdid = form.addField({
                     id: "custpage_ppdid",
@@ -271,7 +275,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
                 tunitrate=sublistpm.addField({
                     id: "custrecordml_unitrate",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'unit Rate'
                 });
                 tunitrate.updateDisplayType({
@@ -458,12 +462,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.unitbase+" "
                     });
+                    log.debug("unitrate",result1.unitrate);
+                    log.debug("item",result1.item); 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_unitrate',
                         line: counter,
                         value: result1.unitrate
                     });
-                    log.debug("unitrate",result1.unitrate);
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qtya',
                         line: counter,
@@ -911,6 +917,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     qtybuy=qtytot;
 
                     unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
+                    log.debug("unitrate",unitrate);
+                    log.debug("item",item); 
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
 					"section": section,

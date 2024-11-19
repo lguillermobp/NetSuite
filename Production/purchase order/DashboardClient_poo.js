@@ -3,13 +3,13 @@
  * @NApiVersion 2.x
  */
 
-define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message", "/SuiteScripts/Modules/LoDash.js"],
+define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message","N/url", "/SuiteScripts/Modules/LoDash.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (runtime,currentRecord, error,log,record, s,message,  _) {
+    function (runtime,currentRecord, error,log,record, s,message,url,  _) {
 
         var countpos = 0;
         function pageInit(context) {
@@ -59,6 +59,20 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 sublistId: 'custpage_records'
             });
             
+        }
+        function godashboard() {
+            var script = 'customscript_maindash_poo';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
+
+            window.open(suiteletURL, "_self");
+
         }
         function unmarkall() {
             
@@ -712,6 +726,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         }
         return {
             pageInit: pageInit,
+            godashboard: godashboard,
             refresh: refresh,
             onButtonClick: onButtonClick,
             process: process,
