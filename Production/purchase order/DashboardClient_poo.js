@@ -209,12 +209,31 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             var memoh = currentRec.getValue({
                 fieldId: "custpage_memo"
             });
+            var PPDID = currentRec.getValue({
+                fieldId: "custpage_ppdid"
+            });
 
             var sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
             console.log("Totalrecord: ",sublistCount);
-            
+
+
+
+            var script = 'customscript_maindash_poo';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
+
+            suiteletURL += "&ppd=" + PPDID;
+
+            window.open(suiteletURL, "_self");
+
             
             var isfirst= true;
            

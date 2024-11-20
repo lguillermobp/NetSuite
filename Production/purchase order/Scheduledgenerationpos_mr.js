@@ -104,35 +104,32 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
 
         var reduce = function reduce(context) {
 
-            var custpageDate = runtime.getCurrentScript().getParameter({
-                name: 'custscript_custpageDate'
-            });
-            var memoh = runtime.getCurrentScript().getParameter({
-                name: 'custscript_memoh'
-            });
-
             var fresult = JSON.parse(context.values[0]);
 
-            internalid=fresult.values["MAX(formulanumeric)"];
-            expdate=fresult.values["GROUP(custcol_bkms_po_item_exp_ship_date)"];
+            var task=fresult.values["GROUP(trandate)"];
 
+
+            var currentRec = currentRecord.get();
             
-           
-           
+            var custpageDate = currentRec.getValue({
+                fieldId: "custpage_date"
+            });
+            var memoh = currentRec.getValue({
+                fieldId: "custpage_memo"
+            });
 
-            log.debug("custpageDate",custpageDate);
-           
+            var sublistCount = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
+            console.log("Totalrecord: ",sublistCount);
+            
+            
+            var isfirst= true;
+        
             var totpo = 0;
 
             for (var i = 0; i < sublistCount; i++) {
-
-                var omit = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit',
-                    line: i
-                });
-               
-                if (omit) continue;
+                
 
                 if (isfirst) {
                     var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',
@@ -180,7 +177,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                         });
                         purchaseOrder.setText({
                             fieldId: 'custbody_productionline',
-                            text: productionline // Replace with the internal ID of the vendor
+                            text: productionline.trim() // Replace with the internal ID of the vendor
                         });
                         purchaseOrder.setText({
                             fieldId: 'custbody_task',
@@ -272,7 +269,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                     });
                     purchaseOrder.setText({
                         fieldId: 'custbody_productionline',
-                        text: productionline // Replace with the internal ID of the vendor
+                        text: productionline.trim() // Replace with the internal ID of the vendor
                     });
                     purchaseOrder.setValue({
                         fieldId: 'trandate',
@@ -321,6 +318,11 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                     fieldId: 'custrecordml_qty',
                     line: i
                 });
+                var unitrate = currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_unitrate',
+                    line: i
+                });
 
                 var price = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
@@ -346,6 +348,10 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                     value: itemid // Replace with the internal ID of the item
                 });
 
+                if (unitrate==0) {unitrate=1;}
+                
+                qty=Math.ceil(qty/unitrate);
+
                 purchaseOrder.setCurrentSublistValue({
                     sublistId: 'item',
                     fieldId: 'quantity',
@@ -367,12 +373,14 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                 purchaseOrder.commitLine({
                     sublistId: 'item'
                 });
-                console.log("Record No: ",i);
+                console.log("Record No: ",i+" - "+vendorid);
+                
                 
             }
             if (savingpo) {purchaseOrder.save();savingpo=false;totpo++}
 
 
+   
             context.write(context.key, salesOrderData);
         };
 
