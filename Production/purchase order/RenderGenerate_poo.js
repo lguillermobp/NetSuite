@@ -16,21 +16,20 @@ define(["N/search", "N/file", "N/http", "N/xml", "N/error", "N/task"],
     function (search, file, http, xml, error, task) {
         function onRequest(context) {
             if (context.request.method === http.Method.GET) {
-                const LOCATION_ID = base.validateLocationId(context.request.parameters.location);
-                const NUMBER_OF_PRIORITY_ORDERS = Number(context.request.parameters.numberOfPriorityOrders);
-                const STARTING_DOCUMENT_NUMBER = String(context.request.parameters.startingDocumentNumber);
-                const STATUS_PRINTED = context.request.parameters.status_printed === "true";
-                const BATCH_CODE = context.request.parameters.batch_code;
-
-             
+                const PPD_ID = base.validateLocationId(context.request.parameters.ppdid);
+                const DATE_PO = base.validateDate(context.request.parameters.datepo);
+                const MEMO = base.validateMemo(context.request.parameters.memo);
+                const DATAPPD = base.validateData(context.request.parameters.datappd);
                
                     var scriptTask_mr = task.create({taskType: task.TaskType.MAP_REDUCE});
                     // call ScheduledIFPrintCode.js (2085)
-                    scriptTask_mr.scriptId = "customscriptscheduledgenerat_mr";
+                    scriptTask_mr.scriptId = "customscript_schedulegenerate_poo_mr";
                     scriptTask_mr.deploymentId = 'customdeploy1';
                     scriptTask_mr.params = {
-                        custscriptsalesorderdata	: salesOrderData,
-                        custscriptbatchcode: BATCH_CODE
+                        custscript_ppdid: PPD_ID,
+                        custscript_datepo: DATE_PO,
+                        custscript_memo: MEMO,
+                        custscript_data: DATAPPD
                     };
                     var scriptTaskId = scriptTask_mr.submit();
 

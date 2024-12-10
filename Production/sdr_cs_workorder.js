@@ -57,8 +57,11 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
          * @since 2015.2
          */
         function fieldChanged(context) {
-
+            var currentRecord = context.currentRecord;
+            var sublistId = context.sublistId
+            var fieldId = context.fieldId;
             var memo = context.currentRecord.getValue({fieldId: "memo"});
+
 
             if (memo=="commit")
                 {
@@ -72,9 +75,18 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
 
                 }
 
-
                
+        
+                log.debug("fieldId", fieldId);
+        
+                var entityname= currentRecord.getValue({ fieldId: 'entityname'});
+        
+                if (fieldId === 'custbody_scheduletaskid') {
 
+                    
+
+
+                }
 
         }
 

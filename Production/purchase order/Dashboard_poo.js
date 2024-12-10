@@ -112,7 +112,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',
                     type : serverWidget.SublistType.LIST,
-                    label: 'Demand Records',
+                    label: 'PPD List',
         
                 });
                 var resultspt= findCases1();
@@ -153,10 +153,23 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'PPDPO'
                 });
-
                 ppdpod.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
+                var wppdpons = sublistpm.addField({
+                    id: "custrecordml_ppdpons",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'PPDPONS'
+                });
+                wppdpons.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var ppdpodn = sublistpm.addField({
+                    id: "custrecordml_ppdpon",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'PPDPO'
+                });
+
                 sublistpm.addField({
                     id: "custrecordml_productionline",
                     type: serverWidget.FieldType.TEXT,
@@ -174,6 +187,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: "custrecordml_task",
                     type: serverWidget.FieldType.TEXT,
                     label:'Task Schedule'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_podate",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Date Earlier'
                 });
                 sublistpm.addField({
                     id: "custrecordml_taskds",
@@ -319,6 +337,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Project'
                 });
+                sublistpm.addField({
+                    id: "custrecordml_poid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'PO NetSuite'
+                });
                 var customerid = sublistpm.addField({
                     id: "custrecordml_customer",
                     type: serverWidget.FieldType.INTEGER,
@@ -352,6 +375,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 // loop through each line, skipping the header
                 
                 var counter = 0;
+                log.debug("summarypos",summarypos);
                 resultspt.forEach(function(result1) {
 
                     
@@ -368,12 +392,23 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.ppdpo
                         
                     });
-
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_ppdpons',
+                        line: counter,
+                        value: result1.ppdpon
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_ppdpon',
+                        line: counter,
+                        value: result1.ppdpon
+                        
+                    });
                     
                     sublistpm.setSublistValue({
                         id: 'custrecordml_leadtime',
                         line: counter,
-                        value: leadtime
+                        value: result1.leadtime+0
                         
                     });
                     sublistpm.setSublistValue({
@@ -405,6 +440,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.taskds
                         
+                    });
+                    
+                    var index = summarypos.map(function (img) { return img.ppdpons; }).indexOf(result1.ppdpons);
+                    if (index==-1) {wpodate=" ";}
+                    else {wpodate=summarypos[index].podate;}
+                    
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_podate',
+                        line: counter,
+                        value: wpodate
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_taskde',
@@ -462,8 +507,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.unitbase+" "
                     });
-                    log.debug("unitrate",result1.unitrate);
-                    log.debug("item",result1.item); 
+ 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_unitrate',
                         line: counter,
@@ -532,6 +576,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.memo.substring(0, 298)
                     });
                     sublistpm.setSublistValue({
+                        id: 'custrecordml_poid',
+                        line: counter,
+                        value: result1.poid+" "
+                    });
+                    sublistpm.setSublistValue({
                         id: 'custrecordml_omit',
                         line: counter,
                         value: result1.omit
@@ -554,13 +603,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         type: serverWidget.FieldType.TEXT,
                         label:'Production Line'
                     });
-                    var ppdpod = sublistppd.addField({
-                        id: "custrecordml_ppdpo",
+                    var wppdpons=sublistppd.addField({
+                        id: "custrecordml_ppdpons",
                         type: serverWidget.FieldType.TEXT,
-                        label:'PPDPO'
+                        label:'PPDPONS'
                     });
-    
-                    ppdpod.updateDisplayType({
+                    wppdpons.updateDisplayType({
                         displayType: serverWidget.FieldDisplayType.HIDDEN
                     });
                     
@@ -576,6 +624,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: "custrecordml_taskd",
                         type: serverWidget.FieldType.TEXT,
                         label:'task'
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_podate",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'Date Earlier'
                     });
                     sublistppd.addField({
                         id: "custrecordml_taskds",
@@ -627,10 +680,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         type: serverWidget.FieldType.FLOAT,
                         label:'Total USD'
                     });
-                    sublistppd.addField({
+                    var memoww=sublistppd.addField({
                         id: "custrecordml_memo",
                         type: serverWidget.FieldType.TEXT,
                         label:'Project'
+                    });
+                    memoww.updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.HIDDEN
+                    });
+                    sublistppd.addField({
+                        id: "custrecordml_poid",
+                        type: serverWidget.FieldType.TEXT,
+                        label:'PO NetSuite'
                     });
                     
                     sublistppd.addField({
@@ -648,9 +709,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
     
                         
                         sublistppd.setSublistValue({
-                            id: 'custrecordml_ppdpo',
+                            id: 'custrecordml_ppdpons',
                             line: counter,
-                            value: result1.ppdpo
+                            value: result1.ppdpon
                             
                         });
                         sublistppd.setSublistValue({
@@ -662,6 +723,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                             id: 'custrecordml_taskds',
                             line: counter,
                             value: result1.taskds
+                            
+                        });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_podate',
+                            line: counter,
+                            value: result1.podate
                             
                         });
                         sublistppd.setSublistValue({
@@ -681,7 +748,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         sublistppd.setSublistValue({
                         id: 'custrecordml_leadtime',
                         line: counter,
-                        value: leadtime
+                        value: result1.leadtime+0
                         
                     });
                         sublistppd.setSublistValue({
@@ -734,6 +801,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                             line: counter,
                             value: result1.memo.substring(0, 298)
                         });
+                        sublistppd.setSublistValue({
+                            id: 'custrecordml_poid',
+                            line: counter,
+                            value: result1.poid+" "
+                        });    
                        
                         counter++;
                     
@@ -759,6 +831,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			type: "customrecord_ppd",
             filters:
             [
+                ["custrecord_ppd_code.custrecord_poid","anyof","@NONE@"], 
+                "AND", 
                 ["custrecord_ppd_id","anyof",PPDID]
              ],
             
@@ -794,6 +868,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "custrecord_ppd_date",
                 "custrecord_purchaseunit",
                 "created",
+                "custrecord_ppd_code",
                 "custrecord_ppd_duedate",
                 "custrecord_ppd_id",
                 "custrecord_ppd_price",
@@ -825,6 +900,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 search.createColumn({
                    name: "unitstype",
                    join: "CUSTRECORD_PPD_ITEM"
+                }),
+                search.createColumn({
+                   name: "custrecord_poid",
+                   join: "CUSTRECORD_PPD_CODE"
                 })
             ]
         });
@@ -870,6 +949,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var i=0;
         var h=0;
         var procesar;
+        var omit="F";
 
 		pagedData.pageRanges.forEach(function (pageRange) {
            
@@ -882,6 +962,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 nobatching=fresult.getValue({name: "custentity_noppdbatching",join: "CUSTRECORD_PPD_VENDOR"});
                 preferredvendorid=fresult.getValue({name: "custrecord_ppd_vendor"});
                 memoid=fresult.getValue({name: "custrecord_ppd_customer"});
+                ppdpo=fresult.getValue({name: "custrecord_ppd_code"});
+                ppdpon=fresult.getText({name: "custrecord_ppd_code"});
+                var position = ppdpon.search("S");
+                ppdpons = ppdpon.substring(0, position);
+                poid=fresult.getText({name: "custrecord_poid",join: "CUSTRECORD_PPD_CODE"});
                 if (fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"})) {task=fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"});}
                 else {task=" ";}
 
@@ -890,8 +975,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if (isfirsttime) 
                     {
                         prod=fresult.getText({name: "custrecord_ppd_item"});
-                        if (nobatching)    {ppdpot="V"+preferredvendorid+"C"+memoid+"S"+task;}
-                        else               {ppdpot="V"+preferredvendorid;}
+                        ppdpot=ppdpo;
+                        ppdpont=ppdpon;
+                        ppdponst=ppdpons;
                         memoidt=fresult.getValue({name: "custrecord_ppd_customer"});
                         preferredvendoridt=fresult.getValue({name: "custrecord_ppd_vendor"});
                         preferredvendort=fresult.getText({name: "custrecord_ppd_vendor"});
@@ -900,9 +986,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         isfirsttime=false;
                     }
                
-                    if (nobatching)    {ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task;}
-                    else               {ppdpo="V"+preferredvendorid;}
-
+                    
 
                     if (ppdpot!=ppdpo || prod!=fresult.getText({name: "custrecord_ppd_item"}))
                 {  
@@ -912,16 +996,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                     //ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task;
               
-                    if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
-                    else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
+                    if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;}
+                    else {qtybuy=(qtytot-qtytota-qtytotpo);}
                     qtybuy=qtytot;
 
                     unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
-                    log.debug("unitrate",unitrate);
-                    log.debug("item",item); 
+                    
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
+                    "ppdpon": ppdpont,
 					"section": section,
+                    "ppdpons": ppdponst,
+                    "poid": poid,
                     "task": task,
                     "taskd": taskd,
                     "taskds": taskds,
@@ -956,24 +1042,27 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                     vendorsid[preferredvendorid]=preferredvendort;
                     var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpot);
-                    log.debug("index",index);
-                    log.debug("ppdpot",ppdpot);
-                    log.debug("qtytot",(qtytot) * price);
-                   
+                    
+
                     if (index==-1)
                         {
                             summarypos[h] ={
                                 "ppdpo": ppdpot,
+                                "ppdpon": ppdpont,
+                                "ppdpons": ppdponst,
+                                "poid": poid,
                                 "task": task,
                                 "taskd": taskd,
+                                "podate": taskds,
                                 "taskds": taskds,
                                 "productionline": productionline,
                                 "total":(qtybuy) * price,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
+                                "leadtime": leadtime,
                                 "currency": currency,
-                                "memo": memo,
+                                "memo": memo+"; ",
                                 "customer": memoidt
                                 };
                             
@@ -982,20 +1071,30 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else 
                         {
                             qtytrn=summarypos[index].total
-                            
+                            var podate;
+                            podate1=new Date(summarypos[index].podate);
+                            taskdate1=new Date(taskds);
+                            if (podate1>taskdate1) {podate=taskds;}
+                            else {podate=summarypos[index].podate;}
+                            wmemo=summarypos[index].memo+"; " + memo;
                             summarypos[index] = {
                                 
                                 "ppdpo": ppdpot,
+                                "ppdpon": ppdpont,
+                                "poid": poid,
+                                "ppdpons": ppdponst,
                                 "task": task,
                                 "taskd": taskd,
                                 "taskds": taskds,
+                                "podate": podate,
                                 "productionline": productionline,
                                 "total":Number((qtybuy) * price)+qtytrn,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
+                                "leadtime": leadtime,
                                 "currency": currency,
-                                "memo": memo,
+                                "memo": wmemo,
                                 "customer": memoidt
                                 };
                            
@@ -1007,8 +1106,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     qtytotpo=0;
                     memo="";
                     procesar="N";
-                    if (nobatching)    {ppdpot="V"+preferredvendorid+"C"+memoid+"S"+task;}
-                    else               {ppdpot="V"+preferredvendorid;}
+                    ppdpot=ppdpo;
+                    ppdpont=ppdpon;
+                    ppdponst=ppdpons;
                     prod=fresult.getText({name: "custrecord_ppd_item"});
                     memoidt=fresult.getValue({name: "custrecord_ppd_customer"});
                     preferredvendoridt=fresult.getValue({name: "custrecord_ppd_vendor"});
@@ -1056,13 +1156,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 		});
         if (procesar=="Y")
             {  
-                if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;omit="T";}
-                    else {qtybuy=(qtytot-qtytota-qtytotpo);omit="F";}
+                if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;}
+                    else {qtybuy=(qtytot-qtytota-qtytotpo);}
                 qtybuy=qtytot;
 
                 unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
                 pagedatas[i] = {
                 "ppdpo": ppdpot,
+                "ppdpon": ppdpont,
+                "ppdpons": ppdponst,
+                "poid": poid,
                 "section": section,
                 "task": task,
                 "taskd": taskd,
@@ -1093,8 +1196,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 i++;
 
-                if (omit=="F") 
-                    {
+               
 
                 var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpot);
                     
@@ -1102,16 +1204,21 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         {
                             summarypos[h] ={
                                 "ppdpo": ppdpot,
+                                "ppdpon": ppdpont,
+                                "ppdpons": ppdponst,
+                                "poid": poid,
                                 "task": task,
                                 "taskd": taskd,
                                 "taskds": taskds,
+                                "podate": taskds,
                                 "productionline": productionline,
                                 "total":(qtybuy) * price,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
+                                "leadtime": leadtime,
                                 "currency": currency,
-                                "memo": memo,
+                                "memo": memo+"; ",
                                 "customer": memoidt
                                 };
                             
@@ -1120,25 +1227,34 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else 
                         {
                             qtytrn=summarypos[index].total
-                            
+                            podate1=new Date(summarypos[index].podate);
+                            taskdate1=new Date(taskds);
+                            if (podate1>taskdate1) {podate=taskds;}
+                            else {podate=summarypos[index].podate;}
+                            wmemo=summarypos[index].memo+"; " + memo;
                             summarypos[index] = {
                                 
                                 "ppdpo": ppdpot,
+                                "ppdpon": ppdpont,
+                                "ppdpons": ppdponst,
+                                "poid": poid,
                                 "task": task,
                                 "taskd": taskd,
                                 "taskds": taskds,
+                                "podate": podate,
                                 "productionline": productionline,
                                 "total":Number((qtybuy) * price)+qtytrn,
                                 "preferredvendor": preferredvendort,
                                 "preferredvendorid": preferredvendoridt,
                                 "nobatching": nobatchingt,
+                                "leadtime": leadtime,
                                 "currency": currency,
-                                "memo": memo,
+                                "memo": wmemo,
                                 "customer": memoidt
                                 };
                            
                         }
-                    }
+                   
             }
             
             summarypos = _.orderBy(summarypos, ["ppdpo"], ["asc"]);

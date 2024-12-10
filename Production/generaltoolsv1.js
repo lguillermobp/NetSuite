@@ -1919,6 +1919,37 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             
         }
 
+        function get_PPDID (value){
+
+
+            var paramrec = r.load({
+                type: "customlist_ppdid",
+                id: value,
+                isDynamic: false,
+                defaultValues: null
+            });
+    
+    
+            if (paramrec)
+            {   var sts="Complated";
+                var records=1;
+            }
+            else
+            {
+                var sts="Error";
+                var records=0;
+            }
+            var retvar= {};
+    
+            retvar = {
+                "sts": sts,
+                "date": "",
+                "records": records,
+                "data": paramrec
+            }
+            return retvar;
+        }
+
         return {
             findassembly: findassembly,
             delassembly: delassembly,
@@ -1945,6 +1976,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             get_items_components: get_items_components,
             get_item_informations: get_item_informations,
             get_items_listInventory: get_items_listInventory,
+            get_PPDID: get_PPDID,
             calcenddate: calcenddate
         };
 

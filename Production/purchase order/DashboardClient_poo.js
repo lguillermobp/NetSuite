@@ -125,9 +125,12 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 {
                     if (context.fieldId == 'custrecordml_omit')
                         {
-                            ppdpo=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_ppdpo'});
+                           
+                            ppdpow= currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_ppdpons'});
                             omitppd=currentRecord.getCurrentSublistValue({sublistId: 'custpageppd_records',fieldId: 'custrecordml_omit'});
-                            
+                            log.debug("ppdpow",ppdpow);
+                            console.log("ppdpow: ",ppdpow);
+                            console.log("omitppd: ",omitppd);
                             var count = currentRecord.getLineCount({
                                 sublistId: 'custpage_records'
                             });
@@ -142,14 +145,16 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
     
                                 ppdporec=currentRecord.getCurrentSublistValue({
                                     sublistId: 'custpage_records',
-                                    fieldId: 'custrecordml_ppdpo'
+                                    fieldId: 'custrecordml_ppdpons'
                                 });
+                                log.debug("ppdporec",ppdporec);
+                                console.log("ppdporec: ",ppdporec);
                                 selecf=currentRecord.getCurrentSublistValue({
                                     sublistId: 'custpage_records',
                                     fieldId: 'custrecordml_omit'
                                 });
     
-                                if (ppdporec!=ppdpo) continue;
+                                if (ppdporec!=ppdpow) continue;
                                 
                                 currentRecord.setCurrentSublistValue({
                                     sublistId: 'custpage_records',
@@ -218,7 +223,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             });
             console.log("Totalrecord: ",sublistCount);
 
-
+/*
 
             var script = 'customscript_maindash_poo';
             var deployment = 'customdeploy1';
@@ -233,7 +238,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             suiteletURL += "&ppd=" + PPDID;
 
             window.open(suiteletURL, "_self");
-
+*/
             
             var isfirst= true;
            
@@ -262,25 +267,36 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     line: i });
                     var ppdpot = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpo',
                     line: i });
+                    var ppdponst = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpons',
+                        line: i });
                     var customerid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_customer',
                     line: i });
                     var vendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',
                     line: i });
                     var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',
                     line: i });
+                    var podate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_podate',
+                    line: i });
                     var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',
                     line: i });
-                    var newpotdate=new Date(taskds);
-                    var newpotdatedue=new Date(taskds);
-                    newpotdate.setDate(newpotdate.getDate()-leadtime);
+                    var newpotdate=new Date(podate);
                     
+                    var newpotdatedue=new Date(podate);
+                    //newpotdate.setDate(newpotdate.getDate()-leadtime);
+                    newpotdate= addDays(newpotdate, -leadtime);
+                    
+                    var isrunninglate= false;
                     if (new Date(newpotdate)<new Date(custpageDate)) 
-                        {newpotdate=new Date(custpageDate);}
+                        {newpotdate=new Date(custpageDate);
+                        isrunninglate=true;
+                        }
+                   
+                    trndate=newpotdate;
+                    newpotdatedue = newpotdate;
                     
+                    //newpotdatedue.setDate(newpotdatedue.getDate()+leadtime);
+                    newpotdatedue= addDays(newpotdatedue, +leadtime);
                     
-                    newpotdatedue.setDate(newpotdate.getDate()+leadtime);
-                    
-            
 
                         var purchaseOrder = record.create({
                             type: record.Type.PURCHASE_ORDER,
@@ -301,13 +317,19 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                             fieldId: 'custbody_productionline',
                             text: productionline.trim() // Replace with the internal ID of the vendor
                         });
+                        
+                        purchaseOrder.setValue({
+                            fieldId: 'custbody_ppdcode',
+                            value: ppdpot.trim() // Replace with the internal ID of the vendor
+                        });
+                        
                         purchaseOrder.setText({
                             fieldId: 'custbody_task',
                             text: taskd // Replace with the internal ID of the vendor
                         });
                         purchaseOrder.setValue({
                             fieldId: 'trandate',
-                            value: new Date(newpotdate) // Set the transaction date
+                            value: new Date(trndate) // Set the transaction date
                         });
                         purchaseOrder.setValue({
                             fieldId: 'duedate',
@@ -322,6 +344,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                             value: "4" // Set the transaction memo
                         });
                         purchaseOrder.setValue({
+                            fieldId: 'custbody_runninglate',
+                            value: isrunninglate 
+                        });
+                        purchaseOrder.setValue({
                             fieldId: 'custbody_customer',
                             value: customerid // Set the transaction memo
                         });
@@ -332,17 +358,36 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     
                     }
 
+                var ppdpons = currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_ppdpons',
+                    line: i
+                });
                 var ppdpo = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_ppdpo',
                     line: i
                 });
+                
                
 
                 if (ppdpot!=ppdpo)
                 {
 
-                    if (savingpo) {purchaseOrder.save();savingpo=false;totpo++}
+                    if (savingpo) {
+                        var idpo = purchaseOrder.save();
+                        record.submitFields({
+                            type: "customrecord_ppd_po",
+                            id: ppdpot.trim(),
+                            values: {
+                                "custrecord_poid": idpo
+                            }
+                        })
+                       
+
+
+                        savingpo=false;
+                        totpo++}
                     ppdpot = ppdpo;
 
                     var purchaseOrder = record.create({
@@ -361,16 +406,27 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     line: i });
                     var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',
                     line: i });
+                    var podate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_podate',
+                    line: i });
                     var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',
                     line: i });
-                    var newpotdate=new Date(taskds);
-                    var newpotdatedue=new Date(taskds);
-                    newpotdate.setDate(newpotdate.getDate()-leadtime);
-
-                    if (new Date(newpotdate)<new Date(custpageDate)) 
-                        {newpotdate=new Date(custpageDate);}
+                    var newpotdate=new Date(podate);
                     
-                    newpotdatedue.setDate(newpotdate.getDate()+leadtime);
+                    var newpotdatedue=new Date(podate);
+                    //newpotdate.setDate(newpotdate.getDate()-leadtime);
+                    newpotdate= addDays(newpotdate, -leadtime);
+                    
+                    var isrunninglate= false;
+                    if (new Date(newpotdate)<new Date(custpageDate)) 
+                        {newpotdate=new Date(custpageDate);
+                        isrunninglate=true;
+                        }
+                    
+                    trndate=newpotdate;
+                    newpotdatedue = newpotdate;
+                   
+                    //newpotdatedue.setDate(newpotdatedue.getDate()+leadtime);
+                    newpotdatedue= addDays(newpotdatedue, +leadtime);
                     
 
                     // Set field values
@@ -395,12 +451,17 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     });
                     purchaseOrder.setValue({
                         fieldId: 'trandate',
-                        value: new Date(newpotdate) // Set the transaction date
+                        value: new Date(trndate) // Set the transaction date
                     });
                     purchaseOrder.setValue({
                         fieldId: 'duedate',
                         value: new Date(newpotdatedue) // Set the transaction date
                     });
+                    
+                     purchaseOrder.setValue({
+                         fieldId: 'custbody_ppdcode',
+                         value: ppdpot.trim() // Replace with the internal ID of the vendor
+                     });
                     purchaseOrder.setValue({
                         fieldId: 'memo',
                         value: memoh // Set the transaction memo
@@ -408,6 +469,10 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     purchaseOrder.setValue({
                         fieldId: 'custbody_typepo',
                         value: "4" // Set the transaction memo
+                    });
+                    purchaseOrder.setValue({
+                        fieldId: 'custbody_runninglate',
+                        value: isrunninglate 
                     });
                     purchaseOrder.setValue({
                         fieldId: 'custbody_customer',
@@ -492,14 +557,40 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                     value: memo 
                 });
 
+                purchaseOrder.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'expectedreceiptdate',
+                    value:  new Date(newpotdatedue) 
+                });
+
+                purchaseOrder.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'custcol_atlas_promise_date',
+                    value:  new Date(newpotdatedue) 
+                });
                 purchaseOrder.commitLine({
                     sublistId: 'item'
                 });
-                console.log("Record No: ",i+" - "+vendorid);
+                console.log("Record No: ",i+" - "+sublistCount);
                 
                 
             }
-            if (savingpo) {purchaseOrder.save();savingpo=false;totpo++}
+
+            
+            if (savingpo) {
+                    var idpo=purchaseOrder.save();
+                    record.submitFields({
+                        type: "customrecord_ppd_po",
+                        id: ppdpot.trim(),
+                        values: {
+                            "custrecord_poid": idpo
+                        }
+                    })
+                   
+
+
+                    savingpo=false;
+                    totpo++}
 
             message.create({
                 title: "Process Completed",
@@ -510,8 +601,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             return true;
         }
 
-
-        function processppd() {
+        function process1() {
 
             var currentRec = currentRecord.get();
             
@@ -521,158 +611,52 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             var memoh = currentRec.getValue({
                 fieldId: "custpage_memo"
             });
+            var PPDID = currentRec.getValue({
+                fieldId: "custpage_ppdid"
+            });
 
             var sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
             console.log("Totalrecord: ",sublistCount);
 
+
+            var isfirst= true;
+           
+
             log.debug("custpageDate",custpageDate);
             log.debug("sublistCount",sublistCount);
             var totpo = 0;
 
-            console.log("Record No: ",sublistCount);
-
             for (var i = 0; i < sublistCount; i++) {
-
+                
                 var omit = currentRec.getSublistValue({
                     sublistId: 'custpage_records',
                     fieldId: 'custrecordml_omit',
                     line: i
                 });
-               
-                if (omit) continue;
-
-                var ppdpo = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_ppdpo',
-                    line: i
-                });
-               
-
-                var PPD = record.create({
-                    type: "customrecord_ppd",
-                    isDynamic: false
-                });
-
-                var currency = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_icurrency',  line: i });
-                var amountdol = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_totalusd',  line: i });
-                var amount = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_total',  line: i });
-                var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',
-                line: i });
-                var taskd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_task',
-                line: i });
-                var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',
-                line: i });
-                var customerid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_customer',
-                line: i });
-                var vendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',
-                line: i });
-                var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',
-                line: i });
-                var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',
-                line: i });
-                var newpotdate=new Date(taskds);
-                var newpotdatedue=new Date(taskds);
-                newpotdate.setDate(newpotdate.getDate()-leadtime);
-
-                if (new Date(newpotdate)<new Date(custpageDate)) 
-                    {newpotdate=new Date(custpageDate);}
-                
-                newpotdatedue.setDate(newpotdate.getDate()+leadtime);
-                    
-
-                // Set field values
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_vendor',
-                    value: vendorid // Replace with the internal ID of the vendor
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_task',
-                    value: task // Replace with the internal ID of the vendor
-                });
-                PPD.setText({
-                    fieldId: 'custrecord_ppd_productionline',
-                    text: productionline.trim() // Replace with the internal ID of the vendor
-                });
-                
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_date',
-                    value: new Date(newpotdate) // Set the transaction date
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_duedate',
-                    value: new Date(newpotdatedue) // Set the transaction date
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_id',
-                    value: memoh // Set the transaction memo
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_leadtime',
-                    value: leadtime // Set the transaction memo
-                });
-                PPD.setValue({
-                    fieldId: 'custbody_typepo',
-                    value: "4" // Set the transaction memo
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_customer',
-                    value: customerid // Set the transaction memo
-                });
-
-
-                var itemid = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_itemid',
-                    line: i
-                });
-                var qty = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_qty',
-                    line: i
-                });
-
-                var price = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_price',
-                    line: i
-                });
-
-
-                 // Add line items
-
-                 PPD.setValue({
-                    fieldId: 'custrecord_ppd_item',
-                    value: itemid // Set the transaction memo
-                });
-
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_quantity',
-                    value: qty // Set the transaction memo
-                });
-                PPD.setValue({
-                    fieldId: 'custrecord_ppd_price',
-                    value: price // Set the transaction memo
-                });
-                PPD.setValue({  fieldId: 'custrecord_ppd_currency', value: currency });
-                PPD.setValue({  fieldId: 'custrecord_ppd_amountdollar', value: amountdol });
-                PPD.setValue({  fieldId: 'custrecord_ppd_amount', value: amount });
-                
-                PPD.save();
-                console.log("i: ",i);
-                totpo++
             }
-            
 
-            message.create({
-                title: "Process Completed",
-                message: "Have been created " + totpo + " Purchase Orders",
-                type: message.Type.CONFIRMATION,
-                duration: 10000
-            }).show();
-            return true;
+
+            /*
+
+            var script = 'customscript_maindash_poo';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
+
+            suiteletURL += "&ppd=" + PPDID;
+
+            window.open(suiteletURL, "_self");
+*/
+            
         }
+  
         function download(filename, text) {
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -743,13 +727,18 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
     
     
         }
+        function addDays  (date, days)  {
+             newDate = new Date(date);
+            newDate.setDate(newDate.getDate() + days);
+            return newDate;
+          };
         return {
             pageInit: pageInit,
             godashboard: godashboard,
             refresh: refresh,
+            addDays: addDays,
             onButtonClick: onButtonClick,
             process: process,
-            processppd: processppd,
             fieldChanged: fieldChanged,
             markall: markall,
             unmarkall: unmarkall
