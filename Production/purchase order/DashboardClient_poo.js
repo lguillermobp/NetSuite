@@ -195,12 +195,8 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
     
                         }
     
-                    
-                    
-                        
                     }
-          
-             
+                   
           }
   
       
@@ -618,27 +614,12 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             var sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
+            var sublistCount = currentRec.getLineCount({
+                sublistId: 'custpage_records'
+            });
             console.log("Totalrecord: ",sublistCount);
 
-
-            var isfirst= true;
-           
-
-            log.debug("custpageDate",custpageDate);
-            log.debug("sublistCount",sublistCount);
-            var totpo = 0;
-
-            for (var i = 0; i < sublistCount; i++) {
-                
-                var omit = currentRec.getSublistValue({
-                    sublistId: 'custpage_records',
-                    fieldId: 'custrecordml_omit',
-                    line: i
-                });
-            }
-
-
-            /*
+/*
 
             var script = 'customscript_maindash_poo';
             var deployment = 'customdeploy1';
@@ -654,6 +635,100 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
 
             window.open(suiteletURL, "_self");
 */
+            
+            var isfirst= true;
+           
+
+            log.debug("custpageDate",custpageDate);
+            log.debug("sublistCount",sublistCount);
+            var totpo = 0;
+
+            for (var i = 0; i < sublistCount; i++) {
+                
+                var omit = currentRec.getSublistValue({
+                    sublistId: 'custpage_records',
+                    fieldId: 'custrecordml_omit',
+                    line: i
+                });
+               
+                if (omit) continue;
+
+                    var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid', line: i });
+                    var taskd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_task',line: i });
+                    var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',line: i });
+                    var customerid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_customer',line: i });
+                    var vendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',line: i });
+                    var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',line: i });
+                    var podate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_podate',line: i });
+                    var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',line: i });
+
+                    arraylist[i] = {
+                        "custrecord_ppd_id": ppdid,
+                        "custrecord_ppd_code": ppdcode,
+                        "custrecord_ppd_duedate": newpotdatedue,
+                        "custrecord_ppd_date": newpotdate,
+                        "custrecord_ppd_vendor": vendorid,
+                        "custrecord_ppd_customer": customerid,
+                        "custrecord_ppd_productionline": productionline,
+                        "custrecord_ppd_task": task,
+                        "custrecord_ppd_currency": currency,
+                        "custrecord_ppd_currencyrate": currencyrate,
+                        "custrecord_ppd_leadtime": leadtime,
+                        "custrecord_ppd_amount": amount,
+                        "custrecord_ppd_amountdollar": amountdol,
+                        "custrecord_ppd_status": " ",
+                        "custrecord_ppd_item": itemid,
+                        "custrecord_ppd_quantity": qty,
+                        "custrecord_ppd_price": price,
+                        "custrecord_purchaseunit": unitpurchase,
+                        "custrecord_unitbase": unitbase,
+                        "custrecord_unitrate": unitrate
+                    }
+                    
+                    console.log("i: ",i);
+
+            }
+
+           
+            var script = 'customscriptrendergenerate_poo';
+            var deployment = 'customdeploy1';
+            var parameters = "";
+
+            var scheme = 'https://';
+            var host = url.resolveDomain({
+                hostType: url.HostType.APPLICATION
+                });
+
+            var suiteletURL = url.resolveScript({
+                scriptId:script,
+                deploymentId: deployment,
+                returnExternalUrl: false
+            });
+            //window.open(suiteletURL, "_blank");
+            var headerObj = {
+                name: 'Accept-Language',
+                value: 'en-us'
+            };
+            var datap  = {
+                ppdid: PPDID,
+                datepo: custpageDate,
+                memo: memoh,
+                data: arraylist
+            };
+            postData=JSON.stringify(datap);
+
+            var  response = https.post.promise({
+                url  : scheme + host + suiteletURL,
+                body: postData, // a=1&b=2&c=3
+                headers: headerObj
+            });  
+            
+            message.create({
+                title: "Process Starting ...",
+                message: "We will be created " + totpo + " Purchase Orders, you will receive a confirmation email when the process is finished",
+                type: message.Type.CONFIRMATION,
+                duration: 10000
+            }).show();
             
         }
   

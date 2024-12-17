@@ -19,11 +19,12 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
         var workOrderLocation; 
         var workOrderLocationID;
         var transferred=[];
+        var lineItemIds2=[];
         function onRequest(context) {
             const WO_INTERNAL_ID = String(context.request.parameters.id);
 
             let pdf = file.load({id: "/SuiteScripts/bomPDF.xml"}).getContents();
-
+            let lineItemIds1 = [];
             pdf = pdf.replace("[PRINTED_BY]", runtime.getCurrentUser().name);
             pdf = pdf.replace("[DATE_TIME]", format.format({
                 value: new Date(),
@@ -37,9 +38,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 [
                     ["type","anyof","WorkOrd"], 
                     "AND", 
-                    ["internalid","anyof",[WO_INTERNAL_ID]], 
-                    "AND", 
-                    ["mainline","is","T"]
+                    ["internalid","anyof",[WO_INTERNAL_ID]]
                  ],
                 
                 "columns": [
@@ -102,12 +101,29 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                         "type": "date",
                         "sortdir": "NONE"
                     }, {
-                    "name": "custrecord_wipbin",
+                        "name": "custrecord_wipbin",
                         "join": "department"
+                    }, {
+                        "name": "internalid",
+                        "join": "item",
+                        "label": "Internal ID"
                     },
-                    "department"
+                    "department",
+                    "mainline"
                 ]
-            }).run().each(function (result) {
+            });
+            var pagedData = searchWorkOrderHeader.runPaged({
+                "pageSize" : 1000
+            });
+    
+            pagedData.pageRanges.forEach(function (pageRange) {
+    
+                var page = pagedData.fetch({index: pageRange.index});
+    
+                page.data.forEach(function (result) {
+
+                if (result.getValue({name: "mainline"}) == "*") {
+                       
                 workOrderLocation = result.getText({name: "location"});
                 workOrderLocationID = result.getValue({name: "location"});
 
@@ -121,8 +137,49 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 pdf = pdf.replace("[FINISHED_QUANTITY]", result.getValue({name: "quantity"}));
                 pdf = pdf.replace("[DEPARTMENT]", result.getText({name: "department"}));
                 pdf = pdf.replace("[WIP_BIN]", result.getText({name: "custrecord_wipbin", join: "department"}));
-            });
 
+            }
+            else {
+                lineItemIds1.push(result.getValue({name: "internalid", join: "item"}));
+            }
+            });
+        });
+
+            log.audit("lineItemIds1 " , lineItemIds1);
+            const binLocationItem = search.create({
+                type: "item",
+                filters:
+                [
+                    ["internalid","anyof",lineItemIds1],
+                    "AND",
+                    ["binnumber","isnotempty",""]
+                ],
+                columns:
+                [
+                    "itemid",
+                    "binnumber",
+                    "internalid"
+                ]
+            });
+            var pagedData = binLocationItem.runPaged({
+                "pageSize" : 1000
+            });
+    
+            pagedData.pageRanges.forEach(function (pageRange) {
+    
+                var page = pagedData.fetch({index: pageRange.index});
+    
+                page.data.forEach(function (result) {
+
+                log.audit("internalid " , result.getValue({name: "internalid"}));
+                log.audit("binnumber " , result.getValue({name: "binnumber"}));
+
+                lineItemIds2[result.getValue({name: "internalid"})] = result.getValue({name: "binnumber"});
+
+                });
+             });
+
+            log.audit("lineItemIds2 " , lineItemIds2);
 
             var resultstr= findCases5(WO_INTERNAL_ID,workOrderLocationID);
             let workOrderLines = "";
@@ -213,9 +270,9 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += `<td>${line}</td>`;
                 workOrderLines += `<td>${result.getText({name: "item",summary: "GROUP"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item",summary: "GROUP"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantity",summary: "GROUP"})} </td>`;
-                //workOrderLines += `<td>${result.getValue({name: "binnumber", join: "item",summary: "GROUP"})}</td>`;
-                workOrderLines += `<td> </td>`;
+                workOrderLines += `<td>${result.getValue({name: "quantity",summary: "GROUP"})} </td>`; 
+                workOrderLines += `<td>${lineItemIds2[result.getValue({name: "internalid",join: "item",summary: "GROUP"})]}</td>`;
+               // workOrderLines += `<td> </td>`;
                 workOrderLines += `<td>${result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn}</td>`;
                 workOrderLines += "</tr>";
                 }

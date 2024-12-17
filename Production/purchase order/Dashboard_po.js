@@ -274,12 +274,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
                 sublistpm.addField({
                     id: "custrecordml_qtypo",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity on Purchase Order'
                 });
                 sublistpm.addField({
                     id: "custrecordml_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity'
                 });
                 tunitpo=sublistpm.addField({

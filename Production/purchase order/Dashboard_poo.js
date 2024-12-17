@@ -49,7 +49,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 form.addButton({
                     id: 'custpage_process',
                     label: 'Generate Purchase Orders',
-                    functionName: "process()"
+                    functionName: "process1()"
                 });
                 form.addButton({
                     id: 'custpage_refresh',
@@ -257,22 +257,22 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 sublistpm.addField({
                     id: "custrecordml_qtyt",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity Total'
                 });
                 sublistpm.addField({
                     id: "custrecordml_qtya",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Available Quantity'
                 });
                 sublistpm.addField({
                     id: "custrecordml_qtypo",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity on Purchase Order'
                 });
                 sublistpm.addField({
                     id: "custrecordml_qty",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity'
                 });
                 tpounit=sublistpm.addField({
@@ -442,14 +442,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         
                     });
                     
-                    var index = summarypos.map(function (img) { return img.ppdpons; }).indexOf(result1.ppdpons);
-                    if (index==-1) {wpodate=" ";}
-                    else {wpodate=summarypos[index].podate;}
-                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_podate',
                         line: counter,
-                        value: wpodate
+                        value: result1.podate
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_taskde',
@@ -836,55 +832,40 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 ["custrecord_ppd_id","anyof",PPDID]
              ],
             
-            columns:
-            [
-                "custrecord_ppd_productionline",
-                "custrecord_ppd_task",
-                search.createColumn({
-                    name: "custrecord_so_sc_startdate",
-                    join: "CUSTRECORD_PPD_TASK"
-                }),
-                search.createColumn({
-                    name: "custrecord_so_sc_enddate",
-                    join: "CUSTRECORD_PPD_TASK"
-                }),
-                "custrecord_ppd_leadtime",
-                search.createColumn({
-                    name: "custrecord_ppd_vendor",
-                    sort: search.Sort.ASC
-                }),
-                search.createColumn({
-                    name: "custrecord_ppd_item",
-                    sort: search.Sort.ASC
-                }),
-                search.createColumn({
-                    name: "custrecord_ppd_customer",
-                    sort: search.Sort.ASC
-                }),
-                "custrecord_ppd_quantity",
-                "custrecord_ppd_currency",
-                "custrecord_ppd_amount",
-                "custrecord_ppd_amountdollar",
-                "custrecord_ppd_date",
-                "custrecord_purchaseunit",
-                "created",
-                "custrecord_ppd_code",
-                "custrecord_ppd_duedate",
+             columns:
+             [
                 "custrecord_ppd_id",
-                "custrecord_ppd_price",
-                "custrecord_ppd_status",
+                "internalid",
+                "custrecord_ppd_code",
+                "custrecord_ppd_productionline",
+                search.createColumn({
+                   name: "custrecord_so_sc_task",
+                   join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                   name: "custrecord_podate",
+                   join: "CUSTRECORD_PPD_CODE"
+                }),
+                search.createColumn({
+                   name: "custrecord_so_sc_startdate",
+                   join: "CUSTRECORD_PPD_TASK"
+                }),
+                search.createColumn({
+                   name: "internalid",
+                   join: "CUSTRECORD_PPD_VENDOR"
+                }),
+                "custrecord_ppd_vendor",
                 search.createColumn({
                    name: "custentity_noppdbatching",
                    join: "CUSTRECORD_PPD_VENDOR"
                 }),
                 search.createColumn({
-                   name: "internalid",
+                   name: "custrecord_so_sc_enddate",
                    join: "CUSTRECORD_PPD_TASK"
                 }),
-                search.createColumn({
-                   name: "custrecord_so_sc_task",
-                   join: "CUSTRECORD_PPD_TASK"
-                }),
+                "custrecord_ppd_leadtime",
+                "custrecord_ppd_item",
+                "custrecord_ppd_qtydemand",
                 search.createColumn({
                    name: "quantityavailable",
                    join: "CUSTRECORD_PPD_ITEM"
@@ -893,20 +874,24 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    name: "quantityonorder",
                    join: "CUSTRECORD_PPD_ITEM"
                 }),
-                search.createColumn({
-                   name: "purchaseunit",
-                   join: "CUSTRECORD_PPD_ITEM"
-                }),
-                search.createColumn({
-                   name: "unitstype",
-                   join: "CUSTRECORD_PPD_ITEM"
-                }),
+                "custrecord_ppd_quantity",
+                "custrecord_ppd_price",
+                "custrecord_ppd_currency",
+                "custrecord_ppd_amount",
+                "custrecord_ppd_customer",
                 search.createColumn({
                    name: "custrecord_poid",
                    join: "CUSTRECORD_PPD_CODE"
-                })
-            ]
-        });
+                }),
+                "custrecord_ppd_unitrate",
+                "custrecord_purchaseunit",
+                "custrecord_ppd_amountdollar",
+                "custrecord_ppd_date",
+                "created",
+                "custrecord_ppd_duedate",
+                "custrecord_ppd_status"
+             ]
+          });
         if (prodlineselected.length==1) {
             prodlineselected1=prodlineselected[0];}
             else {prodlineselected1=prodlineselected;}
@@ -964,9 +949,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 memoid=fresult.getValue({name: "custrecord_ppd_customer"});
                 ppdpo=fresult.getValue({name: "custrecord_ppd_code"});
                 ppdpon=fresult.getText({name: "custrecord_ppd_code"});
+                unitrate=Number(fresult.getValue({name: "custrecord_ppd_unitrate"}));
                 var position = ppdpon.search("S");
                 ppdpons = ppdpon.substring(0, position);
                 poid=fresult.getText({name: "custrecord_poid",join: "CUSTRECORD_PPD_CODE"});
+                podate=fresult.getValue({name: "custrecord_podate",join: "CUSTRECORD_PPD_CODE"});
                 if (fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"})) {task=fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"});}
                 else {task=" ";}
 
@@ -991,20 +978,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     if (ppdpot!=ppdpo || prod!=fresult.getText({name: "custrecord_ppd_item"}))
                 {  
 
-                    
-                    
-
                     //ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task;
               
                     if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;}
                     else {qtybuy=(qtytot-qtytota-qtytotpo);}
                     qtybuy=qtytot;
 
-                    unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
-                    
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
                     "ppdpon": ppdpont,
+                    "podate": podate,
 					"section": section,
                     "ppdpons": ppdponst,
                     "poid": poid,
@@ -1038,8 +1021,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     
     				i++;
                
-
-
                     vendorsid[preferredvendorid]=preferredvendort;
                     var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpot);
                     
@@ -1053,7 +1034,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "poid": poid,
                                 "task": task,
                                 "taskd": taskd,
-                                "podate": taskds,
+                                "podate": podate,
                                 "taskds": taskds,
                                 "productionline": productionline,
                                 "total":(qtybuy) * price,
@@ -1071,11 +1052,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else 
                         {
                             qtytrn=summarypos[index].total
-                            var podate;
-                            podate1=new Date(summarypos[index].podate);
-                            taskdate1=new Date(taskds);
-                            if (podate1>taskdate1) {podate=taskds;}
-                            else {podate=summarypos[index].podate;}
                             wmemo=summarypos[index].memo+"; " + memo;
                             summarypos[index] = {
                                 
@@ -1160,11 +1136,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else {qtybuy=(qtytot-qtytota-qtytotpo);}
                 qtybuy=qtytot;
 
-                unitrate=Number(resultsunitm[unitbase+"/"+unitpurchase])+0;
                 pagedatas[i] = {
                 "ppdpo": ppdpot,
                 "ppdpon": ppdpont,
                 "ppdpons": ppdponst,
+                "podate": podate,
                 "poid": poid,
                 "section": section,
                 "task": task,
@@ -1210,7 +1186,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "task": task,
                                 "taskd": taskd,
                                 "taskds": taskds,
-                                "podate": taskds,
+                                "podate": podate,
                                 "productionline": productionline,
                                 "total":(qtybuy) * price,
                                 "preferredvendor": preferredvendort,
@@ -1227,10 +1203,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else 
                         {
                             qtytrn=summarypos[index].total
-                            podate1=new Date(summarypos[index].podate);
-                            taskdate1=new Date(taskds);
-                            if (podate1>taskdate1) {podate=taskds;}
-                            else {podate=summarypos[index].podate;}
+                            
                             wmemo=summarypos[index].memo+"; " + memo;
                             summarypos[index] = {
                                 
