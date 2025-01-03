@@ -6,10 +6,12 @@
 var ecddays = [];
 var ecdmonths = [];
 var ecdholydays = [];
+var oldstartdate;
 define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
 
         datarec=context.currentRecord;
+        oldstartdate = datarec.getValue({ fieldId: "custbody_invoicedate" });
         // Code to be executed when the page loads
         log.debug("context",context);
         var po = datarec.getValue({
@@ -35,6 +37,36 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 log.debug("enddate",invdate);
             }
 
+        if (fieldId == "custbody_invoicedate")
+        {
+            var startdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
+
+            if (String(oldstartdate).substring(0, 10)) 
+                {
+
+                if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 
+                    {
+                        if (ecddays.length==0) {pecddays();}
+                        var y = oldstartdate.getFullYear();
+                        var m = ('0'+(oldstartdate.getMonth()+1)).slice(-2)
+                        var d = ('0'+(oldstartdate.getDate())).slice(-2)
+                        datetofind = m + "/" + d + "/" + y;
+                        initial = parseInt(ecddays.indexOf(datetofind));
+                        log.debug("initial",initial);
+
+                        var y = startdate.getFullYear();
+                        var m = ('0'+(startdate.getMonth()+1)).slice(-2)
+                        var d = ('0'+(startdate.getDate())).slice(-2)
+                        datetofind = m + "/" + d + "/" + y;
+                        final = parseInt(ecddays.indexOf(datetofind));
+                        log.debug("final",final);
+                        dayspushed = Math.abs(final - initial) + 1;
+                        if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
+                        refreshScheduleint(dayspushed);
+                    }
+                }
+    }
+
 
         // Code to be executed when a field value changes
     }
@@ -56,7 +88,27 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         });
         log.debug("sc",sc);
         log.debug("pl",pl);
-        lookstsc(sc, pl, shipdate);
+        lookstsc(sc, pl, shipdate,0);
+        
+    }
+
+    function refreshScheduleint(dayspushed) {
+        
+        var currRec = currentRecord.get();
+
+
+        var sc = currRec.getValue({
+            fieldId: "id"
+        });
+        var pl = currRec.getValue({
+            fieldId: "custbody_productionline"
+        });
+        var shipdate = currRec.getValue({
+            fieldId: "custbody_invoicedate"
+        });
+        log.debug("sc",sc);
+        log.debug("pl",pl);
+        lookstsc(sc, pl, shipdate,dayspushed);
         
     }
 
@@ -86,7 +138,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
 
     function lookst(sc, pl, shipdate) {
 
-        pecddays();
+        if (ecddays.length==0) {pecddays();}
         console.log("ecdholydays",ecdholydays);
 
         var fsearch = s.create({
@@ -254,7 +306,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
     }
 
 
-    function lookstsc(sc, pl, shipdate) {
+    function lookstsc(sc, pl, shipdate,dayspushed) {
 
         var fsearch = s.create({
             type: "customrecord_so_scheduletasks",
@@ -268,6 +320,9 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 "custrecord_salecontract",
                 "custrecord_so_sc_productionline",
                 "custrecord_so_sc_tasksgroup",
+                "custrecord_so_sc_note",
+                "custrecord_so_sc_startdate",
+                "custrecord_so_sc_enddate",
                 s.createColumn({
                     name: "custrecord_sc_tasksgroup",
                     join: "CUSTRECORD_SO_SC_TASK"
@@ -290,7 +345,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                    join: "CUSTRECORD_SO_SC_PRODUCTIONLINE"
                 })
             ]
-                    });
+            });
 
 
         var pagedData = fsearch.runPaged({
@@ -310,14 +365,39 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                         page.data.forEach(function (fresult1) {
                             
                             scheduleID = fresult1.getValue({ name: "internalid" });
-                            log.debug("scheduleID",scheduleID);
-                            var recordToDelete = record.delete({
-                                type: 'customrecord_so_scheduletasks',
-                                id: scheduleID
+                            taskstartdate = fresult1.getValue({ name: "custrecord_so_sc_startdate" });
+                            taskenddate = fresult1.getValue({ name: "custrecord_so_sc_enddate" });
+                            log.debug("taskstartdate",taskstartdate);
+                            log.debug("taskenddate",taskenddate);
+                            log.debug("dayspushed",dayspushed);
+                            var newenddatestart =new Date(calcenddate(taskstartdate,dayspushed));
+                            var newenddateend =new Date(calcenddate(taskenddate,dayspushed));
+                            log.debug("newenddatestart",newenddatestart);
+                            log.debug("newenddateend",newenddateend);
+
+
+                            var recordschedule = record.load ({
+                                type: "customrecord_so_scheduletasks",
+                                id: scheduleID.trim()
                             });
+
+                            recordschedule.setValue({
+                                fieldId: "custrecord_so_sc_startdate",
+                                value: newenddatestart
+                            });
+                            recordschedule.setValue({
+                                fieldId: "custrecord_so_sc_enddate",
+                                value: newenddateend
+                            });
+                            var saveRecord = recordschedule.save({
+                                enableSourcing: true,
+                                ignoreMandatoryFields: true
+                            });
+
+                            
+                            log.debug("scheduleID",scheduleID);
                         });
                     });
-                    lookst(sc, pl, shipdate);
                 }
                 console.log('Success with value ' + result);
             }
@@ -401,85 +481,85 @@ function lookcd(sc, cd) {
    
 }
 
-function lookcdsc(sc, cd) {
-    
-    var fsearch = s.create({
-        type: "customrecord_cd_sc",
-        filters:
-        [
-           ["custrecord_cd_sc","anyof",sc]
-        ],
-        columns:
-        [
-           s.createColumn({
-              name: "custrecord_cd_template",
-              join: "CUSTRECORD_CD_SC_SPECIFICATION"
-           }),
-           s.createColumn({
-              name: "custrecord_cd_group",
-              join: "CUSTRECORD_CD_SC_SPECIFICATION"
-           }),
-           s.createColumn({
-              name: "custrecord_cd_specification",
-              join: "CUSTRECORD_CD_SC_SPECIFICATION"
-           }),
-           "custrecord_cd_sc_detail",
-           s.createColumn({
-              name: "internalid",
-              join: "CUSTRECORD_CD_SC_SPECIFICATION",
-              sort: s.Sort.ASC
-           }),
-           "internalid"
-        ]
-         });
-         log.debug("cd",cd);
+    function lookcdsc(sc, cd) {
+        
+        var fsearch = s.create({
+            type: "customrecord_cd_sc",
+            filters:
+            [
+            ["custrecord_cd_sc","anyof",sc]
+            ],
+            columns:
+            [
+            s.createColumn({
+                name: "custrecord_cd_template",
+                join: "CUSTRECORD_CD_SC_SPECIFICATION"
+            }),
+            s.createColumn({
+                name: "custrecord_cd_group",
+                join: "CUSTRECORD_CD_SC_SPECIFICATION"
+            }),
+            s.createColumn({
+                name: "custrecord_cd_specification",
+                join: "CUSTRECORD_CD_SC_SPECIFICATION"
+            }),
+            "custrecord_cd_sc_detail",
+            s.createColumn({
+                name: "internalid",
+                join: "CUSTRECORD_CD_SC_SPECIFICATION",
+                sort: s.Sort.ASC
+            }),
+            "internalid"
+            ]
+            });
+            log.debug("cd",cd);
 
-    var pagedData = fsearch.runPaged({
-        "pageSize" : 1000
-    });
-    log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
-   
+        var pagedData = fsearch.runPaged({
+            "pageSize" : 1000
+        });
+        log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
     
-    if (pagedData.pageRanges.length > 0) {
-   
-        function success(result) {
+        
+        if (pagedData.pageRanges.length > 0) {
+    
+            function success(result) {
 
-            if (result) 
-            {
-                pagedData.pageRanges.forEach(function (pageRange) {
-                    var page = pagedData.fetch({index: pageRange.index});
-                    page.data.forEach(function (fresult1) {
-                        
-                        cribID = fresult1.getValue({ name: "internalid" });
-                        log.debug("cribID",cribID);
-                        var recordToDelete = record.delete({
-                            type: 'customrecord_cd_sc',
-                            id: cribID
+                if (result) 
+                {
+                    pagedData.pageRanges.forEach(function (pageRange) {
+                        var page = pagedData.fetch({index: pageRange.index});
+                        page.data.forEach(function (fresult1) {
+                            
+                            cribID = fresult1.getValue({ name: "internalid" });
+                            log.debug("cribID",cribID);
+                            var recordToDelete = record.delete({
+                                type: 'customrecord_cd_sc',
+                                id: cribID
+                            });
                         });
                     });
-                });
-                lookcd(sc, cd);
+                    lookcd(sc, cd);
+                }
+                console.log('Success with value ' + result);
             }
-            console.log('Success with value ' + result);
+        
+            function failure(reason) {
+                console.log('Failure: ' + reason);
+            }
+            dialog.confirm({
+                'title': 'Sales Contract contains Crib Design',
+                'message': 'Are you sure that you want refresh it?'
+            }).then(success).catch(failure);
+        
         }
-    
-        function failure(reason) {
-            console.log('Failure: ' + reason);
+        else
+        {
+            lookcd(sc, cd);
         }
-        dialog.confirm({
-            'title': 'Sales Contract contains Crib Design',
-            'message': 'Are you sure that you want refresh it?'
-        }).then(success).catch(failure);
-    
+
+
+
     }
-    else
-    {
-        lookcd(sc, cd);
-    }
-
-
-
-}
 
     function pecddays() {
         
@@ -640,6 +720,152 @@ function lookcdsc(sc, cd) {
         console.log("ecdmonths",ecdmonths);
         
        
+    }
+
+    function calcenddate(strdate,duration) {
+
+        var dt = new Date(strdate);
+        log.debug("dt",dt);
+        var strdate = dt;
+        
+        log.debug("strdate",strdate);
+
+        if (ecddays.length==0) {pecddays();}
+
+        var y = strdate.getFullYear();
+        var m = ('0'+(strdate.getMonth()+1)).slice(-2)
+        var d = ('0'+(strdate.getDate())).slice(-2)
+        datetofind = m + "/" + d + "/" + y;
+        
+        initial = parseInt(ecddays.indexOf(datetofind));
+        
+
+        if (initial==-1)      {return strdate;}
+        
+        newenddate=new Date(ecddays[initial+duration-1]);
+
+
+        function pecddays() {
+
+            var ecdholydays=[];
+        
+            var fsearch = s.create({
+                type: "customrecord_blocksofdays",
+                columns:
+                [
+                   "internalid",
+                   s.createColumn({
+                      name: "custrecord_blockdate",
+                      sort: s.Sort.ASC
+                   }),
+                   "custrecord_blockno",
+                   "name",
+                   "custrecord_sequence",
+                   "custrecord_recurrent"
+                ]
+            });
+    
+    
+            var pagedData = fsearch.runPaged({
+                "pageSize" : 1000
+            });
+            var i=1;
+            pagedData.pageRanges.forEach(function (pageRange) {
+                var page = pagedData.fetch({index: pageRange.index});
+                page.data.forEach(function (fresult1) {
+    
+                    custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
+                    custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
+                    custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
+
+                if (custrecord_recurrent) 
+                    {
+                        custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);
+                        vstartdate= new Date(custrecord_blockdate);
+                        var y = vstartdate.getFullYear();
+                        var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
+                        var d = ('0'+(vstartdate.getDate())).slice(-2)
+                        custrecord_blockdate = m + "/" + d + "/" + y;
+                    }
+                
+                function getMonday(d,tc) 
+                {
+                    //return d;
+                    log.debug("d",d);
+                    log.debug("tc",tc);
+                    const today = new Date();
+                    var montha = today.getMonth() + 1;
+                    const myArray = d.split("/");
+                    
+                    if ((myArray[0]-montha)<-3) {yeara=today.getFullYear()+1;}
+                    else                        {yeara=today.getFullYear();}
+                    log.debug("(myArray[0]-montha",(myArray[0]-montha));
+                    mes = [31,28,31,30,31,30,31,31,30,31,30,31]
+
+                    if (tc==1) 
+                    {
+                    d = myArray[0]+"-01-"+yeara;
+                    d = new Date(d);
+                    var day = d.getDay();
+                    
+                    diff = d.getDate()  +  (day <= 1 ? (1 - day) :  (8 - day)); // adjust when day is sunday
+                    }
+                    if (tc==2) 
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() == 0 ? 7 : d.getDay());
+                    
+                    diff = d.getDate()  +  (1 - day); // adjust when day is sunday
+                    }
+                    if (tc==3)
+                    {
+                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
+                    d = new Date(d);
+                    var day = (d.getDay() < 4 ? 7 + d.getDay(): d.getDay());
+                    
+                    diff = d.getDate()  +  (4 - day); // adjust when day is sunday
+                    }
+                    if (tc==4)
+                        {
+                        d = myArray[0]+"-"+myArray[1]+"-"+yeara;
+                        d = new Date(d);
+                        diff = d.getDate(); // adjust when day is sunday
+                        }
+
+                    return new Date(d.setDate(diff));
+                    
+                }       
+    
+                    ecdholydays[i]=custrecord_blockdate;
+                    i++;
+                    
+                });
+                
+            });
+            const td = new Date();
+            var newstartdate=new Date(td);
+            newstartdate.setDate(td.getDate()-100);
+    
+            for (i=1;i<300;i++)
+            {
+                newstartdate.setDate(newstartdate.getDate()+1);
+                if (newstartdate.getDay() == 0) {i--;continue;}
+                if (newstartdate.getDay() == 6) {i--;continue;}
+    
+                var y = newstartdate.getFullYear();
+                var m = ('0'+(newstartdate.getMonth()+1)).slice(-2)
+                var d = ('0'+(newstartdate.getDate())).slice(-2)
+                datetofind = m + "/" + d + "/" + y;
+                initial = parseInt(ecdholydays.indexOf(datetofind));
+                if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
+                ecddays[i]=datetofind;
+            }
+            
+        }
+
+
+        return newenddate;
     }
     return {
         pageInit: pageInit,

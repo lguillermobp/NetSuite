@@ -67,37 +67,72 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             var custrecord_purchaseunit = fresult.custrecord_purchaseunit;
             var custrecord_unitbase = fresult.custrecord_unitbase;
             var custrecord_unitrate = fresult.custrecord_unitrate;
-
-            
+            var custrecord_ppdinternalid= fresult.custrecord_ppdinternalid;
+ 
             var ppdid = custrecord_ppd_id;
             var ppdpo = custrecord_ppd_code;
             var podate = custrecord_ppd_date;
-           
         
             if (ppdpo!=tppdpo) 
             {
                 tppdpo=ppdpo;
 
-                var PPDCodeR = record.create({
-                    type: "customrecord_ppd_po",
-                    isDynamic: false
-                });
+                try {
 
-                PPDCodeR.setValue({
-                    fieldId: 'name',
-                    value: ppdpo // Replace with the internal ID of the vendor
-                });
-                PPDCodeR.setValue({
-                    fieldId: 'custrecord_ppdid',
-                    value: ppdid // Replace with the internal ID of the vendor
-                });
-                PPDCodeR.setValue({
-                    fieldId: 'custrecord_podate',
-                    value: new Date(podate) // Replace with the internal ID of the vendor
-                });
-               
-                PPDCodeID=PPDCodeR.save();
+                if (custrecord_ppdinternalid!=0) 
+                    {
 
+                    var PPDCode = record.load({
+                        type: "customrecord_ppd_po",
+                        id: custrecord_ppdinternalid
+                    });
+
+                    ppddate=PPDCode.getValue({
+                        fieldId: 'custrecord_podate'
+                    });
+                    
+                    podate1=new Date(ppddate);
+                    taskdate1=new Date(podate);
+                    if (podate1>taskdate1) {
+
+                        PPDCode.setValue({
+                            fieldId: 'custrecord_podate',
+                            value: taskdate1 // Replace with the internal ID of the vendor
+                        });
+
+                    }
+                    else {podate=summarypos[index].podate;}
+
+                    PPDCode.save();
+                    PPDCodeID=custrecord_ppdinternalid;
+                }
+                else 
+                {
+
+                    var PPDCodeR = record.create({
+                        type: "customrecord_ppd_po",
+                        isDynamic: false
+                    });
+
+                    PPDCodeR.setValue({
+                        fieldId: 'name',
+                        value: ppdpo // Replace with the internal ID of the vendor
+                    });
+                    PPDCodeR.setValue({
+                        fieldId: 'custrecord_ppdid',
+                        value: ppdid // Replace with the internal ID of the vendor
+                    });
+                    PPDCodeR.setValue({
+                        fieldId: 'custrecord_podate',
+                        value: new Date(podate) // Replace with the internal ID of the vendor
+                    });
+                
+                    PPDCodeID=PPDCodeR.save();
+                }
+            }
+            catch (e) {
+                log.error("error",e);
+            }
             }
 
             var PPD = record.create({
@@ -129,6 +164,10 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             PPD.setValue({
                 fieldId: 'custrecord_ppd_code',
                 value: PPDCodeID // Replace with the internal ID of the vendor
+            });
+            PPD.setValue({
+                fieldId: 'custrecord_ppdcodetask',
+                value: 'V'+vendorid+'T'+task // Replace with the internal ID of the vendor
             });
             PPD.setValue({
                 fieldId: 'custrecord_ppd_vendor',

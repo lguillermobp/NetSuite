@@ -12,7 +12,7 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 isDynamic: true
             });
             
-            task = currentRecord.getText({fieldId: "custbody_task"});
+            task = currentRecord.getText({fieldId: "custbody_scheduletaskid"});
             assembly= currentRecord.getValue({fieldId: "assemblyitem"});
             createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
             if (createdfrom == 11485) { 
@@ -76,6 +76,7 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 internalid = paramdata.getValue({name: "internalid"});
                 log.debug("internalid",internalid);
                 currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
+                currentRecord.setValue({fieldId: "custbody_task", value: task});
                 
                 }
             else 

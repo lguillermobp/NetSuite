@@ -3,13 +3,13 @@
  * @NApiVersion 2.x
  */
 
-define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message","N/url", "/SuiteScripts/Modules/LoDash.js"],
+define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search","N/ui/message","N/url", "/SuiteScripts/Modules/LoDash.js"],
     /**
      *
      * @param currentRecord
      * @param error
      */
-    function (runtime,currentRecord, error,log,record, s,message,url,  _) {
+    function (https,runtime,currentRecord, error,log,record, s,message,url,  _) {
 
         var countpos = 0;
         function pageInit(context) {
@@ -582,11 +582,9 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                             "custrecord_poid": idpo
                         }
                     })
-                   
-
-
                     savingpo=false;
-                    totpo++}
+                    totpo++
+                }
 
             message.create({
                 title: "Process Completed",
@@ -600,6 +598,8 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
         function process1() {
 
             var currentRec = currentRecord.get();
+
+            var arraylist = [];
             
             var custpageDate = currentRec.getValue({
                 fieldId: "custpage_date"
@@ -652,44 +652,86 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
                 });
                
                 if (omit) continue;
-
-                    var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid', line: i });
-                    var taskd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_task',line: i });
-                    var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',line: i });
-                    var customerid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_customer',line: i });
-                    var vendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',line: i });
-                    var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',line: i });
-                    var podate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_podate',line: i });
-                    var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',line: i });
-
+                var custrecordml_baunit = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_baunit',line: i });
+                var custrecordml_currency = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_currency',line: i });
+                var custrecordml_currencyrate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_currencyrate',line: i });
+                var custrecordml_customer = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_customer',line: i });
+                var custrecordml_icurrency = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_icurrency',line: i });
+                var custrecordml_item = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_item',line: i });
+                var custrecordml_itemid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_itemid',line: i });
+                var custrecordml_leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',line: i });
+                var custrecordml_memo = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_memo',line: i });
+                var custrecordml_nobatching = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_nobatching',line: i });
+                var custrecordml_omit = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_omit',line: i });
+                var custrecordml_podate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_podate',line: i });
+                var custrecordml_poid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_poid',line: i });
+                var custrecordml_pounit = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_pounit',line: i });
+                var custrecordml_ppdpon = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpon',line: i });
+                var custrecordml_ppdpo = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpo',line: i });
+                var custrecordml_ppdpons = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpons',line: i });
+                var custrecordml_preferredvendor = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendor', line: i});
+                var custrecordml_preferredvendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',line: i });
+                var custrecordml_price = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_price',line: i });
+                var custrecordml_productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',line: i });
+                var custrecordml_qty = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_qty',line: i });
+                var custrecordml_qtya = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_qtya',line: i });
+                var custrecordml_qtypo = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_qtypo',line: i });
+                var custrecordml_qtyt = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_qtyt',line: i });
+                var custrecordml_section = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_section',line: i });
+                var custrecordml_sectionid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_sectionid',line: i });
+                var custrecordml_task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_task',line: i });
+                var custrecordml_taskd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskd',line: i });
+                var custrecordml_taskde = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskde',line: i });
+                var custrecordml_taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',line: i });
+                var custrecordml_taskid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',line: i });
+                var custrecordml_total =currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_total',line: i });
+                var custrecordml_totalusd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_totalusd',line: i });
+                var custrecordml_unitrate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_unitrate',line: i });
+                
                     arraylist[i] = {
-                        "custrecord_ppd_id": ppdid,
-                        "custrecord_ppd_code": ppdcode,
-                        "custrecord_ppd_duedate": newpotdatedue,
-                        "custrecord_ppd_date": newpotdate,
-                        "custrecord_ppd_vendor": vendorid,
-                        "custrecord_ppd_customer": customerid,
-                        "custrecord_ppd_productionline": productionline,
-                        "custrecord_ppd_task": task,
-                        "custrecord_ppd_currency": currency,
-                        "custrecord_ppd_currencyrate": currencyrate,
-                        "custrecord_ppd_leadtime": leadtime,
-                        "custrecord_ppd_amount": amount,
-                        "custrecord_ppd_amountdollar": amountdol,
-                        "custrecord_ppd_status": " ",
-                        "custrecord_ppd_item": itemid,
-                        "custrecord_ppd_quantity": qty,
-                        "custrecord_ppd_price": price,
-                        "custrecord_purchaseunit": unitpurchase,
-                        "custrecord_unitbase": unitbase,
-                        "custrecord_unitrate": unitrate
+                        "custrecordml_customer": custrecordml_customer,
+                        "custrecordml_item": custrecordml_item,
+                        "custrecordml_itemid": custrecordml_itemid,
+                        "custrecordml_leadtime": custrecordml_leadtime,
+                        "custrecordml_memo": custrecordml_memo,
+                        "custrecordml_podate": custrecordml_podate,
+                        "custrecordml_ppdpo": custrecordml_ppdpo,
+                        "custrecordml_ppdpons": custrecordml_ppdpons,
+                        "custrecordml_preferredvendorid": custrecordml_preferredvendorid,
+                        "custrecordml_price": custrecordml_price,
+                        "custrecordml_productionline": custrecordml_productionline,
+                        "custrecordml_qty": custrecordml_qty,
+                        "custrecordml_task": custrecordml_task,
+                        "custrecordml_taskd": custrecordml_taskd,
+                        "custrecordml_taskds": custrecordml_taskds,
+                        "custrecordml_taskid": custrecordml_taskid,
+                        "custrecordml_unitrate": custrecordml_unitrate
                     }
                     
                     console.log("i: ",i);
 
             }
 
-           
+            arraylist[arraylist.length] = {
+                "custrecordml_customer": "*last",
+                "custrecordml_item": "*last",
+                "custrecordml_itemid": "*last",
+                "custrecordml_leadtime": "*last",
+                "custrecordml_memo": "*last",
+                "custrecordml_podate": "*last",
+                "custrecordml_ppdpo": "*last",
+                "custrecordml_ppdpons": "*last",
+                "custrecordml_preferredvendorid": "*last",
+                "custrecordml_price": "*last",
+                "custrecordml_productionline": "*last",
+                "custrecordml_qty": "*last",
+                "custrecordml_task": "*last",
+                "custrecordml_taskd": "*last",
+                "custrecordml_taskds": "*last",
+                "custrecordml_taskid": "*last",
+                "custrecordml_unitrate": "*last"
+            }
+    
             var script = 'customscriptrendergenerate_poo';
             var deployment = 'customdeploy1';
             var parameters = "";
@@ -814,6 +856,7 @@ define(["N/runtime","N/currentRecord", "N/error",'N/log', "N/record", "N/search"
             addDays: addDays,
             onButtonClick: onButtonClick,
             process: process,
+            process1: process1,
             fieldChanged: fieldChanged,
             markall: markall,
             unmarkall: unmarkall

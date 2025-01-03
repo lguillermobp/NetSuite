@@ -21,6 +21,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var customersselected;
         var sectionsselected;
         var summarypos=[];
+        var resultsrp=[];
         var vendorsid=[];
         var PPDID;
         function onRequest(context) {
@@ -85,12 +86,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
                 
     
-                var sublistpm = form.addSublist({
-                    id: 'custpage_records',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'Demand Records',
-        
-                });
+                
                 var resultspt= findCases1();
                
                 var plantext="";
@@ -144,6 +140,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     });
 
                 sections.defaultValue = sectionsselected;
+
+
+                var sublistpm = form.addSublist({
+                    id: 'custpage_records',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'Demand Records',
+        
+                });
 
 				sublistpm.addButton({
                     id: 'custpage_processtag',
@@ -344,6 +348,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Project'
                 });
+                sublistpm.addField({
+                    id: "custrecordml_ppdpreview",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'PPD Preview'
+                });
                 var customerid = sublistpm.addField({
                     id: "custrecordml_customer",
                     type: serverWidget.FieldType.INTEGER,
@@ -351,6 +360,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
 
                 customerid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                var kppdinternalid = sublistpm.addField({
+                    id: "custrecordml_ppdinternalid",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'PPD Internal Id'
+                });
+
+                kppdinternalid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
                 
@@ -362,34 +381,44 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 var resultscurr= currencies();
                 var resultppdcode=fppdcode(PPDID)
+
                 
 
                 // loop through each line, skipping the header
                 
                 var counter = 0;
                 resultspt.forEach(function(result1) {
+                
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf("PPD"+PPDID+"V"+result1.preferredvendorid+"T"+result1.task);
 
-                    if (!resultppdcode[result1.ppdpo]) {womit="F";} else {womit="T";}
+                    if (indexxy!=-1 || result1.ppdpreview != " ") {womit="T";} else {womit="F";}
+
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcode; }).indexOf(result1.ppdpo);
+                    if (indexxy==-1) {ppdinternalid=0;} else {ppdinternalid=resultppdcode[indexxy].internalid;}
+                    log.debug("ppdinternalid",ppdinternalid);
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_omit',
                         line: counter,
-                        value: womit
-                        
+                        value: womit   
                     });
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_preferredvendor',
                         line: counter,
                         value: result1.preferredvendor
-                        
+                    });
+
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_ppdinternalid',
+                        line: counter,
+                        value: ppdinternalid
                     });
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_ppdpo',
                         line: counter,
                         value: result1.ppdpo
-                        
                     });
                    
 
@@ -412,6 +441,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_section',
                         line: counter,
                         value: result1.section
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_ppdpreview',
+                        line: counter,
+                        value: result1.ppdpreview
                         
                     });
                     sublistpm.setSublistValue({
@@ -663,233 +698,229 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         value: result1.memo.substring(0, 298)
                     });
                    
-                    counter++;
-                
+                    counter++;              
                 
 				})
 
                
+        //======================================================================================================
 
-                //======================================================================================================
+            var sublistppd = form.addSublist({
+            id: 'custpageppd_records',
+            type : serverWidget.SublistType.LIST,
+            label: 'PPD',
+            });
+            sublistppd.addField({
+                id: "custrecordml_productionline",
+                type: serverWidget.FieldType.TEXT,
+                label:'Production Line'
+            });
+            var ppdpod = sublistppd.addField({
+                id: "custrecordml_ppdpo",
+                type: serverWidget.FieldType.TEXT,
+                label:'PPDPO'
+            });
 
-                    var sublistppd = form.addSublist({
-                    id: 'custpageppd_records',
-                    type : serverWidget.SublistType.LIST,
-                    label: 'PPD',
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_productionline",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Production Line'
-                    });
-                    var ppdpod = sublistppd.addField({
-                        id: "custrecordml_ppdpo",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'PPDPO'
-                    });
-    
-                    ppdpod.updateDisplayType({
-                        displayType: serverWidget.FieldDisplayType.HIDDEN
-                    });
-                    
-                    var tastidd= sublistppd.addField({
-                        id: "custrecordml_task",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'task'
-                    });
-                    tastidd.updateDisplayType({
-                        displayType: serverWidget.FieldDisplayType.HIDDEN
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_taskd",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'task'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_podate",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Date Earlier'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_taskds",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Start Date'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_preferredvendor",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Preferred Vendor'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_nobatching",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Vendor is not batching'
-                    });
-                    var vendorid = sublistppd.addField({
-                        id: "custrecordml_preferredvendorid",
-                        type: serverWidget.FieldType.INTEGER,
-                        label:'Preferred Vendor ID'
-                    });
-                    vendorid.updateDisplayType({
-                        displayType: serverWidget.FieldDisplayType.HIDDEN
-                    });
-        
-                   
-                    sublistppd.addField({
-                        id: "custrecordml_currency",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Currency Vendor'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_leadtime",
-                        type: serverWidget.FieldType.INTEGER,
-                        label:'Lead Time'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_total",
-                        type: serverWidget.FieldType.FLOAT,
-                        label:'Total'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_currencyrate",
-                        type: serverWidget.FieldType.FLOAT,
-                        label:'Exchange Rate'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_totalusd",
-                        type: serverWidget.FieldType.FLOAT,
-                        label:'Total USD'
-                    });
-                    sublistppd.addField({
-                        id: "custrecordml_memo",
-                        type: serverWidget.FieldType.TEXT,
-                        label:'Project'
-                    });
-                    sublistppd.addField({
-                        id: 'custrecordml_omit',
-                        label: 'Omit',
-                        type: serverWidget.FieldType.CHECKBOX
-                    });
-    
-        
-                    // loop through each line, skipping the header
-                    
-                    var counter = 0;
-
-                    summarypos.forEach(function(result1) {
-
-                        if (!resultppdcode[result1.ppdpo]) {womit="F";} else {womit="T";}
-
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_omit',
-                            line: counter,
-                            value: womit
-                            
-                        });
-    
-                        
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_ppdpo',
-                            line: counter,
-                            value: result1.ppdpo
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_preferredvendor',
-                            line: counter,
-                            value: result1.preferredvendor+" "
-                        });
-
-                        
-
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_nobatching',
-                            line: counter,
-                            value: result1.nobatching+" "
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_taskds',
-                            line: counter,
-                            value: result1.taskds
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_podate',
-                            line: counter,
-                            value: result1.podate
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_task',
-                            line: counter,
-                            value: result1.task
-                            
-                        });
-                        if (!vendorsid[result1.preferredvendorid]) {qtylead="0"}
-                        else {qtylead=vendorsid[result1.preferredvendorid].leadtime}
-
-                        sublistppd.setSublistValue({
-                        id: 'custrecordml_leadtime',
-                        line: counter,
-                        value: qtylead
-                        
-                    });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_taskd',
-                            line: counter,
-                            value: result1.taskd+" "
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_productionline',
-                            line: counter,
-                            value: result1.productionline+" "
-                            
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_preferredvendorid',
-                            line: counter,
-                            value: result1.preferredvendorid
-                            
-                        });
-                        
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_total',
-                            line: counter,
-                            value: result1.total.toFixed(2)
-                        });
-                        
-                        if (!result1.currency) {
-                            dcurrency="US Dollar";}
-                        else {dcurrency=result1.currency;}
-                        
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_currency',
-                            line: counter,
-                            value: dcurrency
-                        });
-                        
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_currencyrate',
-                            line: counter,
-                            value: resultscurr[dcurrency].exchangerate
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_totalusd',
-                            line: counter,
-                            value: (result1.total*resultscurr[dcurrency].exchangerate).toFixed(2)
-                        });
-                        sublistppd.setSublistValue({
-                            id: 'custrecordml_memo',
-                            line: counter,
-                            value: result1.memo.substring(0, 298)
-                        });
-                       
-                        counter++;
-                    
+            ppdpod.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
+            });
             
-                    })
+            var tastidd= sublistppd.addField({
+                id: "custrecordml_task",
+                type: serverWidget.FieldType.TEXT,
+                label:'task'
+            });
+            tastidd.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
+            });
+            sublistppd.addField({
+                id: "custrecordml_taskd",
+                type: serverWidget.FieldType.TEXT,
+                label:'task'
+            });
+            sublistppd.addField({
+                id: "custrecordml_podate",
+                type: serverWidget.FieldType.TEXT,
+                label:'Date Earlier'
+            });
+            sublistppd.addField({
+                id: "custrecordml_taskds",
+                type: serverWidget.FieldType.TEXT,
+                label:'Start Date'
+            });
+            sublistppd.addField({
+                id: "custrecordml_preferredvendor",
+                type: serverWidget.FieldType.TEXT,
+                label:'Preferred Vendor'
+            });
+            sublistppd.addField({
+                id: "custrecordml_nobatching",
+                type: serverWidget.FieldType.TEXT,
+                label:'Vendor is not batching'
+            });
+            var vendorid = sublistppd.addField({
+                id: "custrecordml_preferredvendorid",
+                type: serverWidget.FieldType.INTEGER,
+                label:'Preferred Vendor ID'
+            });
+            vendorid.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
+            });
+
+            
+            sublistppd.addField({
+                id: "custrecordml_currency",
+                type: serverWidget.FieldType.TEXT,
+                label:'Currency Vendor'
+            });
+            sublistppd.addField({
+                id: "custrecordml_leadtime",
+                type: serverWidget.FieldType.INTEGER,
+                label:'Lead Time'
+            });
+            sublistppd.addField({
+                id: "custrecordml_total",
+                type: serverWidget.FieldType.FLOAT,
+                label:'Total'
+            });
+            sublistppd.addField({
+                id: "custrecordml_currencyrate",
+                type: serverWidget.FieldType.FLOAT,
+                label:'Exchange Rate'
+            });
+            sublistppd.addField({
+                id: "custrecordml_totalusd",
+                type: serverWidget.FieldType.FLOAT,
+                label:'Total USD'
+            });
+            sublistppd.addField({
+                id: "custrecordml_memo",
+                type: serverWidget.FieldType.TEXT,
+                label:'Project'
+            });
+            sublistppd.addField({
+                id: 'custrecordml_omit',
+                label: 'Omit',
+                type: serverWidget.FieldType.CHECKBOX
+            });
+
+
+            // loop through each line, skipping the header
+            
+            var counter = 0;
+
+            summarypos.forEach(function(result1) {
+
+                womit="F";
+
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_omit',
+                    line: counter,
+                    value: womit
+                    
+                });
+
+                
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_ppdpo',
+                    line: counter,
+                    value: result1.ppdpo
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_preferredvendor',
+                    line: counter,
+                    value: result1.preferredvendor+" "
+                });
+
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_nobatching',
+                    line: counter,
+                    value: result1.nobatching+" "
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_taskds',
+                    line: counter,
+                    value: result1.taskds
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_podate',
+                    line: counter,
+                    value: result1.podate
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_task',
+                    line: counter,
+                    value: result1.task
+                    
+                });
+                if (!vendorsid[result1.preferredvendorid]) {qtylead="0"}
+                else {qtylead=vendorsid[result1.preferredvendorid].leadtime}
+
+                sublistppd.setSublistValue({
+                id: 'custrecordml_leadtime',
+                line: counter,
+                value: qtylead
+                
+            });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_taskd',
+                    line: counter,
+                    value: result1.taskd+" "
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_productionline',
+                    line: counter,
+                    value: result1.productionline+" "
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_preferredvendorid',
+                    line: counter,
+                    value: result1.preferredvendorid
+                    
+                });
+                
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_total',
+                    line: counter,
+                    value: result1.total.toFixed(2)
+                });
+                
+                if (!result1.currency) {
+                    dcurrency="US Dollar";}
+                else {dcurrency=result1.currency;}
+                
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_currency',
+                    line: counter,
+                    value: dcurrency
+                });
+                
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_currencyrate',
+                    line: counter,
+                    value: resultscurr[dcurrency].exchangerate
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_totalusd',
+                    line: counter,
+                    value: (result1.total*resultscurr[dcurrency].exchangerate).toFixed(2)
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_memo',
+                    line: counter,
+                    value: result1.memo.substring(0, 298)
+                });
+                
+                counter++;
+            
+    
+            })
 
 
 
@@ -897,17 +928,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
 
 
-                context.response.writePage(form);
-            } else {
-              
+        context.response.writePage(form);
+        } else {
             
-            }
+        
+        }
     }
 	function findCases1() {
 		var pagedatas=[];
         var resultsunitm=unitm();
-        log.debug("resultsunitm",resultsunitm);
         vendorsss();
+        var resultppdcodetask=fppdcodetask(PPDID)
+        log.debug("resultppdcodetask",resultppdcodetask);
 
 		var fsearch = search.create({
 			type: "workorder",
@@ -1077,13 +1109,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var section;
         var i=0;
         var h=0;
+        var d=0;
         var procesar;
 
 		pagedData.pageRanges.forEach(function (pageRange) {
 
 			var page = pagedData.fetch({index: pageRange.index});
-           
-
 
 			page.data.forEach(function (fresult) {
 
@@ -1115,13 +1146,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
                     currency=fresult.getValue({name: "formulatext",summary: "MAX"});
         
-        
                     qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "MAX"}));
                 
                     qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
                     unitpurchase=fresult.getText({name: "purchaseunit",join: "item",summary: "GROUP"});
                     unitbase=fresult.getText({name: "unit",summary: "GROUP"});
-                    log.debug("unitbase",unitbase);
+                    
                     qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
                     memo=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"});
                     memoid=fresult.getValue({name: "internalid",join: "customerMain",summary: "GROUP"});
@@ -1134,6 +1164,15 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(unitbase+"/"+unitpurchase));
                    if (index1==-1) {unitrate=1;}
                     else {unitrate=resultsunitm[index1].conversionrate;}
+
+                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+task);
+                    log.debug("ppdpreview","V"+preferredvendorid+"T"+task);
+                    if (indexx==-1) 
+                        {ppdpreview=" ";}
+                    else
+                        {   log.debug("ppdpreview",resultppdcodetask[indexx]);
+                            ppdpreview=resultppdcodetask[indexx].ppdcode+ " ";
+                        }
                    
 				    pagedatas[i] = {
                     "ppdpo": ppdpo,
@@ -1149,6 +1188,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 					"item": item,
                     "itemid": itemid,
 					"price": price,
+                    "ppdpreview": ppdpreview,
                     "currency": currency,
 					"qty": qtytot,
                     "qtya": qtytota,
@@ -1163,7 +1203,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "customer": memoid
 				    }
                     
-                    
+                
     				i++;
 
                     var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpo);
@@ -1213,8 +1253,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "customer": memoid
                                 };
                            
-                        }
-                       
+                        }                
                     
                     qtytot=0;
                     qtytota=0;
@@ -1231,9 +1270,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(unitbase+"/"+unitpurchase));
                 if (index1==-1) {unitrate=1;}
                 else {unitrate=resultsunitm[index1].conversionrate;}
-                
+
+                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+task);
+                if (indexx==-1) 
+                    {ppdpreview=" ";}
+                else
+                    {ppdpreview=resultppdcodetask[indexx].ppdcode;}
+
                 pagedatas[i] = {
                 "ppdpo": ppdpo,
+                "ppdpreview": ppdpreview,
                 "section": section,
                 "task": task,
                 "taskd": taskd,
@@ -1259,7 +1305,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "memo": memo,
                 "customer": memoid
                 }
-
+                
                 i++;
 
                 var index = summarypos.map(function (img) { return img.ppdpo; }).indexOf(ppdpo);
@@ -1312,7 +1358,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                            
                         }
             }
-            log.audit("i",i);
             summarypos = _.orderBy(summarypos, ["ppdpo"], ["asc"]);
             pagedatas = _.orderBy(pagedatas, ["ppdpo"], ["asc"]);
 		return pagedatas;
@@ -1484,8 +1529,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
             if (procesar=="Y")
                 {  
-                  
-
 				    pagedatas[i] = {
 					"section": section,
                     "task": task,
@@ -1602,7 +1645,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
     function fvendorsid() {
 
-
         var fsearch = search.create({
 			type: "workorder",
             settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
@@ -1690,47 +1732,130 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
                 h++;
 			});
-            log.debug("pagedatasunitm.length",pagedatasunitm.length);
+
 		});
 
 		return pagedatasunitm;
 	}
+
     function fppdcode(PPDID) {
 		var pagedatasppdcode=[];
 
 		var fsearch = search.create({
-			type: "customrecord_ppd_po",
+			type: "customrecord_ppd",
             filters:
             [
-                ["custrecord_ppdid","anyof",PPDID]
+               ["custrecord_ppd_id","anyof",PPDID]
             ],
             columns:
             [
-                "internalid",
-                "name",
-                "custrecord_ppdid",
-                "custrecord_poid",
-                "custrecord_podate"
+               search.createColumn({
+                  name: "custrecord_ppd_id",
+                  summary: "MAX"
+               }),
+               search.createColumn({
+                  name: "custrecord_ppd_code",
+                  summary: "MAX"
+               }),
+               search.createColumn({
+                  name: "custrecord_ppdcodetask",
+                  summary: "GROUP"
+               }),
+               search.createColumn({
+                  name: "internalid",
+                  join: "CUSTRECORD_PPD_CODE",
+                  summary: "MAX"
+               }),
+               search.createColumn({
+                name: "custrecord_poid",
+                join: "CUSTRECORD_PPD_CODE",
+                summary: "MAX"
+             })
             ]
             });
 
 		var pagedData = fsearch.runPaged({
 			"pageSize" : 1000
 		});
-
+        var h=0;
 		pagedData.pageRanges.forEach(function (pageRange) {
 
 			var page = pagedData.fetch({index: pageRange.index});
-            var h=0
-
+            
 			page.data.forEach(function (fresult) {
 
-                pagedatasppdcode[fresult.getValue({name: "name"})]= fresult.getValue({name: "internalid"})
+                ppdcodetask="PPD"+PPDID+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
+                pagedatasppdcode[h]= 
+                {
+                    "ppdcodetask": ppdcodetask,
+                    "ppdcode": fresult.getValue({name: "custrecord_ppd_code", summary: "MAX"}),
+                    "ppdid": fresult.getValue({name: "custrecord_ppd_id", summary: "MAX"}),
+                    "internalid": fresult.getValue({name: "internalid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"}),
+                    "poid": fresult.getValue({name: "custrecord_poid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"})
+                }
                 h++;
 			});
 		});
 
 		return pagedatasppdcode;
+	}
+
+    function fppdcodetask(PPDID) {
+		var pagedatasppdcodetask=[];
+
+		var fsearch = search.create({
+            type: "customrecord_ppd",
+            filters:
+            [
+               ["custrecord_ppd_id","noneof",PPDID],
+               "AND", 
+               ["custrecord_ppd_code","noneof","@NONE@"]
+            ],
+            columns:
+            [
+               search.createColumn({
+                  name: "custrecord_ppd_id",
+                  summary: "MAX"
+               }),
+               search.createColumn({
+                  name: "custrecord_ppd_code",
+                  summary: "MAX"
+               }),
+               search.createColumn({
+                  name: "custrecord_ppdcodetask",
+                  summary: "GROUP"
+               }),
+               search.createColumn({
+                  name: "custrecord_poid",
+                  join: "CUSTRECORD_PPD_CODE",
+                  summary: "MAX"
+               })
+            ]
+            });
+
+		var pagedData = fsearch.runPaged({
+			"pageSize" : 1000
+		});
+        var h=0
+		pagedData.pageRanges.forEach(function (pageRange) {
+
+			var page = pagedData.fetch({index: pageRange.index});
+            
+			page.data.forEach(function (fresult) {
+
+                pagedatasppdcodetask[h]= 
+                {
+                    "ppdcodetask": fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"}),
+                    "ppdcode": fresult.getValue({name: "custrecord_ppd_code", summary: "MAX"}),
+                    "ppdid": fresult.getValue({name: "custrecord_ppd_id", summary: "MAX"}),
+                    "poid": fresult.getValue({name: "custrecord_poid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"})
+                }
+                
+                h++;
+			});
+		});
+
+		return pagedatasppdcodetask;
 	}
     return {
         onRequest: onRequest

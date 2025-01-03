@@ -61,8 +61,8 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
 
             sublist = form.getSublist({id: 'recmachcustrecord_salecontract'});
             
-            sublist.addButton({
-                id: 'custpage_refresh1',
+            context.form.addButton({
+                id: 'ccustpage_refresh4',
                 label: 'Create Schedule',
                 functionName: 'refreshSchedule()'
             });

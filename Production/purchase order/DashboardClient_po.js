@@ -436,6 +436,8 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 line: i });
                 var ppdcode= currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdpo',
                 line: i });
+                var ppdinternalid= currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_ppdinternalid',
+                line: i });
                 var taskds = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskds',
                 line: i });
                 var leadtime = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_leadtime',
@@ -497,7 +499,8 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                     "custrecord_ppd_price": price,
                     "custrecord_purchaseunit": unitpurchase,
                     "custrecord_unitbase": unitbase,
-                    "custrecord_unitrate": unitrate
+                    "custrecord_unitrate": unitrate,
+                    "custrecord_ppdinternalid": ppdinternalid
                 }
                 
                 console.log("i: ",i);
