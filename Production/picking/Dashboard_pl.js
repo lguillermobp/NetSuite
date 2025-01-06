@@ -22,6 +22,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
         var pagedatasbo=[];
         var pagedatascm=[];
         var transferred=[];
+        var lineItemIds2 = [];
         function onRequest(context) {
             var userObj = runtime.getCurrentUser();
             var userID = userObj.id;
@@ -36,8 +37,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             WONo= paramWO.data.getValue({fieldId: "tranid"});
             WOsts= paramWO.data.getValue({fieldId: "status"});
 
-            log.audit("Wosts", WOsts);
-            
 
             finishedqtyso= paramWO.data.getValue({fieldId: "quantity"});
 
@@ -84,7 +83,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
                 if (WOsts=="Planned") 
                 {
-                    log.audit("WOID " , WOID);
                     try {
                         var itemrec = record.load({
                             type: "workorder",
@@ -551,8 +549,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         line: counter,
                         value: result1.qtyneeded
                     });
-                    log.audit("wresult1.item " , result1.item);
-                    log.audit("result1.binlocationid " , result1.binlocationid);
+
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binlocationid',
                         line: counter,
@@ -625,7 +622,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 
                 var counter = 0;
                 pagedatasbo.forEach(function(result1) {
+                    log.audit("result1.itemid " , result1.itemid);
+                    log.audit("lineItemIds2[result1.itemid] " , lineItemIds2[result1.itemid]);
 
+                    if (!lineItemIds2[result1.itemid]) {binloc=" ";}
+                    else {binloc=lineItemIds2[result1.itemid];}
 
                     sublistbo.setSublistValue({
                         id: 'custrecordbo_item',
@@ -642,7 +643,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistbo.setSublistValue({
                         id: 'custrecordbo_binnumberd',
                         line: counter,
-                        value: result1.binnumberd+" "
+                        value: binloc
                     });
                    
                     sublistbo.setSublistValue({
@@ -972,12 +973,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             if (!transferred[result.getText({name: "item",summary: "GROUP"})]) {qtytrn="0"}
             else {qtytrn=transferred[result.getText({name: "item",summary: "GROUP"})].qty}
-            log.audit("item " , result.getText({name: "item",summary: "GROUP"}));
-            log.audit("backo " , result.getValue({name: "formulanumeric",summary: "SUM"}));
-            log.audit("qtytrn " , qtytrn);
-            log.audit("qty " , result.getValue({name: "quantity",summary: "GROUP"}));
-
-           
+   
             lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity",summary: "GROUP"}),
@@ -994,6 +990,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             pagedatasbo[j] = {
                 "lineNumber": line,
                 "item": result.getText({name: "item",summary: "GROUP"}),
+                "itemid": result.getValue({name: "internalid", join: "item",summary: "GROUP"}),
                 "itemdesc": result.getValue({name: "formulatext",summary: "GROUP"}),
                 "binlocation": " ",
                 "qty": Math.ceil(result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn),
@@ -1015,7 +1012,42 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
         })
        
         lineItemIds = _.uniq(lineItemIds);
-        log.audit("workOrderLocation " , workOrderLocation);
+        log.audit("lineItemIds " , lineItemIds);
+
+
+        const binLocationItem = search.create({
+            type: "item",
+            filters:
+            [
+                ["internalid","anyof",lineItemIds],
+                "AND",
+                ["binnumber","isnotempty",""]
+            ],
+            columns:
+            [
+                "itemid",
+                "binnumber",
+                "internalid"
+            ]
+        });
+        var pagedData = binLocationItem.runPaged({
+            "pageSize" : 1000
+        });
+
+        pagedData.pageRanges.forEach(function (pageRange) {
+
+            var page = pagedData.fetch({index: pageRange.index});
+
+            page.data.forEach(function (result) {
+
+            log.audit("internalid " , result.getValue({name: "internalid"}));
+            log.audit("binnumber " , result.getValue({name: "binnumber"}));
+
+            lineItemIds2[result.getValue({name: "internalid"})] = result.getValue({name: "binnumber"});
+
+            });
+         });
+
         
         let balanceitem=0;
         let itembef;
@@ -1174,8 +1206,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 	}
     var pagedatastr=[];
     function findCases5(WO,workOrderLocation) {
-        log.audit("WO " , WO);
-        log.audit("workOrderLocation " , workOrderLocation);
             
         var j=0;
         const searchWorkOrderLines = search.create({
@@ -1215,7 +1245,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 			"pageSize" : 1000
 		});
 
-
+ 
 
 		pagedData.pageRanges.forEach(function (pageRange) {
 

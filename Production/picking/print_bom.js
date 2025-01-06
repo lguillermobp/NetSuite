@@ -39,7 +39,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     ["type","anyof","WorkOrd"], 
                     "AND", 
                     ["internalid","anyof",[WO_INTERNAL_ID]]
-                 ],
+                ],
                 
                 "columns": [
                     {
