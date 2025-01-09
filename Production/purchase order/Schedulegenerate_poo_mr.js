@@ -126,7 +126,7 @@
                                 text: productionline.trim() // Replace with the internal ID of the vendor
                             });
                             
-                            purchaseOrder.setText({
+                            purchaseOrder.setValue({
                                 fieldId: 'custbody_ppdcode',
                                 value: ppdpot.trim() // Replace with the internal ID of the vendor
                             });
@@ -199,7 +199,7 @@
                                 var vendorid = fresult.custrecordml_preferredvendorid;
                                 var taskds = fresult.custrecordml_taskds;
                                 var podate = fresult.custrecordml_podate;
-                                var leadtime = fresult.custrecordml_leadtime;
+                                var leadtime = fresult.custrecordml_leadtime; 
                                 var newpotdate=new Date(podate);
                                 
                                 //newpotdate.setDate(newpotdate.getDate()-leadtime);
