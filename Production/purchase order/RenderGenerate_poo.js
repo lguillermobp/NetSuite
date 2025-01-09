@@ -45,6 +45,10 @@ define(["N/search",'N/log', "N/file", "N/http", "N/xml", "N/error", "N/task"],
                     custscript_poo_data: DATAPPD
                 };
                 var scriptTaskId = scriptTask_mr.submit();
+
+                var myTaskStatus = task.checkStatus({
+                    taskId: scriptTaskId
+                });
                
                 context.response.renderPdf("Processing");
                 
