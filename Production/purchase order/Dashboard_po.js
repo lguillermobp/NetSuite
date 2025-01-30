@@ -176,11 +176,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'PPDPO'
                 });
 
-                
-
-                // ppdpod.updateDisplayType({
-                //     displayType: serverWidget.FieldDisplayType.HIDDEN
-                // });
+                 ppdpod.updateDisplayType({
+                     displayType: serverWidget.FieldDisplayType.HIDDEN
+                 });
+                 
                 sublistpm.addField({
                     id: "custrecordml_productionline",
                     type: serverWidget.FieldType.TEXT,
@@ -192,6 +191,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'Task Schedule'
                 });
                 taskid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var taskids =sublistpm.addField({
+                    id: "custrecordml_taskids",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Schedule'
+                });
+                taskids.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
                 sublistpm.addField({
@@ -396,6 +403,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     var indexxy = resultppdcode.map(function (img) { return img.ppdcode; }).indexOf(result1.ppdpo);
                     if (indexxy==-1) {ppdinternalid=0;} else {ppdinternalid=resultppdcode[indexxy].internalid;}
                     log.debug("ppdinternalid",ppdinternalid);
+                    log.debug("result1.ppdpo",result1.ppdpo);
 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_omit',
@@ -432,7 +440,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         
                     });
                     sublistpm.setSublistValue({
-                        id: 'custrecordml_sectionid',
+                        id: 'custrecordml_sectionid', 
                         line: counter,
                         value: 0
                         
@@ -459,6 +467,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_taskid',
                         line: counter,
                         value: result1.task
+                        
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_taskids',
+                        line: counter,
+                        value: result1.taskids
                         
                     });
                     sublistpm.setSublistValue({
@@ -733,6 +747,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             tastidd.updateDisplayType({
                 displayType: serverWidget.FieldDisplayType.HIDDEN
             });
+            var tastidds= sublistppd.addField({
+                id: "custrecordml_taskids",
+                type: serverWidget.FieldType.TEXT,
+                label:'task'
+            });
+            tastidds.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
+            });
             sublistppd.addField({
                 id: "custrecordml_taskd",
                 type: serverWidget.FieldType.TEXT,
@@ -843,6 +865,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: 'custrecordml_taskds',
                     line: counter,
                     value: result1.taskds
+                    
+                });
+                sublistppd.setSublistValue({
+                    id: 'custrecordml_taskids',
+                    line: counter,
+                    value: result1.taskids
                     
                 });
                 sublistppd.setSublistValue({
@@ -963,6 +991,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             summary: "GROUP"
             }),
             search.createColumn({
+               name: "internalid",
+               join: "CUSTBODY_SCHEDULETASKID",
+               summary: "GROUP"
+            }),
+            search.createColumn({
                name: "custrecord_so_sc_task",
                join: "CUSTBODY_TASKSC",
                summary: "GROUP",
@@ -1007,7 +1040,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             }),
             search.createColumn({
                 name: "formulanumeric",
-                summary: "MAX",
+                summary: "SUM",
                 formula: "CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END"
             }),
             search.createColumn({
@@ -1123,6 +1156,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     else {section=" ";}
                     if (fresult.getValue({name: "internalid",join: "CUSTBODY_TASKSC",summary: "GROUP"})) {task=fresult.getValue({name: "internalid",join: "CUSTBODY_TASKSC",summary: "GROUP"});}
                     else {task=" ";}
+                    if (fresult.getValue({name: "internalid",join: "CUSTBODY_SCHEDULETASKID",summary: "GROUP"})) {taskids=fresult.getValue({name: "internalid",join: "CUSTBODY_SCHEDULETASKID",summary: "GROUP"});}
+                    else {taskids=" ";}
                     if (fresult.getValue({name: "formulatext",summary: "GROUP"})) {taskd=fresult.getValue({name: "formulatext",summary: "GROUP"});}
                     else {taskd=" ";}
                     if (fresult.getValue({name: "custrecord_so_sc_startdate",join: "CUSTBODY_TASKSC",summary: "MAX"})) {taskds=fresult.getValue({name: "custrecord_so_sc_startdate",join: "CUSTBODY_TASKSC",summary: "MAX"});}
@@ -1146,7 +1181,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     price=fresult.getValue({name: "formulacurrency",summary: "MAX"});
                     currency=fresult.getValue({name: "formulatext",summary: "MAX"});
         
-                    qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "MAX"}));
+                    qtytot+=Number(fresult.getValue({name: "formulanumeric",summary: "SUM"}));
                 
                     qtytota=Number(fresult.getValue({name: "quantityavailable",join: "item",summary: "MAX"}));
                     unitpurchase=fresult.getText({name: "purchaseunit",join: "item",summary: "GROUP"});
@@ -1178,6 +1213,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "ppdpo": ppdpo,
 					"section": section,
                     "task": task,
+                    "taskids": taskids,
                     "nobatching": nobatching,
                     "taskd": taskd,
                     "taskds": taskds,
@@ -1213,6 +1249,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "ppdpo": ppdpo,
                                 "task": task,
                                 "taskd": taskd,
+                                "taskids": taskids,
                                 "nobatching": nobatching,
                                 "taskds": taskds,
                                 "podate": taskds,
@@ -1241,6 +1278,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "ppdpo": ppdpo,
                                 "task": task,
                                 "taskd": taskd,
+                                "taskids": taskids,
                                 "taskds": taskds,
                                 "nobatching": nobatching,
                                 "podate": podate,
@@ -1283,6 +1321,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "section": section,
                 "task": task,
                 "taskd": taskd,
+                "taskids": taskids,
                 "nobatching": nobatching,
                 "taskds": taskds,
                 "taskde": taskde,
@@ -1317,6 +1356,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "task": task,
                                 "taskd": taskd,
                                 "taskds": taskds,
+                                "taskids": taskids,
                                 "nobatching": nobatching,
                                 "podate": taskds,
                                 "productionline": productionline,
@@ -1344,6 +1384,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "ppdpo": ppdpo,
                                 "task": task,
                                 "taskd": taskd,
+                                "taskids": taskids,
                                 "nobatching": nobatching,
                                 "taskds": taskds,
                                 "podate": podate,

@@ -88,7 +88,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         });
         log.debug("sc",sc);
         log.debug("pl",pl);
-        lookstsc(sc, pl, shipdate,0);
+        lookstsc1(sc, pl, shipdate,0);
         
     }
 
@@ -235,17 +235,23 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
             console.log("initial",initial);
             console.log("days",days);
             var noadd="N"
+            
             if (monthlycal==1) 
                            
             { 
-                if (minitial==-1)      {minitial=1;months=0;noadd="Y"}
-                else
-                {
-                    if (minitial<months)      {months=0;noadd="Y"}
-                }
-                newstartdate=new Date(ecdmonths[minitial+months].datefirst);
-                newenddate=new Date(ecdmonths[minitial+months].datelast);
-                duration=ecdmonths[minitial+months].days;
+                if (!ecdmonths[minitial+months])
+
+                    {noadd="Y";}
+                     else {
+                        if (minitial==-1)      {minitial=1;months=0;noadd="Y"}
+                        else
+                        {
+                            if (minitial<months)      {months=0;noadd="Y"}
+                        }
+                        newstartdate=new Date(ecdmonths[minitial+months].datefirst);
+                        newenddate=new Date(ecdmonths[minitial+months].datelast);
+                        duration=ecdmonths[minitial+months].days;
+                        }
             }
             else 
             {
@@ -419,6 +425,99 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
 
 
     }
+
+     function lookstsc1(sc, pl, shipdate,dayspushed) {
+
+        var fsearch = s.create({
+            type: "customrecord_so_scheduletasks",
+            filters:
+            [
+                ["custrecord_salecontract","anyof",sc]
+            ],
+            columns:
+            [
+                "internalid",
+                "custrecord_salecontract",
+                "custrecord_so_sc_productionline",
+                "custrecord_so_sc_tasksgroup",
+                "custrecord_so_sc_note",
+                "custrecord_so_sc_startdate",
+                "custrecord_so_sc_enddate",
+                s.createColumn({
+                    name: "custrecord_sc_tasksgroup",
+                    join: "CUSTRECORD_SO_SC_TASK"
+                }),
+                s.createColumn({
+                    name: "custrecord_sc_task",
+                    join: "CUSTRECORD_SO_SC_TASK"
+                }),
+                s.createColumn({
+                    name: "custrecord_sc_days",
+                    join: "CUSTRECORD_SO_SC_TASK"
+                }),
+                s.createColumn({
+                    name: "custrecord_sc_tasksseq",
+                    join: "CUSTRECORD_SO_SC_TASK",
+                    sort: s.Sort.ASC
+                }),
+                s.createColumn({
+                   name: "custrecord_monthlycal",
+                   join: "CUSTRECORD_SO_SC_PRODUCTIONLINE"
+                })
+            ]
+            });
+
+
+        var pagedData = fsearch.runPaged({
+            "pageSize" : 1000
+        });
+        log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
+       
+        
+        if (pagedData.pageRanges.length > 0) {
+       
+            function success(result) {
+
+                if (result) 
+                {
+                    pagedData.pageRanges.forEach(function (pageRange) {
+                        var page = pagedData.fetch({index: pageRange.index});
+                        page.data.forEach(function (fresult1) {
+                            
+                            scheduleID = fresult1.getValue({ name: "internalid" });
+
+                            record.delete({
+                                type: 'customrecord_so_scheduletasks',
+                                id: scheduleID.trim()
+                            });
+
+                            
+                            log.debug("scheduleID",scheduleID);
+                        });
+                    });
+                }
+                lookst(sc, pl, shipdate);
+                console.log('Success with value ' + result);
+            }
+        
+            function failure(reason) {
+                console.log('Failure: ' + reason);
+            }
+            dialog.confirm({
+                'title': 'Sales Contract contains Schedule Tasks',
+                'message': 'Are you sure that you want refresh it?'
+            }).then(success).catch(failure);
+            
+        }
+        else
+        {
+            lookst(sc, pl, shipdate);
+        }
+
+
+
+    }
+
 
 // Crib Design Template
 

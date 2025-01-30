@@ -126,7 +126,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
 
                             ppdporec=currentRecord.getCurrentSublistValue({
                                 sublistId: 'custpage_records',
-                                fieldId: 'custrecordml_ppdpo1'
+                                fieldId: 'custrecordml_ppdpo'
                             });
 
                             if (ppdporec!=ppdpo) continue;
@@ -426,6 +426,8 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 var amount = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_total',  line: i });
                 var task = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',
                 line: i });
+                var taskids = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskids',
+                    line: i });
                 var taskd = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_task',
                 line: i });
                 var productionline = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_productionline',
@@ -488,6 +490,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                     "custrecord_ppd_customer": customerid,
                     "custrecord_ppd_productionline": productionline,
                     "custrecord_ppd_task": task,
+                    "custrecord_ppd_taskids": taskids,
                     "custrecord_ppd_currency": currency,
                     "custrecord_ppd_currencyrate": currencyrate,
                     "custrecord_ppd_leadtime": leadtime,

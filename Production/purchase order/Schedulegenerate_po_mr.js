@@ -68,17 +68,19 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             var custrecord_unitbase = fresult.custrecord_unitbase;
             var custrecord_unitrate = fresult.custrecord_unitrate;
             var custrecord_ppdinternalid= fresult.custrecord_ppdinternalid;
+            var custrecord_ppd_taskids = fresult.custrecord_ppd_taskids;
  
             var ppdid = custrecord_ppd_id;
             var ppdpo = custrecord_ppd_code;
             var podate = custrecord_ppd_date;
+            log.debug("ppdpo",ppdpo);
         
             if (ppdpo!=tppdpo) 
             {
                 tppdpo=ppdpo;
 
                 try {
-
+                    log.debug("custrecord_ppdinternalid",custrecord_ppdinternalid);
                 if (custrecord_ppdinternalid!=0) 
                     {
 
@@ -101,7 +103,6 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                         });
 
                     }
-                    else {podate=summarypos[index].podate;}
 
                     PPDCode.save();
                     PPDCodeID=custrecord_ppdinternalid;
@@ -144,6 +145,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             var amountdol = custrecord_ppd_amountdollar;
             var amount = custrecord_ppd_amount;
             var task = custrecord_ppd_task;
+            var taskids = custrecord_ppd_taskids;
             var productionline = custrecord_ppd_productionline;
             var customerid = custrecord_ppd_customer;
             var vendorid = custrecord_ppd_vendor;
@@ -169,6 +171,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
                 fieldId: 'custrecord_ppdcodetask',
                 value: 'V'+vendorid+'T'+task // Replace with the internal ID of the vendor
             });
+            
             PPD.setValue({
                 fieldId: 'custrecord_ppd_vendor',
                 value: vendorid // Replace with the internal ID of the vendor
@@ -176,6 +179,10 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             PPD.setValue({
                 fieldId: 'custrecord_ppd_task',
                 value: task // Replace with the internal ID of the vendor
+            });
+            PPD.setValue({
+                fieldId: 'custrecord_ppd_taskid',
+                value: taskids // Replace with the internal ID of the vendor
             });
             PPD.setText({
                 fieldId: 'custrecord_ppd_productionline',

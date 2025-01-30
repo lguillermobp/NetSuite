@@ -18,7 +18,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var currentRecord = context.currentRecord;
         var fieldId = context.fieldId;
         log.debug("fieldId",fieldId);
-        if (fieldId == "custrecord_so_sc_startdate1111") {
+        if (fieldId == "custrecord_so_sc_startdate" || fieldId == "custrecord_sc_soduration") {
             var startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
             var duration = currentRecord.getValue({ fieldId: "custrecord_sc_soduration" });
             log.debug("startdate",startdate);
@@ -66,7 +66,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             log.debug("final",final);
             dayspushed = Math.abs(final - initial) + 1;
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
-            pushsch(internalid, dayspushed,seq,internalidsc,pl);
+            //pushsch(internalid, dayspushed,seq,internalidsc,pl);
         }
         window.opener.location.reload(false);
 

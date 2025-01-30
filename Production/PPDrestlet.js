@@ -20,96 +20,10 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
          function post (_ref) {
 
-            var fsearch = search.create({
-                type: "customrecord_ppd_po",
-                filters:
-                [
-                   ["custrecord_poid.mainline","is","T"], 
-                   "OR", 
-                   ["custrecord_poid","anyof","@NONE@"]
-                ],
-                columns:
-                [
-                   search.createColumn({
-                      name: "custrecord_ppdid",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "name",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_productionline",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_task",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custbody_task",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_vendor",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_date",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_customer",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_currency",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_amountdollar",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "SUM"
-                   }),
-                   search.createColumn({
-                      name: "custrecord_ppd_amount",
-                      join: "CUSTRECORD_PPD_CODE",
-                      summary: "SUM"
-                   }),
-                   search.createColumn({
-                      name: "tranid",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "custbody_typepo",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "amount",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "statusref",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   }),
-                   search.createColumn({
-                      name: "trandate",
-                      join: "CUSTRECORD_POID",
-                      summary: "GROUP"
-                   })
-                ]
-             });
+            var fsearch =search.load({
+               id: "customsearch_ppddashboard"
+           });
+                
 
              var pagedData = fsearch.runPaged({
                 "pageSize" : 1000
@@ -120,12 +34,13 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
 
+                   
+
                     dataf[i] = {
-                        "custrecord_ppdid": fresult1.getValue({name: "custrecord_ppdid", summary: "GROUP"}),
+                        "custrecord_ppdid": fresult1.getText({name: "custrecord_ppdid", summary: "GROUP"}),
                         "name": fresult1.getValue({name: "name", summary: "GROUP"}),
                         "custrecord_ppd_productionline": fresult1.getText({name: "custrecord_ppd_productionline", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
-                        "custrecord_ppd_task": fresult1.getText({name: "custrecord_ppd_task", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
-                        "custbody_task": fresult1.getText({name: "custbody_task", join: "CUSTRECORD_POID", summary: "GROUP"}),
+                        "custrecord_ppd_task": fresult1.getText({name: "custrecord_ppd_taskid", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
                         "custrecord_ppd_vendor": fresult1.getText({name: "custrecord_ppd_vendor", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
                         "custrecord_ppd_date": fresult1.getValue({name: "custrecord_ppd_date", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
                         "custrecord_ppd_customer": fresult1.getText({name: "custrecord_ppd_customer", join: "CUSTRECORD_PPD_CODE", summary: "GROUP"}),
@@ -136,9 +51,10 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "custbody_typepo": fresult1.getText({name: "custbody_typepo", join: "CUSTRECORD_POID", summary: "GROUP"}),
                         "amount": fresult1.getValue({name: "amount", join: "CUSTRECORD_POID", summary: "GROUP"}),
                         "statusref": fresult1.getText({name: "statusref", join: "CUSTRECORD_POID", summary: "GROUP"}),
-                        "trandate": fresult1.getValue({name: "trandate", join: "CUSTRECORD_POID", summary: "GROUP"})
+                        "trandate": fresult1.getValue({name: "trandate", join: "CUSTRECORD_POID", summary: "GROUP"}),
+                        "trackingnumbers": fresult1.getValue({name: "trackingnumbers", join: "CUSTRECORD_POID", summary: "GROUP"}),
+                        "custbody_addtracking": fresult1.getValue({name: "custbody_addtracking", join: "CUSTRECORD_POID", summary: "GROUP"})
                     }
-                    log.audit("dataf", dataf[i]);
                     log.audit("i", i);
                     i++;
 

@@ -339,6 +339,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
                 
                 if (tdhoydatey>=datetofindy && tdhoydatey<=datetoendy) {
+                    log.audit("tdhoydatey",tdhoydatey);
+                    log.audit("datetofindy",datetofindy);
+                    log.audit("datetoendy",datetoendy);
                     
                     classtask="tasktoday";}
 
