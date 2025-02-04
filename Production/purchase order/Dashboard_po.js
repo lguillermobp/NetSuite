@@ -396,7 +396,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
                 
-                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf("PPD"+PPDID+"V"+result1.preferredvendorid+"T"+result1.task);
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf("PPD"+PPDID+"L"+result1.productionlineid+"V"+result1.preferredvendorid+"T"+result1.task);
 
                     if (indexxy!=-1 || result1.ppdpreview != " ") {womit="T";} else {womit="F";}
 
@@ -1152,6 +1152,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			page.data.forEach(function (fresult) {
 
                     productionline=fresult.getText({name: "custbody_productionline",summary: "GROUP"});
+                    productionlineid=fresult.getValue({name: "custbody_productionline",summary: "GROUP"});
                     if (fresult.getValue({name: "custbody_section",summary: "GROUP"})) {section=fresult.getValue({name: "custbody_section",summary: "GROUP"});}
                     else {section=" ";}
                     if (fresult.getValue({name: "internalid",join: "CUSTBODY_TASKSC",summary: "GROUP"})) {task=fresult.getValue({name: "internalid",join: "CUSTBODY_TASKSC",summary: "GROUP"});}
@@ -1193,8 +1194,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                    // ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task; 
 
-                   if (nobatching==false) {ppdpo="PPD"+PPDID+"V"+preferredvendorid;}
-                   else {ppdpo="PPD"+PPDID+"V"+preferredvendorid+"C"+memoid;}
+                   if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid;}
+                   else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid;}
                      
                    var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(unitbase+"/"+unitpurchase));
                    if (index1==-1) {unitrate=1;}
@@ -1790,6 +1791,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             ],
             columns:
             [
+                "custrecord_ppd_productionline",
                search.createColumn({
                   name: "custrecord_ppd_id",
                   summary: "MAX"
@@ -1825,7 +1827,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             
 			page.data.forEach(function (fresult) {
 
-                ppdcodetask="PPD"+PPDID+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
+                ppdcodetask="PPD"+PPDID+"L"+fresult.getValue({name: "custrecord_ppd_productionline"})+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
                 pagedatasppdcode[h]= 
                 {
                     "ppdcodetask": ppdcodetask,

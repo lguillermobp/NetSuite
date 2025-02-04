@@ -244,7 +244,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
 
             if (custrecord_unitrate==0) {custrecord_unitrate=1;}
                 
-                qty=Math.ceil(qty/custrecord_unitrate);
+                qty=Math.ceil(qty/custrecord_unitrate); 
             PPD.setValue({
                 fieldId: 'custrecord_ppd_quantity',
                 value: qty // Set the transaction memo

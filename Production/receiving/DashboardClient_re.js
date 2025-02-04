@@ -166,7 +166,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                         sublistId: context.sublistId,
                         fieldId: "custrecordml_bin"
                     });
-
+                    console.log('binNumber',binNumber);
                     if (binNumber) 
 
                         {
@@ -202,7 +202,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     fieldId: 'preferredbin',
                                     value: true
                                 });
-                            
+                                console.log('lineNumber',lineNumber);
                                 if (lineNumber==-1) {
                                     
                                     rec.selectNewLine({sublistId: "binnumber"});
