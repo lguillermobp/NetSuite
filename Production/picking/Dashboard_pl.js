@@ -985,6 +985,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
             };
+            log.audit("backorder " , result.getValue({name: "formulanumeric",summary: "SUM"}));
+            log.audit("itemdesc " , result.getValue({name: "formulatext",summary: "GROUP"}));
             if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0) 
             {
             pagedatasbo[j] = {

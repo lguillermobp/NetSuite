@@ -386,11 +386,13 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                                 type: "customrecord_so_scheduletasks",
                                 id: scheduleID.trim()
                             });
-
+                            log.audit("newenddatestart",newenddatestart);
+                            log.audit("newenddatestart",newenddatestart);
                             recordschedule.setValue({
                                 fieldId: "custrecord_so_sc_startdate",
                                 value: newenddatestart
                             });
+                            log.audit("newenddateend",newenddateend);
                             recordschedule.setValue({
                                 fieldId: "custrecord_so_sc_enddate",
                                 value: newenddateend

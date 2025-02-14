@@ -131,6 +131,7 @@ function lookcd(sc, cd) {
             var descrip = fresult1.getValue({ name: "formulatext",summary: "GROUP"});
             var trandate = fresult1.getValue({ name: "trandate",summary: "GROUP" });
             var memo = fresult1.getValue({ name: "memomain",summary: "GROUP" });
+            var document = fresult1.getValue({ name: "tranid",summary: "GROUP" });
                 
         var newTaskRecord = record.create({
             type: "customrecord_aid",
@@ -141,17 +142,29 @@ function lookcd(sc, cd) {
             fieldId: "custrecord_ai",
             value: sc 
         });
-        description = descrip + "-" + trandate;
+        description = descrip;
         if (memo !="- None -") {
             description += "-" + memo;
         }
         newTaskRecord.setValue({
             fieldId: "custrecord_aid_description",
-            value: description 
+            value: descrip 
         });
         newTaskRecord.setValue({
             fieldId: "custrecord_typeofdetail",
             value: 1 
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_document",
+            value: document 
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_date",
+            value: new Date(trandate) 
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_category",
+            value: descrip 
         });
         newTaskRecord.setValue({
             fieldId: "custrecord_aid_amount",
@@ -234,7 +247,8 @@ function lookcdq(sc, cd) {
             "discountamount",
             "total",
             "grossamount",
-            "itemtype"
+            "itemtype",
+            "custcol_saledescription"
         ]
             });
 
@@ -276,7 +290,10 @@ function lookcdq(sc, cd) {
         log.debug("page.length",page.length);
         page.data.forEach(function (fresult1) {
             var amount = Number(fresult1.getValue({ name: "amount"}));
-            var descrip = fresult1.getValue({ name: "memo"});
+            var descrip = fresult1.getValue({ name: "custcol_saledescription"});
+            var docdate = fresult1.getValue({ name: "trandate"});
+            var document = fresult1.getValue({ name: "tranid"});
+            var doccategory = fresult1.getValue({ name: "type"});
                 
         var newTaskRecord = record.create({
             type: "customrecord_aid",
@@ -291,6 +308,18 @@ function lookcdq(sc, cd) {
         newTaskRecord.setValue({
             fieldId: "custrecord_aid_description",
             value: description 
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_document",
+            value: document 
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_date",
+            value: new Date(docdate)  
+        });
+        newTaskRecord.setValue({
+            fieldId: "custrecord_aid_category",
+            value: doccategory 
         });
         newTaskRecord.setValue({
             fieldId: "custrecord_typeofdetail",

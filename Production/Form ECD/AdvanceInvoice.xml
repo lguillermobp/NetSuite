@@ -123,15 +123,26 @@
                 <td class="totalboxtop" colspan="5"><b>Total</b></td>
                 </tr>
                 <tr>
-                <td class="address" colspan="6" rowspan="2"><span class="customer"><strong>${results[0].custrecord_ai_customer}</strong></span><br/>${results[0].address}<br/>${results[0].custrecord_ai_description}</td>
+                <td class="address" colspan="6" rowspan="2"><span class="customer"><strong>${results[0].custrecord_ai_customer}</strong></span><br/>${results[0].address}</td>
                 <td align="right" class="totalboxmid" colspan="5">${results[0].custrecord_ai_amount}</td>
                 </tr>
                 <tr>
                 <td align="right" class="totalboxbot" colspan="5"><b>Due Date:</b> ${results[0].custrecord_ai_duedate}</td>
                 </tr>
             </table>
-
             <br/>
+            <table class="body" style="width: 100%; margin-top: 10px;">
+                <tr>
+                    <th>Description</th>
+                    <th>Memo</th>
+                    <th>Additional Memo</th>
+                </tr>
+                <tr>
+                    <td>${results[0].custrecord_ai_description}</td>
+                    <td>${results[0].custrecord_ai_memo}</td>
+                    <td>${results[0].custrecord_memo1}</td>
+                </tr>
+            </table>
 
         </macro>
         <macro id="nlfooter">
@@ -141,30 +152,36 @@
         </macro>
     </macrolist>
   </head>
-  <body header="nlheader" header-height="27%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+  <body header="nlheader" header-height="35%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
 
-    <table style="width: 100%;">
+    <table  class="header"  style="width: 100%;">
+           
       <#list results as result>
         <#if result_index == 0>
           <thead>
             <tr>
-                <th width="75%">Description </th>
-	            <th width="25%">Amount</th>
+                <th width="46%">Description </th>
+				<th width="10%">Date </th>
+				<th width="28%">Document</th>
+	            <th width="16%">Amount</th>
             </tr>
           </thead>
           <#assign typo = result.custrecord_typeofdetail>
         </#if>
-        <#if result.custrecord_typeofdetail!=typo>  <tr><td colspan="2"><hr/></td> </tr>
+        <#if result.custrecord_typeofdetail!=typo>  <tr><td colspan="4"><hr/></td> </tr>
             <#assign typo = result.custrecord_typeofdetail>
 
                
             </#if>
 
-            <tr>
-            <#if result.custrecord_typeofdetail!=' ' && result.custrecord_aid_amount==0 > <td><strong>${result.custrecord_aid_description}</strong></td> 
-            <#else> <td>${result.custrecord_aid_description}</td> 
-            </#if>
+            <tr style="padding-top: 10px;">
+            <#if result.custrecord_typeofdetail!=' ' && result.custrecord_aid_amount==0 > <td colspan="4"><strong>${result.custrecord_aid_description}</strong></td> 
+            <#else> 
+            <td>${result.custrecord_aid_description}</td> 
+            <td>${result.custrecord_aid_date}</td> 
+            <td>${result.custrecord_aid_document}</td> 
 	        <td align="right">${result.custrecord_aid_amount}</td>
+            </#if>
             </tr>
 
 

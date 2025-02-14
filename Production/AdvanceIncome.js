@@ -60,6 +60,14 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                         name: "custrecord_aid_amount",
                         join: "CUSTRECORD_AI"
                      }),
+                     search.createColumn({
+                        name: "custrecord_aid_document",
+                        join: "CUSTRECORD_AI"
+                     }),
+                     search.createColumn({
+                        name: "custrecord_aid_date",
+                        join: "CUSTRECORD_AI"
+                     }),
                      "internalid",
                      search.createColumn({
                         name: "internalid",

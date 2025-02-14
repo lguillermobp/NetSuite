@@ -2,8 +2,8 @@
  * @NApiVersion 2.0
  * @NScriptType MassUpdateScript
  */
-define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
-    function(record, log, GENERALTOOLS) {
+define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
+    function(search,record, log, GENERALTOOLS) {
         var salecontract;
         function each(params) {
             var currentRecord = record.load({
@@ -11,62 +11,76 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 id: params.id,
                 isDynamic: true
             });
-            
-            task = currentRecord.getText({fieldId: "custbody_scheduletaskid"});
+            var saveon=false;
+            section = currentRecord.getValue({fieldId: "custbody_ecdsection"});
+
+            if (!section) 
+            {
+                assemblyrec = record.load({
+                    type: 'assemblyitem',
+                    id: currentRecord.getValue({ fieldId: 'assemblyitem' }),
+                    isDynamic: true
+                })
+                section = assemblyrec.getValue({ fieldId: 'custitem_sections' });
+                log.debug("section", section);
+                log.debug("assemblyrec", assemblyrec);
+                if (!section)
+                {
+                    return;
+                }
+                else
+                {
+                    currentRecord.setValue({ fieldId: "custbody_ecdsection", value: section });
+                    saveon=true;
+                }
+            }
+            productionline = currentRecord.getValue({fieldId: "custbody_productionline"});
+
+            var sectionRecord = record.load({
+                type: 'customrecord_section',
+                id: section,
+                isDynamic: true
+            });
+
+            var stages = sectionRecord.getValue({ fieldId: 'custrecord_stages' });
+            log.debug("stages", stages);
+
             assembly= currentRecord.getValue({fieldId: "assemblyitem"});
             createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
-            if (createdfrom == 11485) { 
 
-                salecontract = record.load({
-                    type: 'salesorder',
-                    id: createdfrom,
-                    isDynamic: true
-                });
-                productionline = salecontract.getValue({fieldId: "custbody_productionline"});
-                currentRecord.setValue({fieldId: "custbody_productionline", value: productionline});
+            var customrecord_pl_scheduletaskSearchObj = search.create({
+                type: "customrecord_pl_scheduletask",
+                filters:
+                [
+                   ["custrecord158","anyof",stages], 
+                   "AND", 
+                   ["custrecord_plst_productionline","anyof",productionline]
+                ],
+                columns:
+                [
+                   "custrecord158",
+                   "custrecord_plst_productionline",
+                   "custrecord_plst_task"
+                ]
+             });
+            var taskdef;
+            var pagedData = customrecord_pl_scheduletaskSearchObj.runPaged({
+                "pageSize" : 1000
+            });
 
-                var lineNumber = salecontract.findSublistLineWithValue({
-                    sublistId: 'item',
-                    fieldId: 'item',
-                    value: assembly
-                });
-                log.debug("lineNumber",lineNumber);
+            pagedData.pageRanges.forEach(function (pageRange) {
+                var page = pagedData.fetch({index: pageRange.index});
+                page.data.forEach(function (fresult1) {
 
-                var parmassambly = record.load({
-                    type: 'assemblyitem',
-                    id: assembly,
-                    isDynamic: true
-                });
-                log.debug("taskb",task);
-                task = parmassambly.getText({fieldId: "custitem_task"});
+                    taskdef= fresult1.getValue({name: "custrecord_plst_task"});
+                    taskdefd= fresult1.getText({name: "custrecord_plst_task"});
 
-                if (lineNumber != -1) {
-                    
-                
+                });
+            });
 
-                salecontract.selectLine({
-                    sublistId: 'item',
-                    line: lineNumber
-                });
-                salecontract.setCurrentSublistValue({
-                    sublistId: 'item',
-                    fieldId: 'custcol_taskid',
-                    value: task,
-                    ignoreFieldChange: true
-                });
-                salecontract.commitLine({
-                    sublistId: 'item'
-                });
-            }
-                currentRecord.setValue({fieldId: "custbody_task", value: task});
-                log.debug("taska",task);
-                salecontract.save();
-            }
-            
-            log.debug("createdfrom",createdfrom);
-            if (task && createdfrom)
+            if (taskdef && createdfrom)
             {
-            paramschedule = GENERALTOOLS.getScheduleParams(task, createdfrom);
+            paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
             log.debug("paramschedule",paramschedule);
             paramdata = paramschedule.data;
             if (paramdata) 
@@ -76,16 +90,17 @@ define(['N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
                 internalid = paramdata.getValue({name: "internalid"});
                 log.debug("internalid",internalid);
                 currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
-                currentRecord.setValue({fieldId: "custbody_task", value: task});
+                currentRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
                 
                 }
             else 
             {
-
                 currentRecord.setValue({fieldId: "custbody_tasksc", value: ''});
+                saveon=true;
             }
-            currentRecord.save();
+            
             }
+            if (saveon)           {currentRecord.save();}
             
         }
         
