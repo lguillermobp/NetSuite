@@ -169,7 +169,7 @@ define(["N/runtime",'N/log', 'N/search', 'N/record',"N/email", "/SuiteScripts/Mo
             });
             PPD.setValue({
                 fieldId: 'custrecord_ppdcodetask',
-                value: 'V'+vendorid+'T'+task // Replace with the internal ID of the vendor
+                value: 'V'+vendorid+'T'+taskids+'C'+customerid // Replace with the internal ID of the vendor
             });
             
             PPD.setValue({

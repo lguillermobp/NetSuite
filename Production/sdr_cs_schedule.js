@@ -68,7 +68,11 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
             //pushsch(internalid, dayspushed,seq,internalidsc,pl);
         }
+        try {
         window.opener.location.reload(false);
+        } catch (e) {
+            
+        }
 
         return true;
     }

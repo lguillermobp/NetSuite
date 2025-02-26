@@ -912,7 +912,48 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
 
         }
 
+        function get_billbalance (billid){
 
+            var filterArray = [];
+            filterArray.push(['internalid', 'anyof', billid], 'AND', ['type', 'anyof', 'VendBill'], 'AND', ['mainline', 'is', "T"]);
+           
+            var fsearch = s.load({
+                id: "customsearch_billbalance"
+            });
+            fsearch.filterExpression = filterArray;
+
+            var pagedData = fsearch.runPaged({
+                "pageSize" : 1000
+            });
+            var i=0;
+            var witemdata;
+            pagedData.pageRanges.forEach(function (pageRange) {
+
+                var page = pagedData.fetch({index: pageRange.index});
+
+
+                page.data.forEach(function (fresult1) {
+
+                   
+                    i++;
+                    witemdata= {    "amaount": fresult1.getValue({name: "amount"}),
+                                    "amaountpaid": fresult1.getValue({name: "amountpaid"}),
+                                    "fxamount": fresult1.getValue({name: "fxamount"}),
+                                    "fxamountpaid": fresult1.getValue({name: "fxamountpaid"})} ;
+
+                })
+            })
+        var retvar= {};
+
+        retvar = {
+            "sts": "Complated",
+            "date": "",
+            "records": i,
+            "data": witemdata
+        }
+        return retvar;
+
+    }
         function get_Item_basic (item){
 
 
@@ -1977,7 +2018,8 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             get_item_informations: get_item_informations,
             get_items_listInventory: get_items_listInventory,
             get_PPDID: get_PPDID,
-            calcenddate: calcenddate
+            calcenddate: calcenddate,
+            get_billbalance: get_billbalance
         };
 
 

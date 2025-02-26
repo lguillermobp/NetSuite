@@ -91,6 +91,7 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
                 log.debug("internalid",internalid);
                 currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
                 currentRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
+                saveon=true;
                 
                 }
             else 

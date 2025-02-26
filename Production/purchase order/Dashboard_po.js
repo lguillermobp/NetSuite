@@ -388,6 +388,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 var resultscurr= currencies();
                 var resultppdcode=fppdcode(PPDID)
+                log.debug("resultppdcode",resultppdcode);
 
                 
 
@@ -396,15 +397,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
                 
-                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf("PPD"+PPDID+"L"+result1.productionlineid+"V"+result1.preferredvendorid+"T"+result1.task);
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf('V'+result1.preferredvendorid+"T"+result1.taskids+"C"+result1.customer);
 
+                    log.audit("result1.preferredvendorid",result1.preferredvendorid);
+                    log.audit("result1.taskids",result1.taskids);
+                    log.audit("result1.customer",result1.customer);
+                    log.audit("result1.ppdreview",result1.ppdreview);
+                    
                     if (indexxy!=-1 || result1.ppdpreview != " ") {womit="T";} else {womit="F";}
 
                     var indexxy = resultppdcode.map(function (img) { return img.ppdcode; }).indexOf(result1.ppdpo);
                     if (indexxy==-1) {ppdinternalid=0;} else {ppdinternalid=resultppdcode[indexxy].internalid;}
-                    log.debug("ppdinternalid",ppdinternalid);
-                    log.debug("result1.ppdpo",result1.ppdpo);
-
+                    
                     sublistpm.setSublistValue({
                         id: 'custrecordml_omit',
                         line: counter,
@@ -1201,8 +1205,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    if (index1==-1) {unitrate=1;}
                     else {unitrate=resultsunitm[index1].conversionrate;}
 
-                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+task);
-                    log.debug("ppdpreview","V"+preferredvendorid+"T"+task);
+                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
+                    
                     if (indexx==-1) 
                         {ppdpreview=" ";}
                     else
@@ -1310,7 +1314,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if (index1==-1) {unitrate=1;}
                 else {unitrate=resultsunitm[index1].conversionrate;}
 
-                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+task);
+                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
                 if (indexx==-1) 
                     {ppdpreview=" ";}
                 else
@@ -1791,7 +1795,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             ],
             columns:
             [
-                "custrecord_ppd_productionline",
+                search.createColumn({
+                    name: "custrecord_ppd_productionline",
+                    summary: "GROUP"
+                 }), 
                search.createColumn({
                   name: "custrecord_ppd_id",
                   summary: "MAX"
@@ -1827,7 +1834,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             
 			page.data.forEach(function (fresult) {
 
-                ppdcodetask="PPD"+PPDID+"L"+fresult.getValue({name: "custrecord_ppd_productionline"})+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
+                ppdcodetask="PPD"+PPDID+"L"+fresult.getValue({name: "custrecord_ppd_productionline", summary: "GROUP"})+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
                 pagedatasppdcode[h]= 
                 {
                     "ppdcodetask": ppdcodetask,

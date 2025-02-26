@@ -450,7 +450,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 line: i });
                 var newpotdate=new Date(taskds);
                 var newpotdatedue=new Date(taskds);
-                newpotdate.setDate(newpotdate.getDate()-leadtime);
+                newpotdate.setDate(newpotdate.getDate()-leadtime); 
 
                 if (new Date(newpotdate)<new Date(custpageDate)) 
                     {newpotdate=new Date(custpageDate);}
