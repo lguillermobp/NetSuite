@@ -9,6 +9,13 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
     function beforeLoad(context) {
         const currentRecordId = context.newRecord.id;
         log.audit({title: "context.type", details: context.type});
+
+        var userObj = runtime.getCurrentUser();
+		var userID = userObj.id;
+		var userPermission = userObj.getPermission({	name : 'TRAN_PURCHORD'	});
+		autPO= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
+
+
         wostatus = context.newRecord.getValue({fieldId: "status"});
 
         if (context.type === context.UserEventType.VIEW) {
@@ -32,6 +39,21 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
                     functionName: `window.open('${printSuitelet1}');`
                 })
             }
+
+            if (wostatus == "Released" || wostatus == "In Progress") {
+
+                if (autPO=="FULL") 
+                    {
+                        const printSuitelet2 = `/app/site/hosting/scriptlet.nl?script=2568&deploy=1&idwo=${currentRecordId}`
+
+                        context.form.addButton({
+                            id: "custpage_createpo", 
+                            label: "Create POs",
+                            functionName: `window.open('${printSuitelet2}');`
+                        })
+                    }
+            }
+
 
             
         }
