@@ -7,14 +7,19 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
     var session = runtime.getCurrentSession();
 
     function beforeLoad(context) {
+
+      
         const currentRecordId = context.newRecord.id;
         log.audit({title: "context.type", details: context.type});
+
+      
 
         var userObj = runtime.getCurrentUser();
 		var userID = userObj.id;
 		var userPermission = userObj.getPermission({	name : 'TRAN_PURCHORD'	});
 		autPO= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
-
+        log.audit({title: "autPO", details: autPO});
+      
 
         wostatus = context.newRecord.getValue({fieldId: "status"});
 
@@ -69,65 +74,69 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
 
             log.audit({title: "itemId", details: itemId});
 
-            var sectionRecord = record.load({
-                type: 'customrecord_section',
-                id: section,
-                isDynamic: true
-            });
+            if (section)
 
-            var stages = sectionRecord.getValue({ fieldId: 'custrecord_stages' });
-            log.debug("stages", stages);
-
-            createdfrom = context.newRecord.getValue({fieldId: "createdfrom"});
-
-            var customrecord_pl_scheduletaskSearchObj = search.create({
-                type: "customrecord_pl_scheduletask",
-                filters:
-                [
-                   ["custrecord158","anyof",stages], 
-                   "AND", 
-                   ["custrecord_plst_productionline","anyof",productionline]
-                ],
-                columns:
-                [
-                   "custrecord158",
-                   "custrecord_plst_productionline",
-                   "custrecord_plst_task"
-                ]
-             });
-            var taskdef;
-            var pagedData = customrecord_pl_scheduletaskSearchObj.runPaged({
-                "pageSize" : 1000
-            });
-
-            pagedData.pageRanges.forEach(function (pageRange) {
-                var page = pagedData.fetch({index: pageRange.index});
-                page.data.forEach(function (fresult1) {
-
-                        taskdef= fresult1.getValue({name: "custrecord_plst_task"});
-                        taskdefd= fresult1.getText({name: "custrecord_plst_task"});
-
-                });
-            });
-
-
-            if (taskdef && createdfrom)
                 {
-                paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
-                log.debug("paramschedule",paramschedule);
-                paramdata = paramschedule.data;
-                if (paramdata) 
+
+                var sectionRecord = record.load({
+                    type: 'customrecord_section',
+                    id: section,
+                    isDynamic: true
+                });
+
+                var stages = sectionRecord.getValue({ fieldId: 'custrecord_stages' });
+                log.debug("stages", stages);
+
+                createdfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+
+                var customrecord_pl_scheduletaskSearchObj = search.create({
+                    type: "customrecord_pl_scheduletask",
+                    filters:
+                    [
+                    ["custrecord158","anyof",stages], 
+                    "AND", 
+                    ["custrecord_plst_productionline","anyof",productionline]
+                    ],
+                    columns:
+                    [
+                    "custrecord158",
+                    "custrecord_plst_productionline",
+                    "custrecord_plst_task"
+                    ]
+                });
+                var taskdef;
+                var pagedData = customrecord_pl_scheduletaskSearchObj.runPaged({
+                    "pageSize" : 1000
+                });
+
+                pagedData.pageRanges.forEach(function (pageRange) {
+                    var page = pagedData.fetch({index: pageRange.index});
+                    page.data.forEach(function (fresult1) {
+
+                            taskdef= fresult1.getValue({name: "custrecord_plst_task"});
+                            taskdefd= fresult1.getText({name: "custrecord_plst_task"});
+
+                    });
+                });
+
+
+                if (taskdef && createdfrom)
                     {
-                    
-                    log.debug("paramdata",paramdata);
-                    internalid = paramdata.getValue({name: "internalid"});
-                    log.debug("internalid",internalid);
-                    context.newRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
-                    context.newRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
-                    
+                    paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
+                    log.debug("paramschedule",paramschedule);
+                    paramdata = paramschedule.data;
+                    if (paramdata) 
+                        {
+                        
+                        log.debug("paramdata",paramdata);
+                        internalid = paramdata.getValue({name: "internalid"});
+                        log.debug("internalid",internalid);
+                        context.newRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
+                        context.newRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
+                        
+                        }
                     }
                 }
-
 
             if (itemId) {
 

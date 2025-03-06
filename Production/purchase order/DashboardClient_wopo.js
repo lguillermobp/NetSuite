@@ -174,12 +174,14 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             var sublistCount = currentRec.getLineCount({
                 sublistId: 'custpage_records'
             });
+            var totpo = currentRec.getLineCount({
+                sublistId: 'custpageppd_records'
+            });
             var typeofpo = currentRec.getValue({
                 fieldId: "custpage_typeofpo"    
             });
             console.log("Totalrecord: ",sublistCount);
 
-            var totpo = 0;
 
             console.log("Record No: ",sublistCount);
 
@@ -287,7 +289,6 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 }
                 
                 console.log("i: ",i);
-                totpo++
             }
             
             arraylist[arraylist.length] = {

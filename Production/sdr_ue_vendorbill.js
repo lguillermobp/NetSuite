@@ -58,7 +58,7 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
                     fieldId: 'custbody_billbalance',
                     value: balance
                 });
-                vendorBillRecord.save();
+                //vendorBillRecord.save();
 
                 log.audit({title: "balance", details: balance});
 

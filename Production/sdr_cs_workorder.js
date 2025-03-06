@@ -63,17 +63,17 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
             var memo = context.currentRecord.getValue({fieldId: "memo"});
 
 
-            if (memo=="commit")
-                {
-                    var reallocate = record.create({
-                        type: record.Type.REALLOCATE_ITEM,
-                        isDynamic: true
-                    });
+            // if (memo=="commit")
+            //     {
+            //         var reallocate = record.create({
+            //             type: record.Type.REALLOCATE_ITEM,
+            //             isDynamic: true
+            //         });
 
-                    log.debug("reallocate",reallocate);
-                    console.log("reallocate",reallocate);
+            //         log.debug("reallocate",reallocate);
+            //         console.log("reallocate",reallocate);
 
-                }
+            //     }
 
                
         
