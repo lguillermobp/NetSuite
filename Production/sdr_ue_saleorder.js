@@ -3,7 +3,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidget) {
+define(['N/record','N/log','N/ui/serverWidget', "N/runtime"], function(record, log,serverWidget,runtime) {
     
     /**
      * Function triggered before a record is submitted.
@@ -14,6 +14,12 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
      */
     function beforeLoad(context) {
         log.debug("context",context);
+
+        var userObj = runtime.getCurrentUser();
+		var userID = userObj.id;
+		var userPermission = userObj.getPermission({	name : 'TRAN_SALESORD'	});
+		autSO= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
+        
 
         if (context.type === context.UserEventType.VIEW) {
             var entity = context.newRecord.getValue({fieldId: 'entity'});
@@ -34,7 +40,17 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
                 label: "Sale Contract form",
                 functionName: "window.open('" + printSuitelet1 + "');"
             })
-
+            if (autSO=="FULL") 
+                {
+                    log.audit({title: "autSO", details: autSO});
+                    const printSuitelet3 = "/app/site/hosting/scriptlet.nl?script=2571&deploy=1&idso=" + id;
+                    
+                    context.form.addButton({
+                        id: 'custpage_copysc',
+                        label: 'Import from Sale Contract',
+                        functionName: "window.open('" + printSuitelet3 + "');"
+                    });
+                }
             var form = context.form;
             sublist1 = form.getSublist({id: 'recmachcustrecord_cd_sc'});
             log.debug("sublist1.type",sublist1.type);
@@ -46,6 +62,9 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
                 label: 'Print Crib Design',
                 functionName: "window.open('" + printSuitelet2 + "');"
             });
+
+
+            
 
         }
 
@@ -62,7 +81,7 @@ define(['N/record','N/log','N/ui/serverWidget'], function(record, log,serverWidg
             sublist = form.getSublist({id: 'recmachcustrecord_salecontract'});
             
             context.form.addButton({
-                id: 'ccustpage_refresh4',
+                id: 'custpage_refresh4',
                 label: 'Create Schedule',
                 functionName: 'refreshSchedule()'
             });

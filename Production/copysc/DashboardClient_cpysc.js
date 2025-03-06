@@ -64,6 +64,11 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                         fieldId: 'createwo',
                         line: i
                     });
+                    var moidn = paramSO.data.getSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'woid',
+                        line: i
+                    });
 
                     try {
                         var lineNumber = currentRecord.findSublistLineWithValue({
@@ -94,6 +99,14 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                             value: item,
                             ignoreFieldChange: false
                         });
+                        currentRecord.setCurrentSublistValue({
+                            sublistId: 'custpage_records',
+                            fieldId: 'custrecordml_woido',
+                            value: moidn+" ",
+                            ignoreFieldChange: false
+                        });
+
+
                         console.log("workorder",workorder);
                         console.log("workordern",workordern);
 
@@ -282,6 +295,16 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 fieldId: 'custrecordml_itemo',
                 line: i
             });
+            var custrecordml_woido = currentRec.getSublistValue({
+                sublistId: 'custpage_records',
+                fieldId: 'custrecordml_woido',
+                line: i
+            });
+            var custrecordml_woidn = currentRec.getSublistValue({
+                sublistId: 'custpage_records',
+                fieldId: 'custrecordml_woidn',
+                line: i
+            });
             var custrecordml_itemn = currentRec.getSublistValue({
                 sublistId: 'custpage_records',
                 fieldId: 'custrecordml_itemn',
@@ -291,6 +314,8 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
              arraylist[totpo] = {
                 "custrecordml_itemo": custrecordml_itemo,
                 "custrecordml_itemo": custrecordml_itemn,
+                "custrecordml_woido": custrecordml_woido,
+                "custrecordml_woidn": custrecordml_woidn,
                 "internalidori": internalidori,
                 "internalidnew": internalidnew
             }
@@ -299,13 +324,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             totpo = totpo + 1;
         }
         
-        arraylist[arraylist.length] = {
-            "custrecordml_itemo": "*last",
-            "custrecordml_itemo": "*last",
-            "internalidori": "*last",
-            "internalidnew": "*last"
-        }
-       
+               
         var script = 'customscriptrendergenerate_cpysc';
         var deployment = 'customdeploy1';
         var parameters = "";

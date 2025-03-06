@@ -13,7 +13,7 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
             customerso = paramSO.data.getValue({fieldId: "entityname"});
 
             let form = serverWidget.createForm({
-                title: 'Copy Sales Order with Manufacturing Order'
+                title: 'Import MOs from Sales Contract '
             });
 
             var userObj = runtime.getCurrentUser();
@@ -27,7 +27,7 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
             });
             var fieldgroup2 = form.addFieldGroup({
                 id : 'fieldgroupid2',
-                label : 'Origin Sale Contract'
+                label : 'Source Sale Contract'
             });
 
             let fieldscn = form.addField({
@@ -58,7 +58,7 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
             let fieldsco = form.addField({
                 id: 'salesorderorigen',
                 type: serverWidget.FieldType.TEXT,
-                label: 'Sale Contract Origen',
+                label: 'Sale Contract Source',
                 container : 'fieldgroupid2'
             });
 
@@ -116,23 +116,14 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
                 type : serverWidget.SublistType.INLINEEDITOR,
                 label: 'Items'
             });
-
             
-            var slitem = sublistpm.addField({
-                id: "custrecordml_itemn",
+            var slwoido = sublistpm.addField({
+                id: "custrecordml_woido",
                 type: serverWidget.FieldType.TEXT,
-                label:'Item SC New'
+                label:'MO origin'
             });
-            slitem.updateDisplayType({
-                displayType: serverWidget.FieldDisplayType.DISABLED
-            });
-            var slworkordern = sublistpm.addField({
-                id: "custrecordml_workordern",
-                type: serverWidget.FieldType.TEXT,
-                label:'Has MO New'
-            });
-            slworkordern.updateDisplayType({
-                displayType: serverWidget.FieldDisplayType.DISABLED
+            slwoido.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
             });
             var slitemd = sublistpm.addField({
                 id: "custrecordml_itemo",
@@ -148,6 +139,31 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
                 label:'Has MO origin'
             });
             slworkordero.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.DISABLED
+            });
+
+            var slwoidn = sublistpm.addField({
+                id: "custrecordml_woidn",
+                type: serverWidget.FieldType.TEXT,
+                label:'MO New'
+            });
+            slwoidn.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.HIDDEN
+            });
+            var slitem = sublistpm.addField({
+                id: "custrecordml_itemn",
+                type: serverWidget.FieldType.TEXT,
+                label:'Item SC New'
+            });
+            slitem.updateDisplayType({
+                displayType: serverWidget.FieldDisplayType.DISABLED
+            });
+            var slworkordern = sublistpm.addField({
+                id: "custrecordml_workordern",
+                type: serverWidget.FieldType.TEXT,
+                label:'Has MO New'
+            });
+            slworkordern.updateDisplayType({
                 displayType: serverWidget.FieldDisplayType.DISABLED
             });
             var willbecopied = sublistpm.addField({
@@ -177,17 +193,26 @@ define(['N/search','N/ui/serverWidget','N/log','N/url', 'N/redirect',"N/ui/messa
                     });
 
 
-                    var itemd = paramSO.data.getSublistValue({
+                    var moidn = paramSO.data.getSublistValue({
                         sublistId: 'item',
-                        fieldId: 'description',
+                        fieldId: 'woid',
                         line: i
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_woidn',
+                        line: i,
+                        value: moidn + " "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_itemo',
                         line: i,
                         value: " "
                     });
-
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_woido',
+                        line: i,
+                        value: " "
+                    });
 
                     var workorder = paramSO.data.getSublistValue({
                         sublistId: 'item',

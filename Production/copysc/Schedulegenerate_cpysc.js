@@ -36,8 +36,127 @@
             var fsearchId = context.key;
             var fresult = JSON.parse(context.value);
 
-   
+            var custrecordml_woido = fresult.custrecordml_woido;
+            var custrecordml_woidn = fresult.custrecordml_woidn;
+            
+            log.debug("custrecordml_woidn",custrecordml_woidn);
 
+            try {
+            var rec = record.load({
+                type: "workorder",
+                id: custrecordml_woidn.trim(),
+                isDynamic: true
+            });
+            } catch (e) {
+                log.debug({  title: "error.save: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+            }
+            
+            log.debug("custrecordml_woido",custrecordml_woido);
+
+            if (custrecordml_woido!=0) {
+
+                
+
+                recfrom = record.load({
+                type: "workorder",
+                id: custrecordml_woido.trim(),
+                isDynamic: true
+                });
+                log.debug("recfrom",recfrom);
+            }
+
+            if (recfrom) {
+                
+                shipcrelines(rec);
+                
+                var lineCount = recfrom.getLineCount('item');
+                log.debug("lineCount",lineCount);
+                for(var i = 0; i < lineCount; i++) {
+                    recfrom.selectLine({
+                        sublistId: 'item',
+                        line: i
+                    });
+
+
+                    var item = recfrom.getCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'item'
+                    });
+                    var quantity = recfrom.getCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'quantity'
+                    });
+                    log.debug("item",item);
+
+                    newLine = rec.selectNewLine({
+                        sublistId: 'item'
+                    });
+                    
+
+                    rec.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'item',
+                        value: item
+                    });
+
+                    rec.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'quantity',
+                        value: quantity
+                    });
+
+                    rec.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'bomquantity',
+                        value: quantity
+                    });
+
+                    rec.commitLine({
+                        sublistId: 'item'
+                    });
+
+                }
+            }
+
+
+            try {  
+                var saverec = rec.save();
+                log.debug({
+                    title: 'EACH',
+                    details: saverec,
+            });
+            } catch (e) {
+                log.debug({  title: "error.save: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+
+        }    
+
+        function shipcrelines(rec)
+        {
+            var lineCount = rec.getLineCount('item');
+            log.debug("lineCount",lineCount);
+            for(var i = lineCount-1; i > -1; i--) {
+
+                var lineNum = rec.selectLine({
+                    sublistId: 'item',
+                    line: i
+                });
+
+                try {
+
+                    rec.removeLine({
+                        sublistId: 'item',
+                        line: i
+                    });
+
+                } catch (e) {
+                    log.debug({  title: "error.save: ", details: "Error Name: " + String(e.name) +  " Error Message: " + String(e.message)});
+
+                }
+                }
+
+        }
+
+            log.debug("recfrom",recfrom);
            
             context.write(fsearchId, fresult);
 
