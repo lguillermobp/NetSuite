@@ -68,6 +68,8 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
             itemId = context.newRecord.getValue({fieldId: "assemblyitem"});
             productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
+            createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+            context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
 
             log.audit({title: "productionline", details: productionline});
             log.audit({title: "section", details: section});
