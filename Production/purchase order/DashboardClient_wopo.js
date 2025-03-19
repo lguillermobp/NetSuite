@@ -348,7 +348,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             
             message.create({
                 title: "Process Starting ...",
-                message: "We will be created " + totpo + " POs, you will receive a confirmation email when the process is finished",
+                message: "We will be created " + totpo + " Items, you will receive a confirmation email when the process is finished",
                 type: message.Type.CONFIRMATION,
                 duration: 10000
             }).show();

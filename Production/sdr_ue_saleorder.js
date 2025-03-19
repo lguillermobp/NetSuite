@@ -51,6 +51,14 @@ define(['N/record','N/log','N/ui/serverWidget', "N/runtime"], function(record, l
                         functionName: "window.open('" + printSuitelet3 + "');"
                     });
                 }
+
+                const printSuitelet4 = "/app/accounting/transactions/custom.nl?customtype=104&soid=" + id;
+                    
+                context.form.addButton({
+                    id: 'custpage_copysc',
+                    label: 'ECD Customer Deposit',
+                    functionName: "window.open('" + printSuitelet4 + "');"
+                });
             var form = context.form;
             sublist1 = form.getSublist({id: 'recmachcustrecord_cd_sc'});
             log.debug("sublist1.type",sublist1.type);

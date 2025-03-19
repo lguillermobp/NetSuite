@@ -66,7 +66,8 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                      }),
                      search.createColumn({
                         name: "custrecord_aid_date",
-                        join: "CUSTRECORD_AI"
+                        join: "CUSTRECORD_AI",
+                        sort: search.Sort.ASC
                      }),
                      "internalid",
                      search.createColumn({

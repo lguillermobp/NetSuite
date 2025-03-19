@@ -9,7 +9,7 @@
     function (runtime,log, search, record,email, GENERALTOOLS) {
 
 
-        var getInputData = function getInputData(context) {
+            var getInputData = function getInputData(context) {
 
             var WOID = runtime.getCurrentScript().getParameter({
                 name: 'custscript_wopo_woid'
@@ -34,6 +34,8 @@
            
             return fsearch;
         };
+
+
         var PPDCodeID=0;
         var tppdpo="";
         var totpo=0;
@@ -43,6 +45,7 @@
         var purchaseOrder;
         var ppdpot;
         var newpotdatedue;
+        var vidpo =[];
         var map = function map(context) {
 
             var fsearchId = context.key;
@@ -64,6 +67,7 @@
                 {
                     if (savingpo) {
                         var idpo=purchaseOrder.save();
+                        vidpo.push(idpo);
                         savingpo=false;
                         omit=true;
                         
@@ -153,6 +157,7 @@
             
                                 if (savingpo) {
                                     var idpo = purchaseOrder.save();
+                                    vidpo.push(idpo);
                                     
                                     log.debug("totpo",totpo);
                                     savingpo=false;
@@ -323,8 +328,34 @@
             var woid = runtime.getCurrentScript().getParameter({
                 name: 'custscript_wopo_woid'
             });
+            paramWO = GENERALTOOLS.get_WO_value(woid);
+            
+            WONo= paramWO.data.getValue({fieldId: "tranid"});
 
             log.debug("woid",woid);
+
+            var transactionSearchObj = search.create({
+                type: "transaction",
+                filters: [
+                    ["type", "anyof", "SalesOrd"], 
+                    "AND", 
+                    ["internalid", "anyof", vidpo]
+                ],
+                columns: [
+                    search.createColumn({name: "internalid", label: "Internal ID"}),
+                    search.createColumn({name: "tranid", label: "Document Number"}),
+                    search.createColumn({name: "entity", label: "Name"})
+                ]
+            });
+
+            var searchResultCount = transactionSearchObj.runPaged().count;
+            log.debug("transactionSearchObj result count", searchResultCount);
+
+            transactionSearchObj.run().each(function(result){
+                // Process each result here
+                vtranid.push(result.getValue({name: "tranid"}));
+                
+            });
 
             try { 
             
@@ -336,14 +367,16 @@
 
             log.debug("emaildest",emaildest);
 
-            subject = "The generation of POs is done";
+            subject = "The generation of MO" + WONo +" is done";
+
+            body = "The PO (s) generated are: " + WONo ;
 
 
             email.send({
                 author : userObj.id,
                 recipients : emaildest,
                 subject : subject,
-                body : subject
+                body : body
             });
         } catch (e) {
             log.error("error",e);

@@ -974,7 +974,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             if (!transferred[result.getText({name: "item",summary: "GROUP"})]) {qtytrn="0"}
             else {qtytrn=transferred[result.getText({name: "item",summary: "GROUP"})].qty}
    
-            lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
+            lineNumbers[result.getValue({name: "item",summary: "GROUP"})] = {
                 "line":line,
                 "qty":result.getValue({name: "quantity",summary: "GROUP"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
@@ -1050,7 +1050,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             });
          });
 
-        
+         log.debug("lineNumbers",lineNumbers);
         let balanceitem=0;
         let itembef;
         let inventoryBalanceLines = "";
@@ -1113,7 +1113,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             if (itembef!=result.getText({name: "item"})) {
                 itembef=result.getText({name: "item"});
-                balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty) - parseInt(lineNumbers[result.getText({name: "item"})].qtyc);
+                log.debug("itembef",itembef);
+                balanceitem=parseInt(lineNumbers[result.getValue({name: "item"})].qty) - parseInt(lineNumbers[result.getValue({name: "item"})].qtyc);
             }
             var qtyr=0;
             if (balanceitem>result.getValue({name: "available"})) {
@@ -1128,7 +1129,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 else {binn=result.getValue({name: "binnumber"});binnt=result.getText({name: "binnumber"});}
 
                 inventoryBalanceData.push({
-                    "lineNumber": lineNumbers[result.getText({name: "item"})].line,
+                    "lineNumber": lineNumbers[result.getValue({name: "item"})].line,
                     "qty": qtyr,
                     "itemid": result.getValue({name: "item"}),
                     "item": result.getText({name: "item"}),
@@ -1160,22 +1161,22 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             else {result.qtyneeded=result.qty-result.binlocationqty;}
 
 
-            if ((lineNumbers[result.item].qty - lineNumbers[result.item].qtyc)>0) {
+            if ((lineNumbers[result.itemid].qty - lineNumbers[result.itemid].qtyc)>0) {
 
             pagedatas[i] = {
                 "lineNumber": result.lineNumber,
                 "item": result.item,
                 "itemid": result.itemid,
-                "itemdesc": lineNumbers[result.item].itemdesc,
+                "itemdesc": lineNumbers[result.itemid].itemdesc,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
-                "qty": lineNumbers[result.item].qty,
+                "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
-                "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
+                "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,
                 "binlocationqty": result.binlocationqty,
-                "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
+                "qtyneeded": lineNumbers[result.itemid].qty - lineNumbers[result.itemid].qtyc,
                 "onhand": result.onhand,
-                "binforpicking": lineNumbers[result.item].binforpicking,
+                "binforpicking": lineNumbers[result.itemid].binforpicking,
                 "memo": "memo"
                 }
 
@@ -1187,16 +1188,16 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "lineNumber": result.lineNumber,
                 "item": result.item,
                 "itemid": result.itemid,
-                "itemdesc": lineNumbers[result.item].itemdesc,
+                "itemdesc": lineNumbers[result.itemid].itemdesc,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
-                "qty": lineNumbers[result.item].qty,
+                "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
-                "qtycommited": Number(lineNumbers[result.item].qtyc) + 0,
+                "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,
                 "binlocationqty": result.binlocationqty,
-                "qtyneeded": lineNumbers[result.item].qty - lineNumbers[result.item].qtyc,
+                "qtyneeded": lineNumbers[result.itemid].qty - lineNumbers[result.itemid].qtyc,
                 "onhand": result.onhand,
-                "binforpicking": lineNumbers[result.item].binforpicking,
+                "binforpicking": lineNumbers[result.itemid].binforpicking,
                 "memo": "memo"
                 }
 
