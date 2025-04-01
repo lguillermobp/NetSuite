@@ -18,7 +18,7 @@
         <macro id="nlheader">
             <table class="header" style="width: 100%;"><tr>
 	<td align="left"><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" style="float: left; margin: 2px" /></#if></td>
-	<td align="right"><span class="name">${results[0].altname}</span></td>
+	<td align="right"><span class="name">${results[0].formulatext_2}</span></td>
 	</tr>
 	<tr>
 	<td align="right" colspan="2"><span class="title">Statement</span></td>
@@ -124,11 +124,11 @@
 	<tr>
 	<th colspan="2">Category</th>
 	<th width="93">Document</th>
-	<th width="108">Date</th>
+	<th width="88">Date</th>
 	
 	<th width="156">Description</th>
 	
-	<th width="109">Amount</th>
+	<th width="89">Amount</th>
 	</tr>
 </thead>
 <tbody>
@@ -137,11 +137,11 @@
 <#assign monto = result.formulacurrency>
 
     <tr>
-	<td colspan="2">${result.formulatext_1}</td>
+	<td colspan="2">${result.formulatext_3}</td>
 	<td>${result.tranid}</td>
 	<td>${result.trandate}</td>
 	
-	<td>${result.formulatext}</td>
+	<td>${result.formulatext_3}</td>
 	<td align="right">${monto?string.currency}</td>
     <#assign totalw = totalw + monto>
 	</tr>

@@ -7,16 +7,19 @@ var ecddays = [];
 var ecdmonths = [];
 var ecdholydays = [];
 var oldstartdate;
+var oldamount;
 define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
 
         datarec=context.currentRecord;
         oldstartdate = datarec.getValue({ fieldId: "custbody_invoicedate" });
+
+        oldamount = datarec.getValue({ fieldId: "total" });
         // Code to be executed when the page loads
         log.debug("context",context);
-        var po = datarec.getValue({
-            fieldId: "otherrefnum"
-        });
+        log.debug("oldamount",oldamount);
+
+        
     }
 
     function fieldChanged(context) {

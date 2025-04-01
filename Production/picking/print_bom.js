@@ -222,7 +222,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     search.createColumn({
                         name: "formulanumeric",
                         summary: "SUM",
-                        formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity})  ELSE 0 END else 0 end "
+                        formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity})  ELSE 0 END end "
                     }),
                     search.createColumn({
                         name: "formulatext",
@@ -265,7 +265,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 };
 
-                if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0) {
+                if ((result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn)>0 || (result.getValue({name: "formulanumeric",summary: "SUM"})=="")) {
                 workOrderLines += "<tr>";
                 workOrderLines += `<td>${line}</td>`;
                 workOrderLines += `<td>${result.getText({name: "item",summary: "GROUP"})}</td>`;

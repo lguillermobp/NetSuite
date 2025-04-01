@@ -37,7 +37,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         var sc = currRec.getValue({
             fieldId: "id"
         });
-        var cd = currRec.getText({
+        var cd = currRec.getValue({
             fieldId: "custrecord_ai_customer"
         });
         
@@ -74,16 +74,19 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
 
 function lookcd(sc, cd) {
 
+    console.log("sc",sc);
+    console.log("cd",cd);
+
     var fsearch = search.load({
-        id: "customsearch_customerstatement",
+        id: "customsearch_ecdcustomerstatement",
     });
 
     fsearch.filters.push(search.createFilter({
 
-        name: "formulatext",
-        operator: "contains",
+        name: "formulanumeric",
+        operator: "equalto",
         values: cd,
-        formula: "{name}",
+        formula: "CASE WHEN ({type} in('ECD Transaction')) THEN {custbody_customer.internalid} ELSE {customer.internalid} END",
         isor: false,
         isnot: false,
         leftparens: 0,
@@ -127,11 +130,11 @@ function lookcd(sc, cd) {
         var page = pagedData.fetch({index: pageRange.index});
         log.debug("page.length",page.length);
         page.data.forEach(function (fresult1) {
-            var amount = Number(fresult1.getValue({ name: "formulacurrency",summary: "SUM" }));
-            var descrip = fresult1.getValue({ name: "formulatext",summary: "GROUP"});
-            var trandate = fresult1.getValue({ name: "trandate",summary: "GROUP" });
-            var memo = fresult1.getValue({ name: "memomain",summary: "GROUP" });
-            var document = fresult1.getValue({ name: "tranid",summary: "GROUP" });
+            var amount = Number(fresult1.getValue(fresult1.columns[11]));
+            var descrip = fresult1.getValue(fresult1.columns[7]);
+            var trandate = fresult1.getValue(fresult1.columns[10]);
+            var memo = fresult1.getValue(fresult1.columns[10]);
+            var document = fresult1.getValue(fresult1.columns[9]);
                 
         var newTaskRecord = record.create({
             type: "customrecord_aid",

@@ -3,7 +3,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(['N/record','N/log','N/ui/serverWidget', "N/runtime"], function(record, log,serverWidget,runtime) {
+define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"], function(format,record, log,serverWidget,runtime, GENERALTOOLS) {
     
     /**
      * Function triggered before a record is submitted.
@@ -71,9 +71,32 @@ define(['N/record','N/log','N/ui/serverWidget', "N/runtime"], function(record, l
                 functionName: "window.open('" + printSuitelet2 + "');"
             });
 
+            var paid = context.newRecord.getValue({ fieldId: "custbody_ecd_amountpaid" });
+            var balance = context.newRecord.getValue({ fieldId: "custbody_ecd_balance" });
+            var total = balance - paid;
+            var ppaid = Math.abs((paid / total) * 100);
 
+            var fpaid = format.format({value:paid, type: format.Type.CURRENCY});
             
+            var fbalance = format.format({value:balance, type: format.Type.CURRENCY});
 
+            var ftotal = format.format({value:total, type: format.Type.CURRENCY});
+
+            var fppaid = format.format({value:ppaid.toFixed(3), type: format.Type.PERCENT});
+            // Code to be executed when the page loads
+
+            ecdsummary = ' <style>#ecdsummary table  {  border: 1px solid black;  border-collapse: collapse} #ecdsummary th  {   font-size: 14px;   padding: 5px;   text-align:right;}#ecdsummary thead th {   font-size: 18px;   text-align:center;}#ecdsummary td  {  font-size: 14px;; padding: 5px;  text-align:right;}</style>'
+    
+            ecdsummary += '<table id="ecdsummary"> <thead> <tr> <th colspan="2" align="center" bgcolor="#000000" style="color: #F1E4E4" scope="col">ECD Summary</th> </tr></thead><tbody> <tr> <th width="47%" align="right" scope="row">ECD Total</th> <td width="53%" align="right">[TOTAL]</td> </tr><tr> <th align="right" scope="row">ECD Amount Paid</th> <td align="right">[PAID]</td> </tr> <tr> <th align="right" scope="row">% Paid</th> <td align="left">[PPAID]</td> </tr> <tr> <th align="right" scope="row">Final Balance Due</th> <td align="right">[BALANCE]</td> </tr> </tbody></table>';
+            ecdsummary = ecdsummary.replace("[TOTAL]", ftotal);
+            ecdsummary = ecdsummary.replace("[PAID]", fpaid);
+            ecdsummary = ecdsummary.replace("[BALANCE]", fbalance);
+            ecdsummary = ecdsummary.replace("[PPAID]", fppaid);
+            
+            log.debug("ecdsummary",ecdsummary);
+            context.newRecord.setValue("custbody_ecd_summary", ecdsummary);
+            
+            
         }
 
 
@@ -118,12 +141,62 @@ define(['N/record','N/log','N/ui/serverWidget', "N/runtime"], function(record, l
      * @param {string} context.type - The operation type (create, edit, delete, xedit, approve, reject, cancel, pack, ship, invoice, reassign, editforecast, revalue, editord, editapprove, reestimatetotal, reestimateresource, reschedule, editcancelled, editrejected).
      */
     function afterSubmit(context) {
+
+        if (context.type != context.UserEventType.DELETE) {
+
+            log.debug("context.type",context.type);
+            var id;
+
+            if (context.oldRecord) {
+                oldamount=context.oldRecord.getValue({fieldId: 'total'});
+                id = context.oldRecord.getValue({fieldId: 'id'});
+            }
+            else { 
+                oldamount=0;
+            }
+
+            if (context.newRecord) {
+                newamount=context.newRecord.getValue({fieldId: 'total'});
+                id = context.newRecord.getValue({fieldId: 'id'});
+            }
+            else {
+                newamount=0;
+            }
+            
+            if (context.type === context.UserEventType.DELETE) {  
+                newamount=0;
+            }
+
+            log.debug("newamount",newamount);
+            log.debug("oldamount",oldamount);
+
+            parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+
+        }
+    }
+
+    function beforeSubmit(context) {
+
+        if (context.type === context.UserEventType.DELETE) { 
+
+            log.debug("context.type",context.type);
+            var id = context.oldRecord.getValue({fieldId: 'id'});
+            oldamount=context.oldRecord.getValue({fieldId: 'total'});
+            newamount=0;
+            log.debug("newamount",newamount);
+            log.debug("oldamount",oldamount);
+    
+            parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+        }
+
+        
         // Your code logic here
     }
     
     
     return {
         beforeLoad: beforeLoad,
-        afterSubmit: afterSubmit
+        afterSubmit: afterSubmit,
+        beforeSubmit: beforeSubmit
     };
 });

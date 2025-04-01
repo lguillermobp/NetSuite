@@ -49,37 +49,23 @@ define(['N/record','N/log','N/ui/serverWidget', "/SuiteScripts/Modules/generalto
 
             log.debug("context.type",context.type);
             var id;
-            var oldapproved=false;
-            var newapproved=false;
 
             if (context.oldRecord) {
-                oldamount=context.oldRecord.getValue({fieldId: 'total'});
+                oldamount=context.oldRecord.getValue({fieldId: 'custbody_amount'});
                 id = context.oldRecord.getValue({fieldId: 'custbody_quote_sc'});
-                oldapproved=context.oldRecord.getValue({fieldId: 'custbody_quoteapproved'});
+            
             }
             else { 
                 oldamount=0;
             }
 
             if (context.newRecord) {
-                newamount=context.newRecord.getValue({fieldId: 'total'});
+                newamount=context.newRecord.getValue({fieldId: 'custbody_amount'});
                 id = context.newRecord.getValue({fieldId: 'custbody_quote_sc'});
-                newapproved=context.newRecord.getValue({fieldId: 'custbody_quoteapproved'});
+            
             }
             else {
                 newamount=0;
-            }
-            log.debug("oldapproved",oldapproved);
-            log.debug("newapproved",newapproved);
-            if (oldapproved==false && newapproved==true) {
-                oldamount=0;
-            }
-            if (oldapproved==true && newapproved==false) {
-                newamount=0;
-            }
-            if (oldapproved==false && newapproved==false) {
-                newamount=0;
-                oldamount=0;
             }
             if (context.type === context.UserEventType.DELETE) {  
                 newamount=0;
@@ -88,7 +74,7 @@ define(['N/record','N/log','N/ui/serverWidget', "/SuiteScripts/Modules/generalto
             log.debug("newamount",newamount);
             log.debug("oldamount",oldamount);
 
-            parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+            parambal = GENERALTOOLS.set_Balance(id,-newamount,-oldamount);
 
        
     }

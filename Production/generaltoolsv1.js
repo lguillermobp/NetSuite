@@ -1991,9 +1991,89 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             return retvar;
         }
 
+        function set_Balance (sc,paa,pab){
+
+            var aa = Number(paa);
+            var ab = Number(pab);
+            var scb = 0;
+            var scp = 0;
+            var cusb = 0;
+            var cusp = 0;
+
+            var recsc = r.load({
+                type: "salesorder",
+                id: sc,
+                isDynamic: false,
+                defaultValues: null
+            });
+
+            if (recsc)
+            {
+
+                var custid=recsc.getValue({fieldId: "entity"});
+                scb = Number(recsc.getValue({fieldId: "custbody_ecd_balance"}));
+                scp = Number(recsc.getValue({fieldId: "custbody_ecd_amountpaid"}));
+
+                var reccust = r.load({
+                    type: "customer",
+                    id: custid,
+                    isDynamic: false,
+                    defaultValues: null
+                });
+
+                if (reccust)
+                {
+                    cusb = Number(reccust.getValue({fieldId: "custentity_ecd_balance"}));
+                    cusp = Number(reccust.getValue({fieldId: "custentity_ecd_amountpaid"})); 
+
+                    if (aa!=ab)
+                    {
+
+                        if (aa<0 || ab<0) 
+                        {
+
+                            cusp = cusp + aa - ab;
+                            scp = scp + aa - ab;
+                            recsc.setValue({fieldId: "custbody_ecd_amountpaid", value: scp});
+                            reccust.setValue({fieldId: "custentity_ecd_amountpaid", value: cusp});
+
+                        }
+
+                        cusb = cusb + aa - ab;
+                        scb = scb + aa - ab;
+
+                        try {
+                            recsc.setValue({fieldId: "custbody_ecd_balance", value: scb});
+                            recsc.save();
+                        }
+                        catch(e) {
+                            log.error("Error",e);
+                        }
+                       
+
+
+                        reccust.setValue({fieldId: "custentity_ecd_balance", value: cusb});
+                        reccust.save();
+                    }
+                }
+
+            }
+    
+            var retvar= {};
+    
+            retvar = {
+                "scbalance": scb,
+                "scpaid": scp,
+                "custbalance": cusb,
+                "custpaid": cusp
+            }
+            return retvar;
+        }
+
         return {
             findassembly: findassembly,
             delassembly: delassembly,
+            set_Balance: set_Balance,
             getScheduleParams: getScheduleParams,
             getIndexOfInArray: getIndexOfInArray,
             get_bom_list: get_bom_list,
