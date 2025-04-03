@@ -25,11 +25,11 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             var entity = context.newRecord.getValue({fieldId: 'entity'});
             var id = context.newRecord.getValue({fieldId: 'id'});
 
-            const printSuitelet = "/app/site/hosting/scriptlet.nl?script=1618&deploy=1&customer=" + entity;
+            const printSuitelet = "/app/site/hosting/scriptlet.nl?script=2587&deploy=1&idso=" + id;
 
             context.form.addButton({
                 id: "custpage_gml",
-                label: "Customer Statement",
+                label: "Sales Contract Statement",
                 functionName: "window.open('" + printSuitelet + "');"
             })
 
@@ -71,10 +71,12 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
                 functionName: "window.open('" + printSuitelet2 + "');"
             });
 
-            var paid = context.newRecord.getValue({ fieldId: "custbody_ecd_amountpaid" });
-            var balance = context.newRecord.getValue({ fieldId: "custbody_ecd_balance" });
-            var total = balance - paid;
-            var ppaid = Math.abs((paid / total) * 100);
+            var paid = Number(context.newRecord.getValue({ fieldId: "custbody_ecd_amountpaid" }));
+            var balance = Number(context.newRecord.getValue({ fieldId: "custbody_ecd_balance" }));
+            var total = Number(balance - paid);
+            var ppaid = Number(Math.abs((paid / total) * 100));
+
+            
 
             var fpaid = format.format({value:paid, type: format.Type.CURRENCY});
             
