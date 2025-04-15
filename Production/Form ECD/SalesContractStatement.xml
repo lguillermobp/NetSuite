@@ -124,7 +124,7 @@
                 </tr>
                 <tr>
                 <td class="address" colspan="6" rowspan="2">${results[0].formulatext_4}</td>
-                <td align="right" class="totalboxmid" colspan="5">${results[0].formulacurrency_1}</td>
+                <td align="right" class="totalboxmid" colspan="5">${results[0].formulacurrency_3}</td>
                 </tr>
                 
             </table>
@@ -136,10 +136,15 @@
                 </tr>
                 <tr>
                     <td>${results[0].formulatext_5}</td>
-                    <td>VIN: ${results[0].name} <br/>
-                        Miles: ${results[0].custrecord_vehicle_octometer} <br/>
-                        Year: ${results[0].custrecord_vehicle_year} <br/>
-                        Color: ${results[0].custrecord_vehicle_color} <br/>
+                    <td>
+                    
+                        <#if results[0].name != "- None -">
+                            <b>VIN: ${results[0].name} </b><br/>
+                            Miles: ${results[0].custrecord_vehicle_octometer} <br/>
+                            Year: ${results[0].custrecord_vehicle_year} <br/>
+                            Color: ${results[0].custrecord_vehicle_color} <br/>
+                        </#if>
+                       
                     </td>
                 </tr>
             </table>

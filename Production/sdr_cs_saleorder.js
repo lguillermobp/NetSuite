@@ -11,6 +11,7 @@ var oldamount;
 define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
 
+
         datarec=context.currentRecord;
         oldstartdate = datarec.getValue({ fieldId: "custbody_invoicedate" });
 
@@ -18,6 +19,41 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         // Code to be executed when the page loads
         log.debug("context",context);
         log.debug("oldamount",oldamount);
+        var vinid = "";
+        // Code to be executed when the record is saved
+
+        var customerid = datarec.getValue({ fieldId: "entity" });
+
+        var vin = datarec.getValue({ fieldId: "custbody_vin" });
+
+        if (!vin && customerid) 
+        {
+            var vinid=lookvin(customerid);
+        }
+        
+
+        function success(result) {
+
+            if (result) 
+            {
+
+                datarec.setValue({fieldId: "custbody_vin",   value: vinid });
+              log.debug("vinid",vinid);
+            }
+          
+            }
+        
+            function failure(reason) {
+                console.log('Failure: ' + reason);
+            }
+
+            if (!vin && vinid)
+            {
+                dialog.confirm({
+                    'title': 'There is a VIN in this customer',
+                    'message': 'Would you like us to attach it to this Sales Contract?'
+                }).then(success).catch(failure);
+            }   
 
         
     }
@@ -134,7 +170,10 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
     }
 
     function saveRecord(context) {
-        // Code to be executed when the record is saved
+        var currentRecord = context.currentRecord;
+
+    
+
         return true;
     }
 
@@ -526,65 +565,110 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
 
 // Crib Design Template
 
-function lookcd(sc, cd) {
+    function lookcd(sc, cd) {
 
-    var fsearch = s.create({
-        type: "customrecord_cripdesign",
-        filters:
-        [
-           ["custrecord_cd_template","anyof",cd]
-        ],
-        columns:
-        [
-           s.createColumn({
-              name: "internalid",
-              sort: s.Sort.ASC
-           }),
-           "custrecord_cd_template",
-           "custrecord_cd_group",
-           "custrecord_cd_specification"
-        ]
-    });
+        var fsearch = s.create({
+            type: "customrecord_cripdesign",
+            filters:
+            [
+            ["custrecord_cd_template","anyof",cd]
+            ],
+            columns:
+            [
+            s.createColumn({
+                name: "internalid",
+                sort: s.Sort.ASC
+            }),
+            "custrecord_cd_template",
+            "custrecord_cd_group",
+            "custrecord_cd_specification"
+            ]
+        });
+        
+
+        var pagedData = fsearch.runPaged({
+            "pageSize" : 1000
+        });
+        log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
+        pagedData.pageRanges.forEach(function (pageRange) {
+            var page = pagedData.fetch({index: pageRange.index});
+            page.data.forEach(function (fresult1) {
+                var cribId = fresult1.getValue({ name: "internalid" });
+                    
+            var newTaskRecord = record.create({
+                type: "customrecord_cd_sc",
+                isDynamic: true
+            });
+            // Set field values for the new record
+            newTaskRecord.setValue({
+                fieldId: "custrecord_cd_sc",
+                value: sc 
+            });
+
+            newTaskRecord.setValue({
+                fieldId: "custrecord_cd_sc_specification",
+                value: cribId 
+            });
+        
+        
+
+            // Save the new record
+            var newTaskRecordId = newTaskRecord.save({
+                enableSourcing: true,
+                ignoreMandatoryFields: true
+            });
+
+        
+        });
+        });
     
+    }
 
-    var pagedData = fsearch.runPaged({
-        "pageSize" : 1000
-    });
-    log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
-    pagedData.pageRanges.forEach(function (pageRange) {
-        var page = pagedData.fetch({index: pageRange.index});
-        page.data.forEach(function (fresult1) {
-            var cribId = fresult1.getValue({ name: "internalid" });
-                
-        var newTaskRecord = record.create({
-            type: "customrecord_cd_sc",
-            isDynamic: true
+    function lookvin(custumerid) {
+
+        var vinid = 0;
+
+        var fsearch = s.create({
+            type: "customrecord_vehicle",
+            filters:
+            [
+                ["custrecord_vehicle_customer","anyof",custumerid]
+            ],
+            columns:
+            [
+                "name",
+                "internalid",
+                "custrecord_vehicle_color",
+                "custrecord_vehicle_customer",
+                "custrecord_vehicle_item",
+                "custrecord_vehicle_make",
+                "custrecord_vehicle_model",
+                "custrecord_vehicle_octometer",
+                "custrecord_vehicle_price",
+                "custrecord_vehicle_project",
+                "custrecord_vehicle_status",
+                "custrecord_vehicle_title",
+                "custrecord_vehicle_weight",
+                "custrecord_vehicle_year"
+            ]
+                    });
+        
+
+        var pagedData = fsearch.runPaged({
+            "pageSize" : 1000
         });
-        // Set field values for the new record
-        newTaskRecord.setValue({
-            fieldId: "custrecord_cd_sc",
-            value: sc 
+        
+        pagedData.pageRanges.forEach(function (pageRange) {
+            var page = pagedData.fetch({index: pageRange.index});
+            page.data.forEach(function (fresult1) {
+                vinid = fresult1.getValue({ name: "internalid" });
+        
+            });
         });
 
-        newTaskRecord.setValue({
-            fieldId: "custrecord_cd_sc_specification",
-            value: cribId 
-        });
-       
-       
-
-        // Save the new record
-        var newTaskRecordId = newTaskRecord.save({
-            enableSourcing: true,
-            ignoreMandatoryFields: true
-        });
-
-     
-    });
-    });
-   
-}
-
+        return vinid;
+    
+    }
     function lookcdsc(sc, cd) {
         
         var fsearch = s.create({

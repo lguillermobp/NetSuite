@@ -64,7 +64,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "quantitytransfered": fresult1.getValue(fresult1.columns[10]),
                         "itemsleft":fresult1.getValue(fresult1.columns[11]),
                         "quantitybo": fresult1.getValue(fresult1.columns[12]),
-                        "totalitemsbo": fresult1.getValue({name: "custbody_totalitemsbo"}),
+                        "totalitemsbo": fresult1.getValue(fresult1.columns[13]),
                         "memo": fresult1.getValue({name: "memo"}),
                         "item_id": fresult1.getValue({name: "internalid",join: "item"}),
                         "item": fresult1.getText({name: "item"}),
