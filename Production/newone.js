@@ -48,7 +48,7 @@ function customizeGlImpact(transactionRecord, standardLines, customLines, book)
         cta1001 = {id: 738, name: "", memo: "Deposit "+nametext};
         cta1205 = {id: 755, name: name, memo: ""};
         cta4035 = {id: 472, name: "", memo: ""};
-        cta2005 = {id: 326, name: "", memo: ""};
+        cta2005 = {id: 326, name: name, memo: ""};
         cta5006 = {id: 937, name: "", memo: ""};
       
         switch(typep) {

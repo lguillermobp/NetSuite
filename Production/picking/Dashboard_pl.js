@@ -916,7 +916,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "AND", 
                 ["internalid","anyof",[WO_INTERNAL_ID]], 
                 "AND", 
-                ["mainline","is","F"]
+                ["mainline","is","F"], 
+                "AND", 
+                ["item.inventorylocation","anyof","@NONE@","1"]
              ],
             
             "columns": 
@@ -937,7 +939,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             }),
             search.createColumn({
                 name: "quantity",
-                summary: "GROUP"
+                summary: "SUM"
             }),
             search.createColumn({
                 name: "quantitycommitted",
@@ -976,7 +978,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
    
             lineNumbers[result.getValue({name: "item",summary: "GROUP"})] = {
                 "line":line,
-                "qty":result.getValue({name: "quantity",summary: "GROUP"}),
+                "qty":result.getValue({name: "quantity",summary: "SUM"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
@@ -997,7 +999,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "binlocation": " ",
                 "qty": Math.ceil(result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn),
                 "binlocationqty": 0,
-                "qtyneeded": result.getValue({name: "quantity",summary: "GROUP"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
+                "qtyneeded": result.getValue({name: "quantity",summary: "SUM"})-result.getValue({name: "quantitycommitted",summary: "SUM"}),
                 "onhand": 0,
                 "memo": "memo",
                 "binnumberd":" "

@@ -88,7 +88,12 @@ define(['N/record','N/log','N/ui/serverWidget', "/SuiteScripts/Modules/generalto
             log.debug("newamount",newamount);
             log.debug("oldamount",oldamount);
 
-            parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+            if (id) {
+
+                parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+            }
+
+            
 
        
     }

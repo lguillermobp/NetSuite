@@ -709,6 +709,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                     }
                     
                     console.log("i: ",i);
+                    totpo++;
 
             }
 

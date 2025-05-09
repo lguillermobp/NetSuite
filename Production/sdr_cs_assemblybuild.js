@@ -4,9 +4,9 @@
  * @NModuleScope SameAccount
  * @NID customscript_bkm_cs_wo_0001
  */
-define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", "N/search", "/SuiteScripts/Modules/generaltoolsv1.js"],
 
-    function(log, r,email,message, nDialog,runtime, GENERALTOOLS) {
+    function(log, r,email,message, nDialog,runtime,search, GENERALTOOLS) {
 
         /**
          * Function to be executed after page is initialized.
@@ -20,17 +20,130 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
         function pageInit(context) 
         {
 
+                workorderId = context.currentRecord.getValue({fieldId: "createdfrom"});
+                log.audit({title: "workorderId", details: workorderId});
+              
+        
+                var userObj = runtime.getCurrentUser();
+                var userID = userObj.id;
+                var userPermission = userObj.getPermission({	name : 'TRAN_PURCHORD'	});
+                autPO= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
+                log.audit({title: "autPO", details: autPO});
+        
+                var itembo = searchboitems(workorderId);
+                        log.debug("itembo", itembo);
+                        if (itembo.length > 0) {
+                            if (itembo.length == 1) {
+                                var msgbo = "Please note the following item is not transferred: " + itembo.toString();
+                            } else {
+                                var msgbo = "Please note the following items are not transferred: " + itembo.toString();
+                            }
+                            log.debug("msgbo", msgbo);
+                        
+                            message.create({
+                                title: "Manufacturing Order contains items have not transferred",
+                                message:  msgbo,
+                                type: message.Type.ERROR
+                            }).show();
+                        }
 
-                log.debug("context.mode",context.mode);
-                log.debug("context.currentRecord",context.currentRecord);
-                var currentRecord = context.currentRecord;
 
-                account = currentRecord.getValue({fieldId: "account"});
-                
-                log.debug("account",account);
-                
-                currentRecord.setValue({fieldId: "account", value: '1312'});
                
+        }
+
+        function searchboitems(workorderId) {
+
+            var itembo=[];
+    
+    
+            var fsearch = search.create({
+                type: "transaction",
+                settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
+                filters:
+                [
+                   [[["status","anyof","WorkOrd:B","WorkOrd:G"],"AND",["internalid","anyof",workorderId],"AND",["type","anyof","WorkOrd"]],"OR",[["type","anyof","InvTrnfr"],"AND",["custbody_mo.internalid","anyof",workorderId],"AND",["custbody_mo.mainline","is","T"],"AND",["memo","isnotempty",""]]], 
+                   "AND", 
+                   ["mainline","is","F"], 
+                   "AND", 
+                   ["location","anyof","4"], 
+                   "AND", 
+                   ["sum(formulanumeric: CASE  WHEN {type}='Manufacturing Order' THEN {quantity} ELSE 0 END - CASE  WHEN {type}='Inventory Transfer' THEN {quantity} ELSE 0 END)","notequalto","0"]
+                ],
+                columns:
+                [
+                   search.createColumn({
+                      name: "formulatext",
+                      summary: "MAX",
+                      formula: "CASE  WHEN {type}='Manufacturing Order' THEN {customermain.altname} ELSE '' END"
+                   }),
+                   search.createColumn({
+                      name: "formulatext",
+                      summary: "GROUP",
+                      formula: "CASE  WHEN {type}='Inventory Transfer' THEN {memo} ELSE {number} END"
+                   }),
+                   search.createColumn({
+                      name: "formulatext",
+                      summary: "MAX",
+                      formula: "CASE  WHEN {type}='Inventory Transfer' THEN {number} ELSE  ' ' END"
+                   }),
+                   search.createColumn({
+                      name: "formulanumeric",
+                      summary: "MAX",
+                      formula: "CASE  WHEN {type}='Manufacturing Order' THEN {internalid} ELSE  0 END"
+                   }),
+                   search.createColumn({
+                      name: "item",
+                      summary: "GROUP"
+                   }),
+                   search.createColumn({
+                      name: "formulanumeric",
+                      summary: "SUM",
+                      formula: "CASE  WHEN {type}='Manufacturing Order' THEN {quantity} ELSE 0 END"
+                   }),
+                   search.createColumn({
+                      name: "formulanumeric",
+                      summary: "SUM",
+                      formula: "CASE  WHEN {type}='Inventory Transfer' THEN {quantity} ELSE 0 END"
+                   }),
+                   search.createColumn({
+                      name: "formulanumeric",
+                      summary: "SUM",
+                      formula: "CASE  WHEN {type}='Manufacturing Order' THEN {quantity}-NVL({quantitycommitted}, 0) ELSE 0 END"
+                   }),
+                   search.createColumn({
+                      name: "datecreated",
+                      summary: "MAX"
+                   }),
+                   search.createColumn({
+                      name: "formulanumeric",
+                      summary: "SUM",
+                      formula: "sum(CASE  WHEN {type}='Manufacturing Order' THEN {quantity} ELSE 0 END - CASE  WHEN {type}='Inventory Transfer' THEN {quantity} ELSE 0 END)"
+                   })
+                ]
+             });
+    
+             var pagedData = fsearch.runPaged({
+                "pageSize" : 1000
+            });
+            log.debug("pagedData.pageRanges.length",pagedData.pageRanges.length);
+           
+            
+            if (pagedData.pageRanges.length > 0) {
+    
+                pagedData.pageRanges.forEach(function (pageRange) {
+                    var page = pagedData.fetch({index: pageRange.index});
+                    page.data.forEach(function (fresult1) {
+                        
+                        item=fresult1.getText(fresult1.columns[4])
+                        qty=fresult1.getValue(fresult1.columns[7]);
+                        descrip=item + " - (" + qty + ") -";
+                        itembo.push(descrip);
+                    });
+                });
+    
+            }
+    
+            return itembo;
         }
         /**
          * Function to be executed when field is changed.

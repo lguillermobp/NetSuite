@@ -72,15 +72,23 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 invdate = GENERALTOOLS.calcenddate(prodline);
                 log.debug("invdate",invdate);}
 
-                currentRecord.setValue({fieldId: "custbody_invoicedate",   value: invdate });
-                log.debug("enddate",invdate);
+               try {
+
+                    currentRecord.setValue({fieldId: "custbody_invoicedate",   value: invdate });
+
+               }catch(e) {
+                    log.debug("Error",e);
+
+
+                    }
+                
             }
 
         if (fieldId == "custbody_invoicedate")
         {
             var startdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
 
-            if (String(oldstartdate).substring(0, 10)) 
+            if (String(oldstartdate).substring(0, 10) && startdate.length!=0)
                 {
 
                 if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 

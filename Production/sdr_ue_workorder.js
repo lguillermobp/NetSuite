@@ -3,7 +3,7 @@
  * @NApiVersion 2.1
  */
 
-define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/generaltoolsv1.js"], function (record, search, runtime,log, GENERALTOOLS) {
+define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/generaltoolsv1.js"], function (record,message, search, runtime,log, GENERALTOOLS) {
     var session = runtime.getCurrentSession();
 
     function beforeLoad(context) {
@@ -161,8 +161,23 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
         // ================================================================================
         // Set Customer PO Number and Sales Order Requested Ship Date
         // ================================================================================
+        
+      
         const currentRecordId = context.newRecord.id;
+        log.audit({title: "context.type", details: context.type});
+        
 
+       
+    }
+
+    function afterSubmit(context) {
+        // ================================================================================
+        // Set Customer PO Number and Sales Order Requested Ship Date
+        // ================================================================================
+        
+      
+        const currentRecordId = context.newRecord.id;
+        log.audit({title: "context.type", details: context.type});
         
 
        
@@ -170,7 +185,8 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
 
     return {
         beforeLoad: beforeLoad,
-        beforeSubmit: beforeSubmit
+        beforeSubmit: beforeSubmit,
+        afterSubmit: afterSubmit
     }
 })
 

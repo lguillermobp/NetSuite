@@ -246,7 +246,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 });
                 sublistpm.addField({
                     id: "custrecordml_leadtime",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Lead Time'
                 });
                 var vendorid = sublistpm.addField({
@@ -801,7 +801,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             });
             sublistppd.addField({
                 id: "custrecordml_leadtime",
-                type: serverWidget.FieldType.INTEGER,
+                type: serverWidget.FieldType.FLOAT,
                 label:'Lead Time'
             });
             sublistppd.addField({

@@ -114,7 +114,7 @@
             <table class="header" style="width: 100%;">
             <tr>
             <td rowspan="3"><#if companyInformation.logoUrl?length != 0><@filecabinet nstype="image" src="${companyInformation.logoUrl}" width="85" height="65" style="float: left; margin: 7px" /> </#if> <span class="nameandaddress">${companyInformation.companyName}</span><br /><span class="nameandaddress">${companyInformation.addressText}</span></td>
-            <td align="right" colspan="2"><p class="title">Statement </p>  <p class="number">${results[0].formulatext_2} </p>  <p class="date">${.now?string.medium}</p></td>
+            <td align="right" colspan="2"><p class="title">Invoice </p>  <p class="number">${results[0].formulatext_2} </p>  <p class="date">${.now?string.medium}</p></td>
             </tr>
            
             </table>

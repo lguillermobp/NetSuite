@@ -193,7 +193,9 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     "AND", 
                     ["internalid","anyof",[WO_INTERNAL_ID]], 
                     "AND", 
-                    ["mainline","is","F"]
+                    ["mainline","is","F"], 
+                    "AND", 
+                    ["item.inventorylocation","anyof","@NONE@","1"]
                  ],
                 
                 "columns":   [
@@ -213,7 +215,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     }),
                     search.createColumn({
                         name: "quantity",
-                        summary: "GROUP"
+                        summary: "SUM"
                     }),
                     search.createColumn({
                         name: "quantitycommitted",
@@ -253,11 +255,11 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 log.audit("item " , result.getText({name: "item",summary: "GROUP"}));
                 log.audit("backo " , result.getValue({name: "formulanumeric",summary: "SUM"}));
                 log.audit("qtytrn " , qtytrn);
-                log.audit("qty " , result.getValue({name: "quantity",summary: "GROUP"}));
+                log.audit("qty " , result.getValue({name: "quantity",summary: "SUM"}));
 
                 lineNumbers[result.getText({name: "item",summary: "GROUP"})] = {
                 "line":line,
-                "qty":result.getValue({name: "quantity",summary: "GROUP"}),
+                "qty":result.getValue({name: "quantity",summary: "SUM"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc":qtytrn,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
@@ -270,7 +272,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 workOrderLines += `<td>${line}</td>`;
                 workOrderLines += `<td>${result.getText({name: "item",summary: "GROUP"})}</td>`;
                 workOrderLines += `<td>${result.getValue({name: "purchasedescription", join: "item",summary: "GROUP"})}</td>`;
-                workOrderLines += `<td>${result.getValue({name: "quantity",summary: "GROUP"})} </td>`; 
+                workOrderLines += `<td>${result.getValue({name: "quantity",summary: "SUM"})} </td>`; 
                 workOrderLines += `<td>${lineItemIds2[result.getValue({name: "internalid",join: "item",summary: "GROUP"})]}</td>`;
                // workOrderLines += `<td> </td>`;
                 workOrderLines += `<td>${result.getValue({name: "formulanumeric",summary: "SUM"})-qtytrn}</td>`;
