@@ -473,7 +473,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                     j++;
     
                 if (!transferred[result.getText({name: "item"})]) {qtytrn=0}
-                else {qtytrn=Number(transferred[result.getText({name: "item"})]).qty}
+                else {qtytrn=Number(transferred[result.getText({name: "item"})].qty)}
                 transferred[result.getText({name: "item"})] = {
                 "qty":Number(result.getValue({name: "quantity"}))+qtytrn
                 };

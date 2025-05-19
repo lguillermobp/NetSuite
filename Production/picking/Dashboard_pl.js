@@ -509,6 +509,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     type: serverWidget.FieldType.CHECKBOX
                 });
                 var resultstr= findCases5(WOID,locationsoid);
+
                 // loop through each line, skipping the header
                 var resultspt= findCases1(WOID,locationsoid);
                 var counter = 0;
@@ -537,8 +538,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         value: result1.qty 
                     });
 
-                    if (!transferred[result1.item]) {qtytrn="0"}
-                    else {qtytrn=transferred[result1.item].qty}
+                    if (!transferred[result1.itemid]) {qtytrn="0"}
+                    else {qtytrn=transferred[result1.itemid].qty}
                     sublistpm.setSublistValue({
                         id: 'custrecordml_commitedqty',
                         line: counter,
@@ -622,8 +623,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 
                 var counter = 0;
                 pagedatasbo.forEach(function(result1) {
-                    log.audit("result1.itemid " , result1.itemid);
-                    log.audit("lineItemIds2[result1.itemid] " , lineItemIds2[result1.itemid]);
+
 
                     if (!lineItemIds2[result1.itemid]) {binloc=" ";}
                     else {binloc=lineItemIds2[result1.itemid];}
@@ -973,11 +973,14 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 summary: "GROUP"
             }));
 
-            if (!transferred[result.getText({name: "item",summary: "GROUP"})]) {qtytrn="0"}
-            else {qtytrn=transferred[result.getText({name: "item",summary: "GROUP"})].qty}
+            
+
+            if (!transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})]) {qtytrn="0"}
+            else {qtytrn=transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})].qty}
    
             lineNumbers[result.getValue({name: "item",summary: "GROUP"})] = {
                 "line":line,
+                "itemid": result.getValue({name: "internalid", join: "item",summary: "GROUP"}),
                 "qty":result.getValue({name: "quantity",summary: "SUM"}),
                 //"qtyc":result.getValue({name: "quantitycommitted"}),
                 "qtyc": qtytrn ,
@@ -1115,7 +1118,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             if (itembef!=result.getText({name: "item"})) {
                 itembef=result.getText({name: "item"});
-                log.debug("itembef",itembef);
+            
                 balanceitem=parseInt(lineNumbers[result.getValue({name: "item"})].qty) - parseInt(lineNumbers[result.getValue({name: "item"})].qtyc);
             }
             var qtyr=0;
@@ -1261,6 +1264,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             
             pagedatastr[j] = {
                 "item": result.getText({name: "item"}),
+                "itemid": result.getValue({name: "item"}),
                 "itemdesc": result.getValue({name: "purchasedescription", join: "item"}).substring(0, 299),
                 "bin": result.getText({name: "binnumber", join: "inventoryDetail"}),
                 "qty": result.getValue({name: "quantity"}),
@@ -1272,9 +1276,10 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 j++;
 
 
-            if (!transferred[result.getText({name: "item"})]) {qtytrn=0}
-            else {qtytrn=Number(transferred[result.getText({name: "item"})]).qty}
-            transferred[result.getText({name: "item"})] = {
+            if (!transferred[result.getValue({name: "item"})]) {qtytrn=0}
+            else {qtytrn=Number(transferred[result.getValue({name: "item"})].qty)}
+
+            transferred[result.getValue({name: "item"})] = {
             "qty":Number(result.getValue({name: "quantity"}))+qtytrn
             };
             

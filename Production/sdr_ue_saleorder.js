@@ -95,7 +95,6 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             ecdsummary = ecdsummary.replace("[BALANCE]", fbalance);
             ecdsummary = ecdsummary.replace("[PPAID]", fppaid);
             
-            log.debug("ecdsummary",ecdsummary);
             context.newRecord.setValue("custbody_ecd_summary", ecdsummary);
             
             
@@ -144,7 +143,7 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
      */
     function afterSubmit(context) {
 
-        if (context.type != context.UserEventType.DELETE) {
+        if (context.type != context.UserEventType.DELETE && context.type != 'xedit') {
 
             log.debug("context.type",context.type);
             var id;

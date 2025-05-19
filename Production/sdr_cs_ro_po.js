@@ -29,7 +29,7 @@
 
               
 
-                 if (internalid==103767)
+                 if (internalid==120860)
                  {
                          var lineCount = datarec.getLineCount({
                                  sublistId: 'item'
@@ -42,20 +42,11 @@
                                          line: i
                                  });
                                  
-                                 itemid=datarec.getCurrentSublistValue({
-                                        sublistId: 'item',
-                                        fieldId: 'item'
-                                });
-                                 qty=datarec.getCurrentSublistValue({
-                                        sublistId: 'item',
-                                        fieldId: 'quantity'
-                                });
-
-                             
+                                                             
                                 datarec.setCurrentSublistValue({
                                          sublistId: 'item',
-                                         fieldId: 'isclosed',
-                                         value: false,
+                                         fieldId: 'custcol_notes',
+                                         value: "191 Billy Gamble;",
                                          ignoreFieldChange: true
                                  });
                                
