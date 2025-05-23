@@ -49,6 +49,16 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
 
+                     if (isNaN(fresult1.getValue({name: "vendor",join: "item"})) || fresult1.getValue({name: "vendor",join: "item"}) == null || fresult1.getValue({name: "vendor",join: "item"}) == "") 
+                        {
+                            vendor_id = 0;
+                            vendor_name = "";
+                        }
+                        else {
+                            vendor_id = fresult1.getValue({name: "vendor",join: "item"})
+                            vendor_name = fresult1.getText({name: "vendor",join: "item"});
+                        }
+
                     dataf[i] = {
                         "productionline": fresult1.getText({name: "custbody_productionline"}),
                         "productionlineid": fresult1.getValue({name: "custbody_productionline"}),
@@ -73,6 +83,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "wo_id": fresult1.getValue({name: "internalid"}),
                         "so_id": fresult1.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC"}),
                         "ECD_Model": fresult1.getText({name: "custbody_appf_veh_model",join: "CUSTBODY_QUOTE_SC"}),
+                        "vendor_id": vendor_id,
+                        "vendor_name": vendor_name
                     }
                     i++;
 

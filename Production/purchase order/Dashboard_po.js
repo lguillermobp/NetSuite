@@ -24,6 +24,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var resultsrp=[];
         var vendorsid=[];
         var PPDID;
+        var breakByTask;
         function onRequest(context) {
 
             var userObj = runtime.getCurrentUser();
@@ -31,6 +32,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             customersselected=paramemp.data.getValue({fieldId: "custentity_customerssalected"});
             sectionsselected=paramemp.data.getValue({fieldId: "custentity_sectionsselected"});
             vendorsselected=paramemp.data.getValue({fieldId: "custentity_vendorsselected"});
+            var paramrec = GENERALTOOLS.get_paramnew_value('0702');
+            breakByTask = paramrec.data.getValue({name: "custrecordparams_value"});
 
 		    // var userID = userObj.id;
 		    // var userPermission = userObj.getPermission({	name : 'TRAN_BUILD'	});
@@ -1197,9 +1200,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     memoid=fresult.getValue({name: "internalid",join: "customerMain",summary: "GROUP"});
 
                    // ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task; 
+                   log.debug("breakByTask",breakByTask);
 
-                   if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid;}
-                   else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid;}
+                   if (breakByTask=='Y') { 
+                    if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"T"+taskids;}
+                    else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid+"T"+taskids;}
+                   }
+                   else {
+                    if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid;}
+                    else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid;}
+                   }
                      
                    var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(unitbase+"/"+unitpurchase));
                    if (index1==-1) {unitrate=1;}

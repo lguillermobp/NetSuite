@@ -18,10 +18,25 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             return _ref;
         }
 
-         function post (_ref) {
+         function post (context) {
+
+            contextjson = JSON.parse(context);
+            log.debug("context",contextjson);
+            var option= contextjson.option;
+            log.debug("option",option);
+
+            if (option == "1") {
+                idsearch = "customsearch_ppdforecdview";
+                }
+                else if (option == "2") {
+                    idsearch = "customsearch_ppdforecdview_3";
+                }
+                else if (option == "3") {
+                    idsearch = "customsearch_ppdforecdview_4";
+                }
 
             var fsearch =search.load({
-               id: "customsearch_ppdforecdview"
+               id: idsearch
            });
                 
 
@@ -31,6 +46,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             var i=0;
             var dataf=[];
             pagedData.pageRanges.forEach(function (pageRange) {
+                log.debug("pageRange", pageRange);
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
 
@@ -55,9 +71,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "po_currencyrate": fresult1.getValue({name: "exchangerate", join: "CUSTRECORD_POID"}),
                         "po_date": fresult1.getValue({name: "trandate", join: "CUSTRECORD_POID"}),
                         "po_datecreated": fresult1.getValue({name: "datecreated", join: "CUSTRECORD_POID"}),
-                        "po_location": fresult1.getText({name: "location", join: "CUSTRECORD_POID"})
+                        "po_location": fresult1.getText({name: "location", join: "CUSTRECORD_POID"}),
+                        "po_qty_received": Number(fresult1.getValue({name: "quantityshiprecv", join: "CUSTRECORD_POID"}))+0
                     }
-                    log.audit("i", i);
                     i++;
 
                 })
