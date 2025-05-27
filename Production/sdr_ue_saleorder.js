@@ -3,7 +3,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js"], function(format,record, log,serverWidget,runtime, GENERALTOOLS) {
+define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js", "/SuiteScripts/Modules/helptools.js"], function(format,record, log,serverWidget,runtime, GENERALTOOLS,HELPTOOLS) {
     
     /**
      * Function triggered before a record is submitted.
@@ -151,6 +151,7 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             if (context.oldRecord) {
                 oldamount=context.oldRecord.getValue({fieldId: 'total'});
                 id = context.oldRecord.getValue({fieldId: 'id'});
+                salescontract= context.oldRecord.getValue({fieldId: 'transactionnumber'});
             }
             else { 
                 oldamount=0;
@@ -159,6 +160,7 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             if (context.newRecord) {
                 newamount=context.newRecord.getValue({fieldId: 'total'});
                 id = context.newRecord.getValue({fieldId: 'id'});
+                salescontract= context.newRecord.getValue({fieldId: 'transactionnumber'});
             }
             else {
                 newamount=0;
@@ -172,6 +174,12 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             log.debug("oldamount",oldamount);
 
             parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+            if (newamount != oldamount) {
+
+                log.debug({title: 'salescontract' , details: salescontract });
+                var okg=HELPTOOLS.helpgo(salescontract);
+               
+            }
 
         }
     }

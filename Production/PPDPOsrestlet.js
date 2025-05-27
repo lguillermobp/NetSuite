@@ -24,6 +24,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             log.debug("context",contextjson);
             var option= contextjson.option;
             log.debug("option",option);
+            var vendorids = getvendors();
+            log.debug("vendorids",vendorids);
+            operatorw = "noneof";
 
             if (option == "1") {
                 idsearch = "customsearch_ppdforecdview";
@@ -34,11 +37,35 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 else if (option == "3") {
                     idsearch = "customsearch_ppdforecdview_4";
                 }
+                else if (option == "4") {
+                    idsearch = "customsearch_ppdforecdview_5";
+                    operatorw = "anyof";
+                }
 
             var fsearch =search.load({
                id: idsearch
-           });
-                
+            });
+
+            var defaultFilters = fsearch.filters;
+
+           
+            var customFilters = [];
+            
+            customFilters = {
+                name: "custrecord_ppd_vendor",
+                join: "CUSTRECORD_PPD_CODE",
+                operator: operatorw,
+                values: vendorids,
+                isor: false,
+                isnot: false,
+                leftparens: 0,
+                rightparens: 0
+
+            };
+
+            defaultFilters.push(customFilters);
+           
+            fsearch.filters = defaultFilters;
 
              var pagedData = fsearch.runPaged({
                 "pageSize" : 1000
@@ -79,7 +106,48 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 })
             })
 
+            function getvendors () {
+
+                var lineItemIds = [];
+                var idsearch = "customsearch_vecdvendors";
+
+                var fsearch = search.load({
+                    id: idsearch
+                });
+
+               fsearch.filters.push(search.createFilter({
+            
+                     name: "custentity_showinprojection",
+                     operator: "is",
+                     values: "T",
+                     isor: false,
+                     isnot: false,
+                     leftparens: 0,
+                     rightparens: 0
+               }));
+
+                var pagedData = fsearch.runPaged({
+                    "pageSize": 1000
+                });
+                
+                pagedData.pageRanges.forEach(function (pageRange) {
+                    var page = pagedData.fetch({ index: pageRange.index });
+                    page.data.forEach(function (fresult1) {
+
+                        lineItemIds.push(fresult1.getValue({
+                            name: "internalid"
+                        }));
+
+                    })
+                })
+
+                return lineItemIds;
+            }
+
+        
             return dataf;
+
+
         }
 
 
