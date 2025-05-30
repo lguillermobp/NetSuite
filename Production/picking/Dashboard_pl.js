@@ -918,7 +918,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "AND", 
                 ["mainline","is","F"], 
                 "AND", 
-                ["item.inventorylocation","anyof","@NONE@","1"]
+                ["item.inventorylocation","anyof","@NONE@","1"], 
+                "AND", 
+                ["item.type","anyof","Assembly","InvtPart"]
              ],
             
             "columns": 

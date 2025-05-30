@@ -41,6 +41,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     idsearch = "customsearch_ppdforecdview_5";
                     operatorw = "anyof";
                 }
+                else if (option == "5") {
+                    idsearch = "customsearch_ppdforecdview_6";
+                }
 
             var fsearch =search.load({
                id: idsearch

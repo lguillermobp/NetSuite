@@ -67,7 +67,9 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
                    "AND", 
                    ["location","anyof","4"], 
                    "AND", 
-                   ["sum(formulanumeric: CASE  WHEN {type}='Manufacturing Order' THEN {quantity} ELSE 0 END - CASE  WHEN {type}='Inventory Transfer' THEN {quantity} ELSE 0 END)","notequalto","0"]
+                   ["sum(formulanumeric: CASE  WHEN {type}='Manufacturing Order' THEN {quantity} ELSE 0 END - CASE  WHEN {type}='Inventory Transfer' THEN {quantity} ELSE 0 END)","notequalto","0"], 
+                   "AND", 
+                   ["item.type","anyof","Assembly","InvtPart"]
                 ],
                 columns:
                 [

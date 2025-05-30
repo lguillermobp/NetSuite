@@ -84,7 +84,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "so_id": fresult1.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC"}),
                         "ECD_Model": fresult1.getText({name: "custbody_appf_veh_model",join: "CUSTBODY_QUOTE_SC"}),
                         "vendor_id": vendor_id,
-                        "vendor_name": vendor_name
+                        "vendor_name": vendor_name,
+                        "quantity": fresult1.getValue({name: "quantity"})
                     }
                     i++;
 
