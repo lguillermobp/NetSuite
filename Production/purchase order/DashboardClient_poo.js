@@ -651,7 +651,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                     line: i
                 });
                
-                if (omit) continue;
+                if (omit) continue; 
                 var custrecordml_baunit = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_baunit',line: i });
                 var custrecordml_currency = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_currency',line: i });
                 var custrecordml_currencyrate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_currencyrate',line: i });

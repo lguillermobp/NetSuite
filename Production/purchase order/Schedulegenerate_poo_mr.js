@@ -73,7 +73,7 @@
                 }
 
                 try {
-                    if (!omit) 
+                    if (!omit)  
 
                         {
 
@@ -294,6 +294,8 @@
                                 fieldId: 'item',
                                 value: itemid // Replace with the internal ID of the item
                             });
+
+                            log.audit("unitrate",unitrate);
             
                             if (unitrate==0) {unitrate=1;}
                             

@@ -353,6 +353,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
 
                 if (itembef!=result.getText({name: "item"})) {
                     itembef=result.getText({name: "item"});
+                    log.audit("itembef " , itembef);
                     balanceitem=parseInt(lineNumbers[result.getText({name: "item"})].qty) - parseInt(lineNumbers[result.getText({name: "item"})].qtyc);
                 }
                 var qtyr=0;

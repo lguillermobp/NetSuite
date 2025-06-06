@@ -977,7 +977,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             
 
-            if (!transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})]) {qtytrn="0"}
+            if (!transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})]) {qtytrn=0}
             else {qtytrn=transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})].qty}
    
             lineNumbers[result.getValue({name: "item",summary: "GROUP"})] = {
@@ -1049,8 +1049,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             page.data.forEach(function (result) {
 
-            log.audit("internalid " , result.getValue({name: "internalid"}));
-            log.audit("binnumber " , result.getValue({name: "binnumber"}));
 
             lineItemIds2[result.getValue({name: "internalid"})] = result.getValue({name: "binnumber"});
 
@@ -1118,6 +1116,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             const inventoryBalanceLocationPriority = inventoryBalanceLocation === workOrderLocation ? 1 : 2;
             inventoryBalanceLocation = inventoryBalanceLocation === "Kissimmee-WIP" ? "WIP" : "Warehouse";
 
+            log.audit("itemtext " , result.getText({name: "item"}));
+            
             if (itembef!=result.getText({name: "item"})) {
                 itembef=result.getText({name: "item"});
             

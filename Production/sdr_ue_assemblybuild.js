@@ -141,9 +141,12 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                 page.data.forEach(function (fresult1) {
                     
                     item=fresult1.getValue(fresult1.columns[4])
-                    qty=fresult1.getValue(fresult1.columns[7]);
-                    descrip=item + " - (" + qty + ") -";
-                    itembo.push(descrip);
+                    qty=Number(fresult1.getValue(fresult1.columns[7]));
+                    if (qty != 0) {
+                        descrip=item + " - (" + qty + ") -";
+                        itembo.push(descrip);
+                    }
+                    
                 });
             });
 

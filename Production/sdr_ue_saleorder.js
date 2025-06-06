@@ -177,7 +177,7 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             if (newamount != oldamount) {
 
                 log.debug({title: 'salescontract' , details: salescontract });
-                var okg=HELPTOOLS.helpgo(salescontract);
+                var okg=HELPTOOLS.changesc(salescontract); 
                
             }
 

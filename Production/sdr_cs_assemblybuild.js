@@ -138,8 +138,10 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
                         
                         item=fresult1.getText(fresult1.columns[4])
                         qty=fresult1.getValue(fresult1.columns[7]);
+                     if (qty != 0) {
                         descrip=item + " - (" + qty + ") -";
                         itembo.push(descrip);
+                    }
                     });
                 });
     

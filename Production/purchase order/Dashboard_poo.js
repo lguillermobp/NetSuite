@@ -512,6 +512,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.unitrate
                     });
+                    log.debug("rresult1.unitrate",result1.unitrate);
+                    log.debug("rresult1.item",result1.item);
                     
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qtya',
@@ -937,6 +939,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         var sectiont="";
         var isfirsttime=true;
         var qtytot=0;
+        var qtytotd=0;
         var qtytota=0;
         var qtytotpo=0;
         var memo="";
@@ -960,11 +963,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 memoid=fresult.getValue({name: "custrecord_ppd_customer"});
                 ppdpo=fresult.getValue({name: "custrecord_ppd_code"});
                 ppdpon=fresult.getText({name: "custrecord_ppd_code"});
-                unitrate=Number(fresult.getValue({name: "custrecord_ppd_unitrate"}));
                 var position = ppdpon.search("S");
                 ppdpons = ppdpon.substring(0, position);
                 poid=fresult.getText({name: "custrecord_poid",join: "CUSTRECORD_PPD_CODE"});
-                podate=fresult.getValue({name: "custrecord_podate",join: "CUSTRECORD_PPD_CODE"});
+                
                 if (fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"})) {task=fresult.getValue({name: "internalid",join: "CUSTRECORD_PPD_TASK"});}
                 else {task=" ";}
 
@@ -982,9 +984,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         isfirsttime=false;
                     }
                
-                    log.debug("ppdpo",ppdpo);
-                    log.debug("ppdpot",ppdpot);
-                    log.debug("prod",prod);
+                   
 
                     if (ppdpot!=ppdpo || prod!=fresult.getText({name: "custrecord_ppd_item"}))
                 {  
@@ -993,7 +993,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
               
                     if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;}
                     else {qtybuy=(qtytot-qtytota-qtytotpo);}
-                    qtybuy=qtytot;
+                    qtybuy=qtytotd;
 
 				    pagedatas[i] = {
                     "ppdpo": ppdpot,
@@ -1016,7 +1016,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "itemid": itemid,
 					"price": price,
                     "currency": currency,
-					"qty": qtytot,
+					"qty": qtytotd,
+                    "qtyd": qtytotd,
                     "qtya": qtytota,
                     "qtypo": qtytotpo,
                     "qtybuy": qtybuy,
@@ -1088,6 +1089,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                        
                     
                     qtytot=0;
+                    qtytotd=0;
                     qtytota=0;
                     qtytotpo=0;
                     memo="";
@@ -1117,7 +1119,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             
                 procesar="Y";
                 nobatchingt=fresult.getValue({name: "custentity_noppdbatching",join: "CUSTRECORD_PPD_VENDOR"});
-                
+                podate=fresult.getValue({name: "custrecord_podate",join: "CUSTRECORD_PPD_CODE"});
                 preferredvendor=fresult.getText({name: "custrecord_ppd_vendor"});
                 leadtime=Number(fresult.getValue({name: "custrecord_ppd_leadtime"}))+0;
                 preferredvendorid=fresult.getValue({name: "custrecord_ppd_vendor"});
@@ -1127,9 +1129,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 unitbase=fresult.getText({name: "unitstype",join: "CUSTRECORD_PPD_ITEM"});
                 price=fresult.getValue({name: "custrecord_ppd_price"});
                 currency=fresult.getText({name: "custrecord_ppd_currency"});
-    
+                unitrate=Number(fresult.getValue({name: "custrecord_ppd_unitrate"}));
     
                 qtytot+=Number(fresult.getValue({name: "custrecord_ppd_quantity"}));
+                qtytotd+=Number(fresult.getValue({name: "custrecord_ppd_qtydemand"}));
                 qtytota=Number(fresult.getValue({name: "quantityavailable",join: "CUSTRECORD_PPD_ITEM"}));
                 qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "CUSTRECORD_PPD_ITEM"}));
                 //qtytota=0;
@@ -1144,7 +1147,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             {  
                 if ((qtytot-qtytota-qtytotpo)<=0) {qtybuy=0;}
                     else {qtybuy=(qtytot-qtytota-qtytotpo);}
-                qtybuy=qtytot;
+                qtybuy=qtytotd;
 
                 pagedatas[i] = {
                 "ppdpo": ppdpot,
@@ -1168,7 +1171,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "itemid": itemid,
                 "price": price,
                 "currency": currency,
-                "qty": qtytot,
+                "qty": qtytotd,
+                "qtyd": qtytotd,
                 "qtybuy": qtybuy,
                 "omit": omit,
                 "leadtime": leadtime,
