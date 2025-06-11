@@ -63,7 +63,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         var currentRecord = context.currentRecord;
         var fieldId = context.fieldId;
         log.debug("fieldId",fieldId);
-        if (fieldId == "custbody_productionline") {
+        if (fieldId == "custbody_productionline1") {
             var invdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
             var prodline = currentRecord.getValue({ fieldId: "custbody_productionline" });
 
@@ -84,7 +84,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 
             }
 
-        if (fieldId == "custbody_invoicedate")
+        if (fieldId == "custbody_invoicedate1")
         {
             var startdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
 

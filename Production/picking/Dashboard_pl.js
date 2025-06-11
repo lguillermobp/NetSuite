@@ -950,7 +950,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             search.createColumn({
                 name: "formulanumeric",
                 summary: "SUM",
-                formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity}- NVL({quantitycommitted}, 0) THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity})  ELSE 0 END end "
+                formula: " case when {item.inventorylocation}='Kissimmee - Warehouse' then CASE WHEN NVL({item.locationquantityavailable}, 0)<{quantity} THEN ABS(NVL({item.locationquantityavailable}, 0)-{quantity})  ELSE 0 END end "
             }),
             search.createColumn({
                 name: "formulatext",
