@@ -62,7 +62,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item_id": Number(fresult1.getValue({name: "internalid"})),
                         "item_name": fresult1.getValue({name: "itemid"}),
                         "item_description": fresult1.getValue({name: "purchasedescription"}),
-                        "item_unit": fresult1.getText({name: "unitstype"})
+                        "item_unit": fresult1.getText({name: "unitstype"}),
+                        "exclude_projections": fresult1.getValue({name: "custitem_exclude_viewecd"}),
                     }
                     i++;
 
