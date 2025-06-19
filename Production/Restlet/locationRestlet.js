@@ -34,18 +34,11 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             log.debug("option",option); 
 
            
-            idsearch = "customsearch_ecd_inventorydetail";
+            idsearch = "customsearch_ecdlocation";
 
-
-             try {
-                var fsearch =search.load({
-                            id: idsearch
-                    });
-                log.debug({ title: 'Search loaded successfully', details: fsearch });
-
-                } catch (error) {
-                log.error({ title: 'Error loading saved search', details: error });
-                }
+            var fsearch =search.load({
+               id: idsearch
+           });
                 
              var pagedData = fsearch.runPaged({
                 "pageSize" : 1000
@@ -56,16 +49,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 log.audit(pageRange.index);
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
-                    
+
                     dataf[i] = {
-                        "bin_id": Number(fresult1.getValue({name: "internalid",     join: "binNumber",  summary: "GROUP"})),
-                        "item_id": Number(fresult1.getValue({name: "item", summary: "GROUP"})),
-                        "item_name": fresult1.getText({name: "item", summary: "GROUP"}),
-                        "location_id": Number(fresult1.getValue({name: "location", summary: "GROUP"})),
-                        "location_name": fresult1.getText({name: "location", summary: "GROUP"}),
-                        "onhand": Number(fresult1.getValue({name: "formulanumeric", summary: "SUM"})),
-                        "available": Number(fresult1.getValue({name: "formulanumeric", summary: "SUM"})),
-                        "stock_unit": fresult1.getText({name: "stockunit",      join: "item",    summary: "GROUP"})
+                        "location_id": Number(fresult1.getValue({name: "internalid"})),
+                        "location_name": fresult1.getValue({name: "name"}),
+                        "location_country": fresult1.getValue({name: "country"}),
+                        "location_city": fresult1.getValue({name: "city"}),
                     }
                     i++;
 

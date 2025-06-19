@@ -42,6 +42,7 @@ define(['N/record','N/search','N/log','N/ui/serverWidget'], function(record,s, l
             location= context.newRecord.getValue({fieldId: 'custrecord_sc_location'});
             log.debug("location", location);
             id = context.newRecord.getValue({fieldId: 'id'});
+            log.debug("id", id);
 
             internalid = PhysicalCount(item, binlocation, location);
 
