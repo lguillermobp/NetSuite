@@ -44,51 +44,55 @@ define(['N/record','N/search','N/log','N/ui/serverWidget'], function(record,s, l
             id = context.newRecord.getValue({fieldId: 'id'});
             log.debug("id", id);
 
-            internalid = PhysicalCount(item, binlocation, location);
+            if (location !== '') {
 
-            if (internalid == 0) {
-                log.debug("Creating new Physical Count Record");
-                pc = record.create({
-                    type: "customrecord_physicalcount",
-                    isDynamic: true
-                });
+                internalid = PhysicalCount(item, binlocation, location);
 
-                pc.setValue({
-                    fieldId: 'custrecord_pc_item',
-                    value: item 
-                });
-                pc.setValue({
-                    fieldId: 'custrecord_pc_bin',
-                    value: binlocation 
-                });
-                pc.setValue({
-                    fieldId: 'custrecord_pc_location',
-                    value: location 
-                });
-                pc.setValue({
-                    fieldId: 'custrecord_pc_item_count',
-                    value: id 
-                });
-                pc.setValue({
-                    fieldId: 'custrecord_pc_status',
-                    value: 2 
-                });
+                if (internalid == 0) {
+                    log.debug("Creating new Physical Count Record");
+                    pc = record.create({
+                        type: "customrecord_physicalcount",
+                        isDynamic: true
+                    });
 
-                pcinternalid = pc.save();
-            }
-            else {
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_item',
+                        value: item 
+                    });
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_bin',
+                        value: binlocation 
+                    });
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_location',
+                        value: location 
+                    });
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_item_count',
+                        value: id 
+                    });
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_status',
+                        value: 2 
+                    });
 
-                pc = record.load({
-                    type: "customrecord_physicalcount",
-                    id: internalid,
-                    isDynamic: true
-                });
+                    pcinternalid = pc.save();
+                }
+                else {
 
-                pc.setValue({
-                    fieldId: 'custrecord_pc_item_count',
-                    value: id 
-                });
-                pc.save();
+                    pc = record.load({
+                        type: "customrecord_physicalcount",
+                        id: internalid,
+                        isDynamic: true
+                    });
+
+                    pc.setValue({
+                        fieldId: 'custrecord_pc_item_count',
+                        value: id 
+                    });
+                    pc.save();
+
+                }
 
             }
 

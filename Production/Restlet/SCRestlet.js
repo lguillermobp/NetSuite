@@ -26,7 +26,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             log.debug("option",option);
 
            
-            idsearch = "customsearch_ecdsalescontract";
+            idsearch = "customsearch_ecdsalescontract_2";
 
             var fsearch =search.load({
                id: idsearch
@@ -70,6 +70,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
                     dataf[i] = {
                         "internalid": fresult1.getValue({name: "internalid"}),
+                        "salescontract_name": fresult1.getValue({name: "transactionnumber"}),
                         "customer_id": fresult1.getValue({name: "entity"}),
                         "amount": fresult1.getValue({name: "amount"}),
                         "productionline": fresult1.getText({name: "custbody_productionline"}),
