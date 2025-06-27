@@ -51,7 +51,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     dataf[i] = {
                         "productionline_id": Number(fresult1.getValue({name: "custrecord_sc_productionline", join: "CUSTRECORD_SO_SC_TASK"})),
                         "productionline_name": fresult1.getText({name: "custrecord_sc_productionline", join: "CUSTRECORD_SO_SC_TASK"}),
-                        "task_id": fresult1.getValue({name: "internalid"}),
+                        "task_id": Number(fresult1.getValue({name: "internalid"})),
+                        "tasks_id": Number(fresult1.getValue({name: "internalid", join: "CUSTRECORD_SO_SC_TASK"})),
                         "task_name": fresult1.getValue({name: "custrecord_sc_task", join: "CUSTRECORD_SO_SC_TASK"}),
                         "task_seq": Number(fresult1.getValue({name: "custrecord_sc_tasksseq", join: "CUSTRECORD_SO_SC_TASK"})),
                         "task_sts": fresult1.getText({name: "custrecord_so_sc_status"}),
