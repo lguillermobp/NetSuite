@@ -278,7 +278,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 sublistpm.addField({
                     id: "custrecordml_qtyt",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Quantity Total'
                 });
                 sublistpm.addField({

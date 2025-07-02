@@ -35,8 +35,8 @@
                 log.debug("vendorids",vendorids);
                 operatorw = "noneof";
 
-
-   
+                carriers= getcarrier();
+                log.debug("carriers",carriers);
 
                 if (option == "1") {
                     idsearch = "customsearch_ppdforecdview";
@@ -90,6 +90,14 @@
                     var page = pagedData.fetch({index: pageRange.index});
                     page.data.forEach(function (fresult1) {
 
+                        
+                        if (fresult1.getValue({name: "custbody_vendorcurriership", join: "CUSTRECORD_POID"})) {
+                            url = carriers[fresult1.getValue({name: "custbody_vendorcurriership", join: "CUSTRECORD_POID"})].url;
+                        }
+                        else {
+                            url = ""; 
+                        }
+
 
                         dataf[i] = {
                             "ppd_id": fresult1.getValue({name: "internalid", join: "CUSTRECORD_PPD_CODE"}),
@@ -103,7 +111,9 @@
                             "item_name": fresult1.getText({name: "custrecord_ppd_item", join: "CUSTRECORD_PPD_CODE"}),
                             "ppd_qty": fresult1.getValue({name: "custrecord_ppd_quantity", join: "CUSTRECORD_PPD_CODE"}),
                             "po_qty": fresult1.getValue({name: "quantity", join: "CUSTRECORD_POID"}),
-                            "po_tracking": fresult1.getValue({name: "trackingnumbers", join: "CUSTRECORD_POID"}) + " " + fresult1.getValue({name: "custbody_addtracking", join: "CUSTRECORD_POID"}),
+                            "po_carrier": fresult1.getText({name: "custbody_vendorcurriership", join: "CUSTRECORD_POID"}), 
+                            "po_carrier_url": url,
+                            "po_tracking": fresult1.getValue({name: "trackingnumbers", join: "CUSTRECORD_POID"}) + " " + fresult1.getValue({name: "custbody_addtracking", join: "CUSTRECORD_POID"}).replace(/[\r\n]+/gm, " "),
                             "po_exp_receiptdate": fresult1.getValue({name: "expectedreceiptdate", join: "CUSTRECORD_POID"}),
                             "po_status": fresult1.getValue({name: "statusref", join: "CUSTRECORD_POID"}),
                             "item_rate": fresult1.getValue({name: "rate", join: "CUSTRECORD_POID"}),
@@ -156,6 +166,52 @@
                     })
 
                     return lineItemIds;
+                }
+
+                function getcarrier () {
+
+                    var linecarrier = [];
+
+                    var fsearch = search.create({
+                        type: "customrecord_vendorcurriership",
+                        filters:
+                        [
+                        ],
+                        columns:
+                        [
+                            "internalid",
+                            "name",
+                            "custrecord_url_tracking"
+                        ]
+                        });
+
+                    var pagedData = fsearch.runPaged({
+                        "pageSize": 1000
+                    });
+                    
+                    pagedData.pageRanges.forEach(function (pageRange) {
+                        var page = pagedData.fetch({ index: pageRange.index });
+                        page.data.forEach(function (fresult1) {
+                            internalid= fresult1.getValue({
+                                name: "internalid"
+                            });
+                            log.debug("internalid", internalid);
+                            namec= fresult1.getValue({
+                                name: "name"
+                            });
+                            url= fresult1.getValue({
+                                name: "custrecord_url_tracking"
+                            });
+
+                            linecarrier[internalid] = {
+                                "name": namec,
+                                "url": url
+                            };
+                             
+                        })
+                    })
+
+                    return linecarrier;
                 }
 
 

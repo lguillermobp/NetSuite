@@ -47,7 +47,7 @@ define(['N/record','N/log'],
             catch(e) {
             log.debug('Error', e);log.debug('params.id', params.id);}
             */
-            /*
+          
            var lineCount = rec.getLineCount({
                 sublistId: 'itemvendor'
             });
@@ -56,18 +56,83 @@ define(['N/record','N/log'],
 
             for (var i = 0; i < lineCount; i++) {
 
-                rec.removeLine({
-                    sublistId: 'itemvendor',
-                    line: i,
-                    ignoreRecalc: true
-                });
+                 var subrecord = rec.getSublistSubrecord({
+                        sublistId: 'itemvendor',
+                        fieldId: 'itemvendorprice',
+                        line: i
+                    });
+
+                    var lineCount1 = subrecord.getLineCount({
+                        sublistId: 'itemvendorpricelines'
+                    });
+                    log.debug('lineCount1', lineCount1);
+                    if (lineCount1 > 0) {
+
+                        var vendor = rec.getSublistValue({
+                            sublistId: 'itemvendor',
+                            fieldId: 'vendor',
+                            line: i
+                        });
+                        var vendorRec = record.load({
+                            type: record.Type.VENDOR,
+                            id: vendor,
+                            isDynamic: false
+                        });
+                        var vendorCurrency = vendorRec.getValue({
+                            fieldId: 'currency'
+                        });
+
+                        log.debug('vendorCurrency', vendorCurrency);
+
+                        
+                        for (var l = 0; l < lineCount1; l++) {
+
+                            currencylist= subrecord.getSublistValue({
+                                                sublistId: 'itemvendorpricelines',
+                                                fieldId: 'vendorcurrency',
+                                                line: l
+                                            });
+
+                            log.debug('currencylist', currencylist);
+
+                            if (currencylist != vendorCurrency) {
+
+                                    subrecord.setSublistValue({
+                                                sublistId: 'itemvendorpricelines',
+                                                fieldId: 'vendorcurrency',
+                                                line: l,
+                                                value: vendorCurrency
+                                            });
+
+                                // subrecord.removeLine({
+                                //     sublistId: 'itemvendorpricelines',
+                                //     line: l,
+                                //     ignoreRecalc: true
+                                // });
+
+                                log.debug('currencylist different', currencylist);
+                            }
+                               
+                            
+                            }
+                    }
+                    
+                
+                log.debug('subrecord', subrecord);
+
+                // rec.removeLine({
+                //     sublistId: 'itemvendor',
+                //     line: i,
+                //     ignoreRecalc: true
+                // });
                
             }
-            try {var saverec = rec.save();}
-             catch(e) {
-             log.debug('Error', e);log.debug('params.id', params.id);}
-            */
+                // try {var saverec = rec.save();}
+                // catch(e) {
+                //     log.debug('Error', e);log.debug('params.id', params.id);
+                // }
 
+            /*
 
              try {var preferredvendor = rec.setSublistValue({
                  sublistId: 'itemvendor',
@@ -86,20 +151,15 @@ define(['N/record','N/log'],
 
           
              
-            
+             */
 
             try {
-                rec.removeLine({
-                    sublistId: 'billofmaterials',
-                    line: 0,
-                    ignoreRecalc: true
-                });
                
             var saverec = rec.save();
             }
             catch(e) {
                 log.debug('Error', e);}
-             */
+            
             
         }
         return {
