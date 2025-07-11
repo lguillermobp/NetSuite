@@ -12,7 +12,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
      * @param {runtime} runtime
      * @param {format} format
      * @param {xml} xml
-     * @param {LoDash} _
+     * @param {LoDash} _ 
      * @returns {{onRequest: onRequest}}
      */
     function (search, file, render, runtime, format, xml,log,  _) {
@@ -22,6 +22,7 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
         var lineItemIds2=[];
         function onRequest(context) {
             const WO_INTERNAL_ID = String(context.request.parameters.id);
+            const OPC = String(context.request.parameters.opt);
 
             let pdf = file.load({id: "/SuiteScripts/bomPDF.xml"}).getContents();
             let lineItemIds1 = [];
@@ -391,7 +392,11 @@ define(["N/search", "N/file", "N/render", "N/runtime", "N/format", "N/xml", "N/l
                 return true;
             });
 
-            inventoryBalanceData = _.orderBy(inventoryBalanceData, ["binnumber", "available","locationPriority"], ["asc", "asc", "asc"]);
+            if (OPC == "1") {
+                inventoryBalanceData = _.orderBy(inventoryBalanceData, ["binnumber", "available","locationPriority"], ["asc", "asc", "asc"]);
+            } else if (OPC == "2") {
+                inventoryBalanceData = _.orderBy(inventoryBalanceData, ["binforpicking", "available","locationPriority"], ["asc", "asc", "asc"]);
+            }
 
             for (const result of inventoryBalanceData) {
                 inventoryBalanceLines += "<tr>";

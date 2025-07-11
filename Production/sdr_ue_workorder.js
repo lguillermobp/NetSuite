@@ -27,7 +27,7 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             // ================================================================================
             // BOM PDF
             // ================================================================================
-            const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1610&deploy=1&id=${currentRecordId}`
+            const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1610&deploy=1&id=${currentRecordId}&opt=1`
 
             context.form.addButton({
                 id: "custpage_print", 

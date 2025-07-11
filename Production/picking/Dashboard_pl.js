@@ -430,7 +430,12 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 sublistpm.addButton({
                 id: "custpage_print", 
                 label: "Print BOM ECD",
-                functionName: "printpl("+WOID+")"
+                functionName: "printpl("+WOID+",'1')"
+                })
+                sublistpm.addButton({
+                id: "custpage_print2", 
+                label: "Print BOM ECD sort by picking bin",
+                functionName: "printpl("+WOID+",'2')"
                 })
 
                 let itemidf =sublistpm.addField({

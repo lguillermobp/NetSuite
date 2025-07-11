@@ -516,7 +516,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             return true;
         }
 
-        function printpl(woid) 
+        function printpl(woid, opc) 
         {
             
             
@@ -526,6 +526,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                 returnExternalUrl: false,
                 params: {
                     'id': woid,
+                    'opt': opc
                 }
                 });
                 https.get.promise({
