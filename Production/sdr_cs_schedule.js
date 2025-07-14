@@ -66,7 +66,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             log.debug("final",final);
             dayspushed = Math.abs(final - initial) + 1;
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
-            //pushsch(internalid, dayspushed,seq,internalidsc,pl);
+            pushsch(internalid, dayspushed,seq,internalidsc,pl);
         }
         try {
         window.opener.location.reload(false);
@@ -80,11 +80,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     function calcenddate(strdate,duration) {
 
         var dt = new Date(strdate);
-        log.debug("dt",dt);
         var strdate = dt;
         
-        log.debug("strdate",strdate);
-
         if (ecddays.length==0) {pecddays();}
 
         var y = strdate.getFullYear();
@@ -101,6 +98,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
 
 
         function pecddays() {
+
+            log.debug("pecddays","start");
 
             var ecdholydays=[];
         
@@ -146,15 +145,14 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 function getMonday(d,tc) 
                 {
                     //return d;
-                    log.debug("d",d);
-                    log.debug("tc",tc);
+
                     const today = new Date();
                     var montha = today.getMonth() + 1;
                     const myArray = d.split("/");
                     
                     if ((myArray[0]-montha)<-3) {yeara=today.getFullYear()+1;}
                     else                        {yeara=today.getFullYear();}
-                    log.debug("(myArray[0]-montha",(myArray[0]-montha));
+
                     mes = [31,28,31,30,31,30,31,31,30,31,30,31]
 
                     if (tc==1) 
@@ -216,7 +214,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
                 ecddays[i]=datetofind;
             }
-            
+            log.debug("pecddays","ending");
         }
 
 
@@ -225,11 +223,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
 
     function pushsch(internalid, dayspushed,seq,internalidscc,pl) {
         log.debug("oldstartdate",oldstartdate);
-        log.debug("pl",pl);
         log.debug("internalid",internalid);
-        log.debug("dayspushed",dayspushed);
-        log.debug("seq",seq);
-        log.debug("internalidscc",internalidscc);
+
         var y = oldstartdate.getFullYear();
         var m = oldstartdate.getMonth() + 1;
         var d = oldstartdate.getDate();
@@ -306,8 +301,6 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 
                 internalidsc=fresult1.getValue({ name: "internalid",join: "CUSTRECORD_SALECONTRACT"});
                 seqss=fresult1.getValue({ name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
-                log.debug("internalidsc",internalidsc);
-                log.debug("seqss",seqss);
 
                 if (seq!=seqss) {changing=false;seq=seqss}
                 if (internalidscc==internalidsc) {changing=true;}
@@ -336,12 +329,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                         fieldId: 'custrecord_so_sc_startdate',
                         value: newstartdate
                     });
-                    log.debug("newenddate",newenddate);
+                    log.debug("strstartdate",newstartdate);
                     scheduleTaskRecord.setValue({
                         fieldId: 'custrecord_so_sc_enddate',
                         value: newenddate
                     });
-
+                    log.debug("endenddate",newenddate);
                     // Save the record
                     scheduleTaskRecord.save({
                         enableSourcing: false,

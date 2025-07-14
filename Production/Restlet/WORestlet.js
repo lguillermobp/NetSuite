@@ -78,6 +78,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "task_name": fresult1.getText({name: "custbody_scheduletaskid"}),
                         "tasksc_id": Number(fresult1.getValue({name: "custbody_tasksc"})),
                         "wo_date": fresult1.getValue({name: "trandate"}),
+                        "item_id": Number(fresult1.getValue({name: "item"}))
                     }
                     i++;
 
