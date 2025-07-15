@@ -19,16 +19,19 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
         }
 
          function post (context) {
+            log.debug("context", context);
 
-            try {
-                    contextjson = JSON.parse(context);
+                try {
+                    data = JSON.parse(context);
                     }
                     catch (e) {
                         log.debug("error",e);
-                        contextjson = context;
+                        data = context;
                     }
-
+            log.debug("data", data);
+            var contextjson = data.data;
             log.debug("contextjson", contextjson);
+            log.debug("contextjson.username", contextjson.username);
 
             var rec = record.create({
                 type: 'customrecord_requestrecords',
@@ -69,14 +72,15 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             }
             if (contextjson.request_reason) {
                 rec.setValue({
-                    fieldId: 'custrecord_additionalinformation',
+                    fieldId: 'custrecord_reason',
                     value: contextjson.request_reason
                 });
             }
+
             if (contextjson.request_date) {
                 rec.setValue({
                     fieldId: 'custrecord_date',
-                    value: contextjson.request_date
+                    value: new Date(contextjson.request_date)
                 });
             }
             if (contextjson.request_sts) {
@@ -97,14 +101,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_id
                 });
             }
-            if (contextjson.wo_id) {
+            if (contextjson.wo_id!="None") {
                 rec.setValue({
                     fieldId: 'custrecord_wo',
                     value: contextjson.wo_id
                 });
             }
-
-            
 
             var recId = rec.save();
             log.debug('Record Created', 'ID: ' + recId);
