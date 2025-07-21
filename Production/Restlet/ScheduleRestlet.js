@@ -38,6 +38,26 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                id: idsearch
            });
                 
+            if (option == "U") {
+
+                var defaultFilters = fsearch.filters;
+                var customFilters = [];
+                
+                    customFilters = {
+                        name: "lastmodifieddate",
+                        operator: "within",
+                        values: "today",
+                        isor: false,
+                        isnot: false,
+                        leftparens: 0,
+                        rightparens: 0
+
+                    };
+
+                    defaultFilters.push(customFilters);
+                    fsearch.filters = defaultFilters;           
+                }
+
              var pagedData = fsearch.runPaged({
                 "pageSize" : 1000
             });
@@ -61,7 +81,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "task_enddate": fresult1.getValue({name: "custrecord_so_sc_enddate"}),
                         "task_duration": fresult1.getValue({name: "custrecord_sc_soduration"}),
                         "salescontract_id": Number(fresult1.getValue({name: "internalid",   join: "CUSTRECORD_SALECONTRACT"})),
-                        "group_by": fresult1.getText({name: "custrecord_sc_tasksgroup",join: "CUSTRECORD_SO_SC_TASK"})
+                        "group_by": fresult1.getText({name: "custrecord_sc_tasksgroup",join: "CUSTRECORD_SO_SC_TASK"}),
+                        "progress": Number(fresult1.getValue({name: "custrecord_so_sc_progress"})),
+                        "lastmodified_by": fresult1.getValue({name: "custrecord_so_sc_user"}),
                     }
                     i++;
 

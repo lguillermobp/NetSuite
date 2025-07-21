@@ -47,24 +47,24 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 log.error({ title: 'Error loading saved search', details: error });
                 }
 
-                   if (option == "U") {
+                if (option == "U") {
 
                 var defaultFilters = fsearch.filters;
                 var customFilters = [];
                 
-                customFilters = {
-                    name: "lastmodifieddate",
-                    operator: "within",
-                    values: "today",
-                    isor: false,
-                    isnot: false,
-                    leftparens: 0,
-                    rightparens: 0
+                    customFilters = {
+                        name: "lastmodifieddate",
+                        operator: "within",
+                        values: "today",
+                        isor: false,
+                        isnot: false,
+                        leftparens: 0,
+                        rightparens: 0
 
-                };
+                    };
 
-                defaultFilters.push(customFilters);
-                fsearch.filters = defaultFilters;           
+                    defaultFilters.push(customFilters);
+                    fsearch.filters = defaultFilters;           
                 }
                 
              var pagedData = fsearch.runPaged({
