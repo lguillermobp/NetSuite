@@ -31,6 +31,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 else if (option == "2") {
                     idsearch = "customsearch_dispatchplan_2";
                 }
+                else if (option == "U") {
+                    idsearch = "customsearch_dispatchplan_upd";
+                }
                 
             
 
@@ -85,7 +88,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "ECD_Model": fresult1.getText({name: "custbody_appf_veh_model",join: "CUSTBODY_QUOTE_SC"}),
                         "vendor_id": vendor_id,
                         "vendor_name": vendor_name,
-                        "quantity": fresult1.getValue({name: "quantity"})
+                        "quantity": fresult1.getValue({name: "quantity"}),
+                        "line_id": fresult1.getValue({name: "line"})
                     }
                     i++;
 

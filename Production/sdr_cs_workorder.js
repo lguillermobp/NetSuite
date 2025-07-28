@@ -57,36 +57,42 @@ define(["N/log","N/record","N/email","N/ui/message", 'N/ui/dialog',"N/runtime", 
          * @since 2015.2
          */
         function fieldChanged(context) {
-            var currentRecord = context.currentRecord;
+
             var sublistId = context.sublistId
             var fieldId = context.fieldId;
             var memo = context.currentRecord.getValue({fieldId: "memo"});
+            var lineNum = context.lineNum;
 
-
-            // if (memo=="commit")
-            //     {
-            //         var reallocate = record.create({
-            //             type: record.Type.REALLOCATE_ITEM,
-            //             isDynamic: true
-            //         });
-
-            //         log.debug("reallocate",reallocate);
-            //         console.log("reallocate",reallocate);
-
-            //     }
+            log.debug("fieldChanged", "sublistId: " + sublistId + ", fieldId: " + fieldId + ", lineNum: " + lineNum + ", memo: " + memo);
 
                
-        
-                log.debug("fieldId", fieldId);
-        
-                var entityname= currentRecord.getValue({ fieldId: 'entityname'});
-        
-                if (fieldId === 'custbody_scheduletaskid') {
+            if (memo=="commit")
+            {
 
+                // Check if the changed field is in the 'item' sublist and is the 'quantity' field
+                if (sublistId === 'item' && fieldId === 'description' ) {
+                    // Get the new quantity value
+
+                    context.currentRecord.selectLine({sublistId: sublistId, line: 0});
                     
+                    var quantity = context.currentRecord.getCurrentSublistValue({
+                        sublistId: sublistId,
+                        fieldId: 'quantity'
+                    });
+                    log.debug("quantity", quantity);
 
+                    // Set the value
+                    context.currentRecord.setCurrentSublistValue({
+                        sublistId: sublistId,
+                        fieldId: 'quantitycommitted',
+                        value: quantity,
+                        ignoreFieldChange: true // Optional, depending on requirements
+                    });
 
+                    // Commit the line
+                    context.currentRecord.commitLine({sublistId: sublistId});
                 }
+            }
 
         }
 
