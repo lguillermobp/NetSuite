@@ -39,6 +39,11 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                      "custrecord_memo2",
                      "custrecord_ai_description",
                      search.createColumn({
+                        name: "custrecord_aid_date",
+                        join: "CUSTRECORD_AI",
+                        sort: search.Sort.ASC
+                     }),
+                     search.createColumn({
                         name: "custrecord_tpd_sequence",
                         join: "CUSTRECORD_AI",
                         sort: search.Sort.ASC
@@ -63,11 +68,6 @@ define(["N/log",'N/render',"N/http", "N/file", "N/record","N/search"],
                      search.createColumn({
                         name: "custrecord_aid_document",
                         join: "CUSTRECORD_AI"
-                     }),
-                     search.createColumn({
-                        name: "custrecord_aid_date",
-                        join: "CUSTRECORD_AI",
-                        sort: search.Sort.ASC
                      }),
                      "internalid",
                      search.createColumn({
