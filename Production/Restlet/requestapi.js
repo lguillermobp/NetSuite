@@ -83,10 +83,10 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: new Date(contextjson.request_date)
                 });
             }
-            if (contextjson.request_sts) {
+            if (contextjson.request_sts_description) {
                 rec.setValue({
                     fieldId: 'custrecord_requeststs',
-                    value: contextjson.request_sts
+                    value: contextjson.request_sts_description
                 });
             }
             if (contextjson.user_email) {
@@ -99,6 +99,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 rec.setValue({
                     fieldId: 'custrecord_viewecdid',
                     value: contextjson.request_id
+                });
+            }
+             if (contextjson.request_type) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_type_vecd',
+                    value: contextjson.request_type
                 });
             }
             if (contextjson.wo_id!="None") {
