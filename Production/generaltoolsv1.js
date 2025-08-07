@@ -954,7 +954,7 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
         return retvar;
 
     }
-        function get_Item_basic (item){
+        function get_Item_basic (item){ 
 
 
             var caseData = s.lookupFields({

@@ -142,16 +142,16 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
 
             if (itemId) {
 
-            paramitem = GENERALTOOLS.get_item_value_new(itemId);
-            paramdata = paramitem.data;
-            department = paramdata.getValue({fieldId: "department"});
-            log.audit({title: "department", details: department});
+                paramitem = GENERALTOOLS.get_item_value_new(itemId);
+                paramdata = paramitem.data;
+                department = paramdata.getValue({fieldId: "department"});
+                log.audit({title: "department", details: department});
 
-            if (department)
-            {
-                context.newRecord.setValue({fieldId: "department", value: department});
-                
-            }
+                if (department)
+                {
+                    context.newRecord.setValue({fieldId: "department", value: department});
+                    
+                }
            
             }
         }
