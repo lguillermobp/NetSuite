@@ -81,9 +81,17 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "bin_id": 0,
                         "item_id": Number(fresult1.getValue({name: "internalid"})),
                         "item_name": fresult1.getValue({name: "itemid"}),
-                        "item_description": fresult1.getValue({name: "purchasedescription"}),
+                        "item_description": fresult1.getValue({name: "salesdescription"}),
+                        "item_description_po": fresult1.getValue({name: "purchasedescription"}),
                         "item_unit": fresult1.getText({name: "unitstype"}),
                         "exclude_projections": fresult1.getValue({name: "custitem_exclude_viewecd"}),
+                        "item_make": fresult1.getText({name: "custitem_make"}),
+                        "item_make_id": Number(fresult1.getValue({name: "custitem_make"})),
+                        "item_model": fresult1.getText({name: "custitem1"}),
+                        "item_price": Number(fresult1.getValue({name: "formulacurrency", formula: "{pricing.unitprice}"})),
+                        "item_step": fresult1.getText({name: "custitem_steps"}),
+                        "item_step_id": Number(fresult1.getValue({name: "custitem_steps"})),
+                        "item_parent_id": Number(fresult1.getValue({name: "parent"}))
                     }
                     i++;
 
