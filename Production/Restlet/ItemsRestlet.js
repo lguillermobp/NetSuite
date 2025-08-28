@@ -91,7 +91,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item_price": Number(fresult1.getValue({name: "formulacurrency", formula: "{pricing.unitprice}"})),
                         "item_step": fresult1.getText({name: "custitem_steps"}),
                         "item_step_id": Number(fresult1.getValue({name: "custitem_steps"})),
-                        "item_parent_id": Number(fresult1.getValue({name: "parent"}))
+                        "item_parent_id": Number(fresult1.getValue({name: "parent"})),
+                        "item_type": fresult1.getText({name: "type"})
                     }
                     i++;
 

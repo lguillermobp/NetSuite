@@ -5,13 +5,13 @@
  * @NScriptType Restlet
  * @NModuleScope SameAccount
  */
-define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.js", "/SuiteScripts/Modules/LoDash.js"],
     /**
      * @param {N/search} search
      * @param {N/record} record
      * @return {{post: exports.post}}
      */
-    function (search, record, log, GENERALTOOLS) {
+    function (search, record, log, GENERALTOOLS, _) {
 
          function get (_ref) {
 
@@ -20,7 +20,14 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
          function post (context) {
 
-            contextjson = JSON.parse(context);
+            try {
+                    contextjson = JSON.parse(context);
+                    }
+                    catch (e) {
+                        log.debug("error",e);
+                        contextjson = context;
+                    }
+
             log.debug("context",contextjson);
             var option= contextjson.option;
             log.debug("option",option);
@@ -62,6 +69,17 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                             vendor_name = fresult1.getText({name: "vendor",join: "item"});
                         }
 
+                        invoicedate=fresult1.getValue({name: "custbody_invoicedate",join: "CUSTBODY_QUOTE_SC"});
+                        if (invoicedate) {
+                            const dateParts = invoicedate.split('/');
+                            const month = parseInt(dateParts[0], 10) - 1; // Month is 0-indexed in Date object
+                            const day = parseInt(dateParts[1], 10);
+                            const year = parseInt(dateParts[2], 10);
+                            invoicedate = new Date(year, month, day);
+                        }
+
+                        
+
                     dataf[i] = {
                         "productionline": fresult1.getText({name: "custbody_productionline"}),
                         "productionlineid": fresult1.getValue({name: "custbody_productionline"}),
@@ -83,20 +101,23 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item": fresult1.getText({name: "item"}),
                         "dateformula": fresult1.getValue({name: "formuladate"}),
                         "invoicedate": fresult1.getValue({name: "custbody_invoicedate",join: "CUSTBODY_QUOTE_SC"}),
+                        "invoicedate1": invoicedate,
                         "wo_id": fresult1.getValue({name: "internalid"}),
                         "so_id": fresult1.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC"}),
                         "ECD_Model": fresult1.getText({name: "custbody_appf_veh_model",join: "CUSTBODY_QUOTE_SC"}),
                         "vendor_id": vendor_id,
                         "vendor_name": vendor_name,
                         "quantity": fresult1.getValue({name: "quantity"}),
-                        "line_id": fresult1.getValue({name: "line"})
+                        "line_id": fresult1.getValue({name: "line"}),
+                        "whonhand": fresult1.getValue(fresult1.columns[27]),
                     }
                     i++;
 
                 })
+                salesOrderData = _.sortBy(dataf, ["item_id", "invoicedate1"]);
             })
 
-            return dataf;
+            return salesOrderData;
         }
 
 

@@ -37,6 +37,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var currentRecord = context.currentRecord;
         startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
         internalidsc = currentRecord.getValue({ fieldId: "custrecord_salecontract" });
+        taskid = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
         pl = currentRecord.getValue({ fieldId: "custrecord_so_sc_productionline" });
         seq1 = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
 
@@ -66,7 +67,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             log.debug("final",final);
             dayspushed = Math.abs(final - initial) + 1;
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
-            pushsch(internalid, dayspushed,seq,internalidsc,pl);
+            pushsch(internalid, dayspushed,seq,internalidsc,pl,taskid);
         }
         try {
         window.opener.location.reload(false);
@@ -221,7 +222,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         return newenddate;
     }
 
-    function pushsch(internalid, dayspushed,seq,internalidscc,pl) {
+    function pushsch(internalid, dayspushed,seq,internalidscc,pl,taskid) {
         log.debug("oldstartdate",oldstartdate);
         log.debug("internalid",internalid);
 
@@ -241,7 +242,9 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 "AND", 
                 ["custrecord_so_sc_task.custrecord_sc_tasksseq","greaterthanorequalto",seq],
                 "AND",
-                ["custrecord_so_sc_productionline","anyof",pl]
+                ["custrecord_so_sc_productionline","anyof",pl],
+                 "AND", 
+                ["custrecord_so_sc_task","anyof",taskid]
             ],
             columns:
             [
