@@ -54,6 +54,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             });
             var i=0;
             var dataf=[];
+            var salesOrderData = [];
             pagedData.pageRanges.forEach(function (pageRange) {
                 log.audit(pageRange.index);
                 var page = pagedData.fetch({index: pageRange.index});
@@ -91,25 +92,25 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "trandate": fresult1.getValue({name: "trandate"}),
                         "customer_id": fresult1.getText({name: "internalid", join: "customerMain"}),
                         "altname": fresult1.getValue({name: "altname", join: "customerMain"}),
-                        "quantitycommitted": fresult1.getValue({name: "quantitycommitted"}),
-                        "quantitytransfered": fresult1.getValue(fresult1.columns[10]),
-                        "itemsleft":fresult1.getValue(fresult1.columns[11]),
-                        "quantitybo": fresult1.getValue(fresult1.columns[12]),
-                        "totalitemsbo": fresult1.getValue(fresult1.columns[13]),
+                        "quantitycommitted": Number(fresult1.getValue({name: "quantitycommitted"})),
+                        "quantitytransfered": Number(fresult1.getValue(fresult1.columns[10])),
+                        "itemsleft": Number(fresult1.getValue(fresult1.columns[11])),
+                        "quantitybo": Number(fresult1.getValue(fresult1.columns[12])),
+                        "totalitemsbo": Number(fresult1.getValue(fresult1.columns[13])),
                         "memo": fresult1.getValue({name: "memo"}),
                         "item_id": fresult1.getValue({name: "internalid",join: "item"}),
                         "item": fresult1.getText({name: "item"}),
                         "dateformula": fresult1.getValue({name: "formuladate"}),
                         "invoicedate": fresult1.getValue({name: "custbody_invoicedate",join: "CUSTBODY_QUOTE_SC"}),
                         "invoicedate1": invoicedate,
-                        "wo_id": fresult1.getValue({name: "internalid"}),
-                        "so_id": fresult1.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC"}),
+                        "wo_id": Number(fresult1.getValue({name: "internalid"})),
+                        "so_id": Number(fresult1.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC"})),
                         "ECD_Model": fresult1.getText({name: "custbody_appf_veh_model",join: "CUSTBODY_QUOTE_SC"}),
                         "vendor_id": vendor_id,
                         "vendor_name": vendor_name,
-                        "quantity": fresult1.getValue({name: "quantity"}),
+                        "quantity": Number(fresult1.getValue({name: "quantity"})),
                         "line_id": fresult1.getValue({name: "line"}),
-                        "whonhand": fresult1.getValue(fresult1.columns[27]),
+                        "whonhand": Number(fresult1.getValue(fresult1.columns[27])),
                     }
                     i++;
 

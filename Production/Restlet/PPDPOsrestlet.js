@@ -122,7 +122,8 @@
                             "po_date": fresult1.getValue({name: "trandate", join: "CUSTRECORD_POID"}),
                             "po_datecreated": fresult1.getValue({name: "datecreated", join: "CUSTRECORD_POID"}),
                             "po_location": fresult1.getText({name: "location", join: "CUSTRECORD_POID"}),
-                            "po_qty_received": Number(fresult1.getValue({name: "quantityshiprecv", join: "CUSTRECORD_POID"}))
+                            "po_qty_received": Number(fresult1.getValue({name: "quantityshiprecv", join: "CUSTRECORD_POID"})),
+                            "po_ppd_task_id": Number(fresult1.getValue({name: "custrecord_ppd_task", join: "CUSTRECORD_PPD_CODE"}))
                         }
                         i++;
 
