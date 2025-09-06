@@ -8,8 +8,28 @@ var ecdmonths = [];
 var ecdholydays = [];
 var oldstartdate;
 var oldamount;
-define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, currentRecord, log, record,dialog, GENERALTOOLS) {
+var userId;
+var userName;
+var userRole;
+var userRoleName;
+var userEmail;
+define(['N/search','N/runtime','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteScripts/Modules/generaltoolsv1.js"], function(s, runtime, currentRecord, log, record,dialog, GENERALTOOLS) {
     function pageInit(context) {
+
+        var currentUser = runtime.getCurrentUser();
+
+        // Accessing user properties
+        userId = currentUser.id;
+        userName = currentUser.name;
+        userRole = currentUser.role; // Internal ID of the role
+        userRoleName = currentUser.roleName; // Name of the role
+        userEmail = currentUser.email;
+
+        console.log('User ID:', userId);
+        console.log('User Name:', userName);
+        console.log('User Role ID:', userRole);
+        console.log('User Role Name:', userRoleName);
+        console.log('User Email:', userEmail);
 
 
         datarec=context.currentRecord;
@@ -84,7 +104,7 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
                 
             }
 
-        if (fieldId == "custbody_invoicedate1")
+        if (fieldId == "custbody_invoicedate" && userRole==3)
         {
             var startdate = currentRecord.getValue({ fieldId: "custbody_invoicedate" });
 
@@ -863,10 +883,10 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
         var dur=0;
 
         var newstartdate=new Date(td);
-        newstartdate.setDate(td.getDate()-100);
+        newstartdate.setDate(td.getDate()-250);
         log.debug("newstartdate",newstartdate);
 
-        for (i=1;i<400;i++)
+        for (i=1;i<500;i++)
         {
             newstartdate.setDate(newstartdate.getDate()+1);
             if (newstartdate.getDay() == 0) {i--;continue;}
@@ -1041,9 +1061,9 @@ define(['N/search','N/currentRecord','N/log',"N/record","N/ui/dialog", "/SuiteSc
             });
             const td = new Date();
             var newstartdate=new Date(td);
-            newstartdate.setDate(td.getDate()-100);
+            newstartdate.setDate(td.getDate()-200);
     
-            for (i=1;i<300;i++)
+            for (i=1;i<400;i++)
             {
                 newstartdate.setDate(newstartdate.getDate()+1);
                 if (newstartdate.getDay() == 0) {i--;continue;}

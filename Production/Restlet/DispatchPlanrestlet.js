@@ -54,7 +54,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             });
             var i=0;
             var dataf=[];
-            var salesOrderData = [];
+            var salesOrderData = []; 
             pagedData.pageRanges.forEach(function (pageRange) {
                 log.audit(pageRange.index);
                 var page = pagedData.fetch({index: pageRange.index});

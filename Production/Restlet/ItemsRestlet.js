@@ -76,6 +76,16 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 log.audit(pageRange.index);
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
+
+                    if (fresult1.getValue({name: "type"})=="Discount") {
+                        item_step_id=9;
+                        item_step="STEP 99 - Discount";
+                    }
+                    else
+                    {
+                        item_step_id=Number(fresult1.getValue({name: "custitem_steps"}));
+                        item_step=fresult1.getText({name: "custitem_steps"});
+                    }
                     
                     dataf[i] = {
                         "bin_id": 0,
@@ -89,8 +99,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item_make_id": Number(fresult1.getValue({name: "custitem_make"})),
                         "item_model": fresult1.getText({name: "custitem1"}),
                         "item_price": Number(fresult1.getValue({name: "formulacurrency", formula: "{pricing.unitprice}"})),
-                        "item_step": fresult1.getText({name: "custitem_steps"}),
-                        "item_step_id": Number(fresult1.getValue({name: "custitem_steps"})),
+                        "item_step": item_step,
+                        "item_step_id": item_step_id,
                         "item_parent_id": Number(fresult1.getValue({name: "parent"})),
                         "item_type": fresult1.getText({name: "type"})
                     }

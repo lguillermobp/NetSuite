@@ -31,7 +31,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 
 
             var dataheader = data.data.dataheader;
-            var option = data.data.option;
+            var option = data.option;
+            log.debug("option", option);
 
             if  (option=="transformformquote")
             {
@@ -40,11 +41,341 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 log.debug("resultid", resultid);
 
             }
+            if  (option=="C")
+            {
+                var resultid=createQuote(data);
+                log.debug("resultid", resultid);
+            }
+            if  (option=="D")
+            {
+                var resultid=deleteQuote(dataheader);
+                log.debug("resultid", resultid);
+            }
+            if  (option=="createsalescontract")
+            {
+                var resultid=createSalesContract(data);
+                log.debug("resultid", resultid);
+            }
 
+
+            return resultid;
+        }
+
+        function createQuote(data)
+        {
+                
+            var dataheader = data.data.dataheader;
+            var customer_id = dataheader.customer_id;
+
+                         // Create a new Quote record
+                var newQuote = record.create({
+                    type: record.Type.ESTIMATE, // Use record.Type.ESTIMATE for Quote records
+                    isDynamic: true // Set to true for dynamic mode, allowing field changes to trigger related field updates
+                });
+
+                // Set a value for a standard field (e.g., entity/customer)
+                // Replace 'YOUR_CUSTOMER_ID' with the actual internal ID of a customer
+                newQuote.setValue({
+                    fieldId: 'entity',
+                    value: customer_id
+                });
+
+                newQuote.setValue({
+                    fieldId: 'custbody_vecd_user',
+                    value: dataheader.username
+                });
+                newQuote.setValue({
+                    fieldId: 'custbody_vecd_ctc_id',
+                    value: dataheader.ctc_id
+                });
+                newQuote.setValue({
+                    fieldId: 'custbody_viewwcd_user',
+                    value: dataheader.first_name + ", " + dataheader.last_name
+                });
+                newQuote.setValue({
+                    fieldId: 'custbody_viewwcd_user_email',
+                    value: dataheader.email
+                });
+
+                var ctcMakeMatrix = [];
+                if (dataheader.ctc_make && typeof dataheader.ctc_make === 'string') {
+                    ctcMakeMatrix = dataheader.ctc_make.split(':').map(function(item) {
+                        return item.trim();
+                    });
+                }
+                if (ctcMakeMatrix.length > 0) {
+                    newQuote.setValue({
+                        fieldId: 'custbody_appf_make_ecd',
+                        value: ctcMakeMatrix[0]
+                    });
+                }
+                if (dataheader.ctc_model.length > 0) {
+                    newQuote.setValue({
+                        fieldId: 'custbody_viewecd_model',
+                        value: dataheader.ctc_model
+                    });
+                }
+                if (dataheader.ctc_ownerdonor.length > 0) {
+                    if (dataheader.ctc_ownerdonor=="on" ) {
+                        var wowner=true
+                    }
+                    else
+                    {
+                        var wowner=false
+                    }
+                        newQuote.setValue({
+                            fieldId: 'custbody_ctc_ownerdonor',
+                            value: wowner
+                        });
+                    }
+
+
+            var datadetail = data.data.datadetail;
+            var item_description = "";
+            var item_price = 0;
+            var consolidated_item_description = "0";
+
+            for (var i = 0; i < datadetail.length; i++) {
+                var item = datadetail[i];
+
+                // Add a line item to the quote
+                newQuote.selectNewLine({
+                    sublistId: 'item'
+                });
+
+                witem_description = item.item_description;
+                witem_price = Number(item.item_price);
+
+                if (item.item_step_id<6)
+                {
+                    if (item.item_step_id==1)
+                    {
+                        if (dataheader.ctc_ownerdonor=="on")
+                        {
+                            witem_description = item.item_description + " (Owner Donor)";
+                            witem_price = 0;
+                        }
+                    }
+                        item_description += witem_description + "\n";
+                        item_price += witem_price;
+                        continue;
+                } 
+          
+                    if (consolidated_item_description=="0")
+                        {
+                                consolidated_item_description = "1";
+                                newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'item',
+                                value: 25146 
+                            });
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'quantity',
+                                value: 1
+                            });
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'description',
+                                value: item_description
+                            });
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'rate',
+                                value: Number(item_price)  // Replace with the actual price
+                            });
+                            newQuote.commitLine({
+                                sublistId: 'item'
+                            });
+
+                        }
+
+ 
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'item',
+                                value: item.item_id // Replace 'YOUR_ITEM_ID' with the actual internal ID of an item
+                            });
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'quantity',
+                                value: 1
+                            });
+                            newQuote.setCurrentSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'rate',
+                                value: Number(item.item_price)  // Replace with the actual price
+                            });
+                            newQuote.commitLine({
+                                sublistId: 'item'
+                            });
+
+                
+                
+
+                log.debug("Item " + i, item);
+            }
+             if (consolidated_item_description=="0")
+                        {
+                            consolidated_item_description = "1";
+                            newQuote.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'item',
+                            value: 25146 
+                        });
+                        newQuote.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'quantity',
+                            value: 1
+                        });
+                        newQuote.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'description',
+                            value: item_description
+                        });
+                        newQuote.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'rate',
+                            value: Number(item_price)  // Replace with the actual price
+                        });
+                        newQuote.commitLine({
+                            sublistId: 'item'
+                        });
+
+                        }
+
+            var quoteId = newQuote.save();
 
 
 
             return quoteId;
+
+        }
+        function createSalesContract(data)
+        {
+                
+            var dataheader = data.data.dataheader;
+            var customer_id = dataheader.customer_id;
+
+                         // Create a new Quote record
+                var newSalesContract = record.create({
+                    type: record.Type.SALES_ORDER, // Use record.Type.ESTIMATE for Quote records
+                    isDynamic: true // Set to true for dynamic mode, allowing field changes to trigger related field updates
+                });
+
+                // Set a value for a standard field (e.g., entity/customer)
+                // Replace 'YOUR_CUSTOMER_ID' with the actual internal ID of a customer
+                newSalesContract.setValue({
+                    fieldId: 'entity',
+                    value: customer_id
+                });
+                newSalesContract.setValue({
+                    fieldId: 'trandate', // Transaction date
+                    value: new Date()
+                });
+                newSalesContract.setValue({
+                    fieldId: 'custbody_vecd_user',
+                    value: dataheader.username
+                });
+                newSalesContract.setValue({
+                    fieldId: 'orderstatus', // Sales Order status (e.g., 'B' for Pending Fulfillment)
+                    value: 'A'
+                });
+                newSalesContract.setValue({
+                    fieldId: 'custbody_vecd_ctc_id',
+                    value: dataheader.ctc_id
+                });
+                newSalesContract.setValue({
+                    fieldId: 'custbody_viewwcd_user',
+                    value: dataheader.first_name + ", " + dataheader.last_name
+                });
+                newSalesContract.setValue({
+                    fieldId: 'custbody_viewwcd_user_email',
+                    value: dataheader.email
+                });
+                newSalesContract.setValue({
+                    fieldId: 'custbody_productionline',
+                    value: dataheader.ctc_productionline
+                });
+                var ctcMakeMatrix = [];
+                if (dataheader.ctc_make && typeof dataheader.ctc_make === 'string') {
+                    ctcMakeMatrix = dataheader.ctc_make.split(':').map(function(item) {
+                        return item.trim();
+                    });
+                }
+                if (ctcMakeMatrix.length > 0) {
+                    newSalesContract.setValue({
+                        fieldId: 'custbody_appf_make_ecd',
+                        value: ctcMakeMatrix[0]
+                    });
+                }
+                if (dataheader.ctc_model.length > 0) {
+                    newSalesContract.setValue({
+                        fieldId: 'custbody_viewecd_model',
+                        value: dataheader.ctc_model
+                    });
+                }
+
+                if (dataheader.ctc_ownerdonor.length > 0) {
+                    if (dataheader.ctc_ownerdonor=="on" ) {
+                        var wowner=true
+                    }
+                    else
+                    {
+                        var wowner=false
+                    }
+                        newSalesContract.setValue({
+                            fieldId: 'custbody_ctc_ownerdonor',
+                            value: wowner
+                        });
+                }
+            
+
+            var datadetail = data.data.datadetail;
+
+            for (var i = 0; i < datadetail.length; i++) {
+
+                if (wowner && datadetail[i].item_step_id == 1) continue;
+                var item = datadetail[i];
+
+                // Add a line item to the quote
+                newSalesContract.selectNewLine({
+                    sublistId: 'item'
+                });
+                newSalesContract.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'item',
+                    value: item.item_id // Replace 'YOUR_ITEM_ID' with the actual internal ID of an item
+                });
+                newSalesContract.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'quantity',
+                    value: 1
+                });
+                newSalesContract.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'price',
+                    value: -1 // Use -1 for custom pricing, then set 'rate'
+                });
+                newSalesContract.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'rate',
+                    value: Number(item.item_price)
+                });
+                
+                newSalesContract.commitLine({
+                    sublistId: 'item'
+                });
+
+                log.debug("Item " + i, item);
+            }
+
+            var salescontractID = newSalesContract.save();
+
+
+
+            return salescontractID;
+
         }
         function transformfromquote(dataheader)
         {
@@ -74,14 +405,34 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
                     } catch (error) {
                         log.error({ title: 'Error saving record', details: error });
+                        return "0";
                     }
                 }
+
+        }
+        function deleteQuote(dataheader)
+        {
+            var quoteId=dataheader.quote_id;  
+
+            try {
+                record.delete({
+                    type: record.Type.ESTIMATE,
+                    id: quoteId
+                });
+                log.debug({ title: 'Record deleted successfully', details: quoteId });
+                return "OK";
+
+            } catch (error) {
+                log.error({ title: 'Error deleting record', details: error });
+                return "0";
+            }    
 
         }
         return {
             get: get,
             post: post,
-            transformfromquote: transformfromquote
-
+            transformfromquote: transformfromquote,
+            createQuote: createQuote,
+            createSalesContract: createSalesContract
         };
     });

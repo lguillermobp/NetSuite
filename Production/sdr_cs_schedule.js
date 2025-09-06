@@ -5,11 +5,13 @@
  */
 var ecddays=[];
 var oldstartdate;
+var oldenddate;
 define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log, record, s, nDialog,runtime) {
     function pageInit(context) {
         // Code to execute when the page loads
         var currentRecord = context.currentRecord;
         oldstartdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
+        oldenddate = currentRecord.getValue({ fieldId: "custrecord_so_sc_enddate" });
        
     }
     
@@ -36,6 +38,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     function saveRecord(context) {
         var currentRecord = context.currentRecord;
         startdate = currentRecord.getValue({ fieldId: "custrecord_so_sc_startdate" });
+        enddate = currentRecord.getValue({ fieldId: "custrecord_so_sc_enddate" });
         internalidsc = currentRecord.getValue({ fieldId: "custrecord_salecontract" });
         taskid = currentRecord.getValue({ fieldId: "custrecord_so_sc_task" });
         pl = currentRecord.getValue({ fieldId: "custrecord_so_sc_productionline" });
@@ -47,27 +50,27 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         });
         var seq = taskrecord.getValue({ fieldId: "custrecord_sc_tasksseq" });
 
-        if (String(startdate).substring(0, 10)!=String(oldstartdate).substring(0, 10)) 
+        if (String(enddate).substring(0, 10)!=String(oldenddate).substring(0, 10)) 
         {
             
             var internalid = currentRecord.getValue({ fieldId: "id" });
 
-            var y = oldstartdate.getFullYear();
-            var m = ('0'+(oldstartdate.getMonth()+1)).slice(-2)
-            var d = ('0'+(oldstartdate.getDate())).slice(-2)
+            var y = oldenddate.getFullYear();
+            var m = ('0'+(oldenddate.getMonth()+1)).slice(-2)
+            var d = ('0'+(oldenddate.getDate())).slice(-2)
             datetofind = m + "/" + d + "/" + y;
             initial = parseInt(ecddays.indexOf(datetofind));
-            log.debug("initial",initial);
 
-            var y = startdate.getFullYear();
-            var m = ('0'+(startdate.getMonth()+1)).slice(-2)
-            var d = ('0'+(startdate.getDate())).slice(-2)
+
+            var y = enddate.getFullYear();
+            var m = ('0'+(enddate.getMonth()+1)).slice(-2)
+            var d = ('0'+(enddate.getDate())).slice(-2)
             datetofind = m + "/" + d + "/" + y;
             final = parseInt(ecddays.indexOf(datetofind));
-            log.debug("final",final);
+
             dayspushed = Math.abs(final - initial) + 1;
             if (initial>final) {dayspushed=(dayspushed - 2)*-1;}
-            pushsch(internalid, dayspushed,seq,internalidsc,pl,taskid);
+            pushsch(internalid, dayspushed,seq,internalidsc,pl,taskid,enddate);
         }
         try {
         window.opener.location.reload(false);
@@ -79,11 +82,14 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
     }
 
     function calcenddate(strdate,duration) {
+        log.debug("*strdate",strdate);
+        log.debug("*duration",duration);
 
         var dt = new Date(strdate);
         var strdate = dt;
         
         if (ecddays.length==0) {pecddays();}
+        log.debug("ecddays",ecddays);
 
         var y = strdate.getFullYear();
         var m = ('0'+(strdate.getMonth()+1)).slice(-2)
@@ -100,7 +106,6 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
 
         function pecddays() {
 
-            log.debug("pecddays","start");
 
             var ecdholydays=[];
         
@@ -199,9 +204,9 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
             });
             const td = new Date();
             var newstartdate=new Date(td);
-            newstartdate.setDate(td.getDate()-100);
+            newstartdate.setDate(td.getDate()-200);
     
-            for (i=1;i<300;i++)
+            for (i=1;i<400;i++)
             {
                 newstartdate.setDate(newstartdate.getDate()+1);
                 if (newstartdate.getDay() == 0) {i--;continue;}
@@ -215,16 +220,20 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
                 ecddays[i]=datetofind;
             }
-            log.debug("pecddays","ending");
+ 
         }
 
-
+        log.debug("*newenddate",newenddate);
         return newenddate;
     }
 
-    function pushsch(internalid, dayspushed,seq,internalidscc,pl,taskid) {
-        log.debug("oldstartdate",oldstartdate);
-        log.debug("internalid",internalid);
+    function pushsch(internalid, dayspushed,seq,internalidscc,pl,taskid,enddatepushed) {
+        log.debug("internalid",internalid)
+        log.debug("dayspushed",dayspushed)
+        log.debug("seq",seq)
+        log.debug("internalidscc",internalidscc)
+        log.debug("pl",pl)
+        log.debug("taskid",taskid)
 
         var y = oldstartdate.getFullYear();
         var m = oldstartdate.getMonth() + 1;
@@ -296,29 +305,80 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         });
         var i=1;
         var changing=true;
+        
+        
+        dateconvert=calcenddate(enddatepushed,2);
+        log.audit("dateconvert: " , dateconvert);
+        var y = dateconvert.getFullYear();
+        var m = dateconvert.getMonth() + 1;
+        var d = dateconvert.getDate();
+        var m = ('0'+(dateconvert.getMonth()+1)).slice(-2)
+        var d = ('0'+(dateconvert.getDate())).slice(-2)
+        datetofind = m + "/" + d + "/" + y;
+        var startdatepushed=datetofind;
+        var enddatepushed=0;
         pagedData.pageRanges.forEach(function (pageRange) {
+            
             var page = pagedData.fetch({index: pageRange.index});
             page.data.forEach(function (fresult1) {
 
                 internalidm = fresult1.getValue({ name: "Internalid" });
-                
                 internalidsc=fresult1.getValue({ name: "internalid",join: "CUSTRECORD_SALECONTRACT"});
                 seqss=fresult1.getValue({ name: "custrecord_sc_tasksseq",join: "CUSTRECORD_SO_SC_TASK"});
+
 
                 if (seq!=seqss) {changing=false;seq=seqss}
                 if (internalidscc==internalidsc) {changing=true;}
 
                 if (changing) 
                 {
-                    var dateString = fresult1.getValue({ name: "custrecord_so_sc_enddate" });
-                    var [month, day, year] = dateString.split('/')
-                    var dateObj = new Date(+year, +month - 1, +day)
-                    var newenddate=new Date(calcenddate(dateObj,dayspushed));
+                  log.audit("startdatepushed: " + startdatepushed);
 
-                    var dateString = fresult1.getValue({ name: "custrecord_so_sc_startdate" });
-                    var [month, day, year] = dateString.split('/')
-                    var dateObj = new Date(year, month - 1, day)
-                    var newstartdate=new Date(calcenddate(dateObj,dayspushed));
+                    if (startdatepushed==0)
+
+                    {   
+                        var dateString = fresult1.getValue({ name: "custrecord_so_sc_enddate" });
+                        log.audit("dateString: " + dateString);
+                        var [month, day, year] = dateString.split('/')
+                        var dateObj = new Date(+year, +month - 1, +day)
+                        var newenddate=new Date(calcenddate(dateObj,dayspushed));
+
+                        dateconvert=calcenddate(dateObj,2);
+                        var y = dateconvert.getFullYear();
+                        var m = dateconvert.getMonth() + 1;
+                        var d = dateconvert.getDate();
+                        var m = ('0'+(dateconvert.getMonth()+1)).slice(-2)
+                        var d = ('0'+(dateconvert.getDate())).slice(-2)
+                        datetofind = m + "/" + d + "/" + y;
+                        startdatepushed=datetofind;
+
+                        var dateString = fresult1.getValue({ name: "custrecord_so_sc_startdate" });
+                        var [month, day, year] = dateString.split('/')
+                        var dateObj = new Date(year, month - 1, day)
+                        var newstartdate=new Date(calcenddate(dateObj,dayspushed));
+
+                    }
+                    else {
+
+                        var newstartdate = new Date(startdatepushed);
+
+                        var dateString = startdatepushed;
+                        var [month, day, year] = dateString.split('/')
+                        var dateObj = new Date(+year, +month - 1, +day)
+                        var newenddate=new Date(calcenddate(dateObj,5));
+
+                        dateconvert=calcenddate(newenddate,2);
+                        var y = dateconvert.getFullYear();
+                        var m = dateconvert.getMonth() + 1;
+                        var d = dateconvert.getDate();
+                        var m = ('0'+(dateconvert.getMonth()+1)).slice(-2)
+                        var d = ('0'+(dateconvert.getDate())).slice(-2)
+                        datetofind = m + "/" + d + "/" + y;
+                        startdatepushed=datetofind;
+                        
+                        log.audit("newenddate: " + newenddate);
+                        log.audit("newstartdate: " + newstartdate);
+                    }
 
                     // Load the record with internal ID 'customrecord_so_scheduletasks'
                     var scheduleTaskRecord = record.load({
@@ -332,12 +392,16 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                         fieldId: 'custrecord_so_sc_startdate',
                         value: newstartdate
                     });
-                    log.debug("strstartdate",newstartdate);
+                    scheduleTaskRecord.setValue({
+                        fieldId: 'custrecord_sc_soduration',
+                        value: 5
+                    });
+
                     scheduleTaskRecord.setValue({
                         fieldId: 'custrecord_so_sc_enddate',
                         value: newenddate
                     });
-                    log.debug("endenddate",newenddate);
+                  
                     // Save the record
                     scheduleTaskRecord.save({
                         enableSourcing: false,
