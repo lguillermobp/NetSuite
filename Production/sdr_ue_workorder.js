@@ -3,7 +3,7 @@
  * @NApiVersion 2.1
  */
 
-define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/generaltoolsv1.js"], function (record,message, search, runtime,log, GENERALTOOLS) {
+define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/generaltoolsv1.js",'N/https'], function (record,message, search, runtime,log, GENERALTOOLS, https) {
     var session = runtime.getCurrentSession();
 
     function beforeLoad(context) {
@@ -69,7 +69,9 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+            ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
             context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+
 
             log.audit({title: "productionline", details: productionline});
             log.audit({title: "section", details: section});
@@ -156,6 +158,33 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             }
         }
     }
+    function postViewECD(ctc_id, opt,datasending) {
+
+                    var headerObj = {
+                            "Content-Type": "application/json",
+                            "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
+                        };
+
+                    const bodyObj = JSON.stringify({
+                        "items": [
+                            {
+                                "ctc_id": ctc_id,
+                                "opt": opt
+                            }
+                        ],
+                        "send_notification": true
+                    });
+
+
+                    var response = https.get({
+                        url: "https://ecdsystem.pythonanywhere.com/api/ctc/" + ctc_id + "/" + opt + "/" + datasending + "/",
+                        body: bodyObj,
+                        headers: headerObj
+                    });
+                    log.debug("response",  response);
+
+                    return response;
+                }
 
     function beforeSubmit(context) {
         // ================================================================================
@@ -178,6 +207,76 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
       
         const currentRecordId = context.newRecord.id;
         log.audit({title: "context.type", details: context.type});
+
+        if (context.type === context.UserEventType.CREATE) {
+
+            itemId = context.newRecord.getValue({fieldId: "assemblyitem"});
+            productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
+            section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
+            createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+            ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
+            context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+
+
+
+            if (ctc_id) {
+                var opt="GET";
+                dataall= postViewECD(ctc_id, opt, 'NA')
+                data = JSON.parse(dataall.body);
+                dataheader = data.data.dataheader;
+                datadetail = data.data.datadetail;
+                log.debug("dataheader", dataheader);
+                log.debug("datadetail", datadetail);
+                log.debug("data", data);
+                var datadetail = data.data.datadetail;
+
+                if (dataheader.ctc_ownerdonor.length > 0) {
+                    if (dataheader.ctc_ownerdonor=="on" ) {
+                        var wowner=true
+                    }
+                    else
+                    {
+                        var wowner=false
+                    }
+                }
+                 var dynamicRecord = record.load({
+                    type: context.newRecord.type,
+                    id: context.newRecord.id, // Only if editing an existing record
+                    isDynamic: true
+                });
+
+                for (var i = 0; i < datadetail.length; i++) {
+
+                    if (wowner && datadetail[i].item_step_id == 1) continue;
+                    var item = datadetail[i];
+
+
+                    dynamicRecord.selectNewLine({
+                        sublistId: 'item'
+                    });
+                    dynamicRecord.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'item',
+                        value: item.item_id // Replace 'YOUR_ITEM_ID' with the actual internal ID of an item
+                    });
+                    dynamicRecord.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'quantity',
+                        value: item.ctc_item_qty
+                    });
+
+                    dynamicRecord.commitLine({
+                        sublistId: 'item'
+                    });            
+
+                    log.debug("Item " + i, item);
+                }
+                var recordId = dynamicRecord.save();
+                dataall= postViewECD(ctc_id, 'SET', context.newRecord.id)
+                log.debug("Record ID", recordId);
+                log.debug("dataall", dataall);
+            }
+        }
         
 
        

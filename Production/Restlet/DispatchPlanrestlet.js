@@ -72,13 +72,17 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
                         invoicedate=fresult1.getValue({name: "custbody_invoicedate",join: "CUSTBODY_QUOTE_SC"});
                         if (invoicedate) {
-                            const dateParts = invoicedate.split('/');
-                            const month = parseInt(dateParts[0], 10) - 1; // Month is 0-indexed in Date object
-                            const day = parseInt(dateParts[1], 10);
-                            const year = parseInt(dateParts[2], 10);
+                            var dateParts = invoicedate.split('/');
+                            var month = parseInt(dateParts[0], 10) - 1; // Month is 0-indexed in Date object
+                            var day = parseInt(dateParts[1], 10);
+                            var year = parseInt(dateParts[2], 10);
                             invoicedate = new Date(year, month, day);
                         }
-
+                        dateformula=fresult1.getValue({name: "formuladate"});
+                        if (dateformula.length == 0) {
+                            dateformula = '01/01/2020';
+                        }
+                     
                         
 
                     dataf[i] = {
@@ -100,7 +104,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "memo": fresult1.getValue({name: "memo"}),
                         "item_id": fresult1.getValue({name: "internalid",join: "item"}),
                         "item": fresult1.getText({name: "item"}),
-                        "dateformula": fresult1.getValue({name: "formuladate"}),
+                        "dateformula": dateformula,
                         "invoicedate": fresult1.getValue({name: "custbody_invoicedate",join: "CUSTBODY_QUOTE_SC"}),
                         "invoicedate1": invoicedate,
                         "wo_id": Number(fresult1.getValue({name: "internalid"})),
