@@ -671,7 +671,7 @@ define(['N/search','N/runtime','N/currentRecord','N/log',"N/record","N/ui/dialog
                 "custrecord_vehicle_item",
                 "custrecord_vehicle_make",
                 "custrecord_vehicle_model",
-                "custrecord_vehicle_octometer",
+                "custrecord_vehicle_odometer",
                 "custrecord_vehicle_price",
                 "custrecord_vehicle_project",
                 "custrecord_vehicle_status",
