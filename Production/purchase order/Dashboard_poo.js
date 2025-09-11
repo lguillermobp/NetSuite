@@ -95,6 +95,19 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                     vendor.defaultValue = vendorsselected;
 
+                var customer = form.addField({
+                    id: "custpage_customers",
+                    type: serverWidget.FieldType.MULTISELECT,
+                    label: "Customers",
+                    source: "Customer"
+                    });
+
+                customer.defaultValue = customersselected;
+
+                customer.updateBreakType({
+                    breakType : serverWidget.FieldBreakType.STARTCOL
+                });
+
                 var productionline = form.addField({
                     id : 'custpage_productionline',
                     type : serverWidget.FieldType.MULTISELECT,
@@ -912,6 +925,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         if (vendorsselected.length==1) {
             vendorsselected1=vendorsselected[0];}
             else {vendorsselected1=vendorsselected;}
+
+         if (customersselected.length==1) {
+            customersselected1=customersselected[0];}
+            else {customersselected1=customersselected;}
        
         if (prodlineselected.length>0) {
             
@@ -927,6 +944,14 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "custrecord_ppd_vendor",
                 operator: "anyof",
                 values: vendorsselected1
+            }));
+        }
+        if (customersselected.length>0) {
+
+            fsearch.filters.push(search.createFilter({
+                name: "custrecord_ppd_customer",
+                operator: "anyof",
+                values: customersselected1
             }));
         }
        

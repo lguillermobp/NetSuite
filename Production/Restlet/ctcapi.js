@@ -93,6 +93,10 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                     value: dataheader.first_name + ", " + dataheader.last_name
                 });
                 newQuote.setValue({
+                    fieldId: 'location',
+                    value: 6
+                });
+                newQuote.setValue({
                     fieldId: 'custbody_viewwcd_user_email',
                     value: dataheader.email
                 });
@@ -144,7 +148,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                 });
 
                 witem_description = item.item_description;
-                witem_price = Number(item.item_price);
+                witem_price = Number(item.item_price *  item.ctc_item_qty);
 
                 if (item.item_step_id<6)
                 {
@@ -172,7 +176,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                             newQuote.setCurrentSublistValue({
                                 sublistId: 'item',
                                 fieldId: 'quantity',
-                                value: 1
+                                value: item.ctc_item_qty
                             });
                             newQuote.setCurrentSublistValue({
                                 sublistId: 'item',
@@ -416,6 +420,10 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                     fieldId: 'orderstatus', // Sales Order status (e.g., 'B' for Pending Fulfillment)
                     value: 'A'
                 });
+                newSalesContract.setValue({
+                    fieldId: 'location',
+                    value: 6
+                });
 
                 newSalesContract.setValue({
                     fieldId: 'custbody_vecd_ctc_id',
@@ -473,7 +481,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                     {
                         var item = datadetail[i];
                         witem_description = item.item_description;
-                        witem_price = Number(item.item_price);
+                        witem_price = Number(item.item_price * item.ctc_item_qty);
 
                         
                             if (item.item_step_id==1)
@@ -563,7 +571,8 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
                     log.error({ title: 'Error scheduling WO creation', details: e.message });
                 }
 
-                        workorderID = createWorkOrderFromSalesOrder(salescontractID, 0,data);
+                   // workorderID = createWorkOrderFromSalesOrder(salescontractID, 0,data);
+                   workorderID = "0";
 
                 var ids = {         "salesorder": salescontractID,  "workorder": workorderID                };
                 

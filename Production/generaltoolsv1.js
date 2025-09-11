@@ -1,5 +1,5 @@
 "use strict";
-define(['N/search',"N/log","N/record"], function (s,log, r) {
+define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
         /**
          * General Tools
          *
@@ -961,13 +961,8 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
                 type: "item",
                 id: item,
                 columns: ["type",
-                    "recordtype",
-                    "salesdescription",
-                    "averagecost",
-                    "bomquantity",
-                    "lastpurchaseprice",
-                    "binnumber",
-                    "weight"]
+                    "itemid"
+                            ]
             });
 
         var retvar= {};
@@ -2069,9 +2064,37 @@ define(['N/search',"N/log","N/record"], function (s,log, r) {
             }
             return retvar;
         }
+         function postViewECD(ctc_id, opt,datasending) {
+
+                    var headerObj = {
+                            "Content-Type": "application/json",
+                            "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
+                        };
+
+                    const bodyObj = JSON.stringify({
+                        "items": [
+                            {
+                                "ctc_id": ctc_id,
+                                "opt": opt
+                            }
+                        ],
+                        "send_notification": true
+                    });
+
+
+                    var response = https.get({
+                        url: "https://ecdsystem.pythonanywhere.com/api/ctc/" + ctc_id + "/" + opt + "/" + datasending + "/",
+                        body: bodyObj,
+                        headers: headerObj
+                    });
+                    log.debug("response",  response);
+
+                    return response;
+                }
 
         return {
             findassembly: findassembly,
+            postViewECD: postViewECD,
             delassembly: delassembly,
             set_Balance: set_Balance,
             getScheduleParams: getScheduleParams,

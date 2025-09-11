@@ -186,7 +186,7 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
 
     function beforeSubmit(context) {
 
-        if (context.type === context.UserEventType.DELETE) { 
+        if (context.type === context.UserEventType.DELETE) {
 
             log.debug("context.type",context.type);
             var id = context.oldRecord.getValue({fieldId: 'id'});
@@ -196,6 +196,12 @@ define(['N/format','N/record','N/log','N/ui/serverWidget', "N/runtime", "/SuiteS
             log.debug("oldamount",oldamount);
     
             parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
+            ctc_id=context.oldRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
+
+             if (ctc_id) {
+                var opt="UNSETSC";
+                dataall= GENERALTOOLS.postViewECD(ctc_id, opt, 'NA')
+                }
         }
 
         

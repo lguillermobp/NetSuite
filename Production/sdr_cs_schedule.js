@@ -315,7 +315,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
         var m = ('0'+(dateconvert.getMonth()+1)).slice(-2)
         var d = ('0'+(dateconvert.getDate())).slice(-2)
         datetofind = m + "/" + d + "/" + y;
-        var startdatepushed=datetofind;
+        //var startdatepushed=datetofind;
+        var startdatepushed=0;
         var enddatepushed=0;
         pagedData.pageRanges.forEach(function (pageRange) {
             
@@ -350,7 +351,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                         var m = ('0'+(dateconvert.getMonth()+1)).slice(-2)
                         var d = ('0'+(dateconvert.getDate())).slice(-2)
                         datetofind = m + "/" + d + "/" + y;
-                        startdatepushed=datetofind;
+                        //startdatepushed=datetofind;
 
                         var dateString = fresult1.getValue({ name: "custrecord_so_sc_startdate" });
                         var [month, day, year] = dateString.split('/')
@@ -392,10 +393,10 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                         fieldId: 'custrecord_so_sc_startdate',
                         value: newstartdate
                     });
-                    scheduleTaskRecord.setValue({
-                        fieldId: 'custrecord_sc_soduration',
-                        value: 5
-                    });
+                    // scheduleTaskRecord.setValue({
+                    //     fieldId: 'custrecord_sc_soduration',
+                    //     value: 5
+                    // });
 
                     scheduleTaskRecord.setValue({
                         fieldId: 'custrecord_so_sc_enddate',
