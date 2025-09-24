@@ -954,13 +954,14 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
         return retvar;
 
     }
-        function get_Item_basic (item){ 
+        function get_Item_basic (item){  
 
 
             var caseData = s.lookupFields({
                 type: "item",
                 id: item,
                 columns: ["type",
+                    "recordtype",
                     "itemid"
                             ]
             });

@@ -34,6 +34,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             vendorsselected=paramemp.data.getValue({fieldId: "custentity_vendorsselected"});
             var paramrec = GENERALTOOLS.get_paramnew_value('0702');
             breakByTask = paramrec.data.getValue({name: "custrecordparams_value"});
+            var paramrec = GENERALTOOLS.get_paramnew_value('0703');
+            breakByCustomer = paramrec.data.getValue({name: "custrecordparams_value"});
 
 		    // var userID = userObj.id;
 		    // var userPermission = userObj.getPermission({	name : 'TRAN_BUILD'	});
@@ -369,16 +371,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'Customer ID'
                 });
 
-                sc_id.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
-                });
-                var sc_id = sublistpm.addField({
-                    id: "custrecordml_sc_id",
-                    type: serverWidget.FieldType.INTEGER,
-                    label:'sc_ ID'
-                });
-
-                sc_id.updateDisplayType({
+                customerid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
 
@@ -409,7 +402,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
                 
-                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf('V'+result1.preferredvendorid+"T"+result1.taskids+"C"+result1.sc_id);
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf('V'+result1.preferredvendorid+"T"+result1.taskids+"C"+result1.customer);
 
                     log.audit("result1.preferredvendorid",result1.preferredvendorid);
                     log.audit("result1.taskids",result1.taskids);
@@ -621,11 +614,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_customer',
                         line: counter,
                         value: result1.customer
-                    });
-                    sublistpm.setSublistValue({
-                        id: 'custrecordml_sc_id',
-                        line: counter,
-                        value: result1.sc_id
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_memo',
@@ -1002,8 +990,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
              "AND", 
             ["sum(formulanumeric: CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END)","notequalto","0"],
             "AND", 
-            ["custbody_quote_sc.mainline","is","T"], 
-            "AND", 
             ["custbody_tasksc.custrecord_so_sc_task","noneof","@NONE@"]
   
         ],
@@ -1115,11 +1101,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 name: "unit",
                 summary: "GROUP"
              }),
-            search.createColumn({
-                name: "internalid",
-                join: "CUSTBODY_QUOTE_SC",
-                summary: "GROUP"
-            })
             ]
         });
         
@@ -1219,25 +1200,52 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     qtytotpo=Number(fresult.getValue({name: "quantityonorder",join: "item",summary: "MAX"}));
                     memo=fresult.getValue({name: "altname",join: "customerMain",summary: "GROUP"});
                     memoid=fresult.getValue({name: "internalid",join: "customerMain",summary: "GROUP"});
-                    sc_id=fresult.getValue({name: "internalid",join: "CUSTBODY_QUOTE_SC",summary: "GROUP"});
 
                    // ppdpo="V"+preferredvendorid+"C"+memoid+"S"+task; 
                    log.debug("breakByTask",breakByTask);
 
                    if (breakByTask=='Y') { 
-                    if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"T"+taskids;}
-                    else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+sc_id+"T"+taskids;}
-                   }
+                    if (nobatching==false) 
+
+                            {
+                                if (breakByCustomer=='Y') 
+                                { 
+                                    ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid+"T"+taskids;
+                                }
+                                else
+                                {
+                                    ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"T"+taskids;
+                                }
+                            
+                            }
+
+                        else 
+                            {
+                                ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid+"T"+taskids;
+                            }
+                    }
                    else {
-                    if (nobatching==false) {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid;}
-                    else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+sc_id;}
+                    if (nobatching==false) 
+                        {
+                         if (breakByCustomer=='Y') 
+                                { 
+                                    ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid;
+                                }
+                                else
+                                {
+                                    ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid;
+                                }
+                        
+
+                        }
+                    else {ppdpo="PPD"+PPDID+"L"+productionlineid+"V"+preferredvendorid+"C"+memoid;}
                    }
                      
                    var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(unitbase+"/"+unitpurchase));
                    if (index1==-1) {unitrate=1;}
                     else {unitrate=resultsunitm[index1].conversionrate;}
 
-                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+sc_id);
+                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
                     
                     if (indexx==-1) 
                         {ppdpreview=" ";}
@@ -1273,8 +1281,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "unitrate": unitrate,
                     //"total": (qtytot-qtytota) * price,
                     "memo": memo,
-                    "customer": memoid,
-                    "sc_id": sc_id
+                    "customer": memoid
 				    }
                     
                 
@@ -1297,8 +1304,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "preferredvendorid": preferredvendorid,
                                 "currency": currency,
                                 "memo": memo,
-                                "customer": memoid,
-                                "sc_id": sc_id
+                                "customer": memoid
                                 };
                             
                             h++;
@@ -1327,8 +1333,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "preferredvendorid": preferredvendorid,
                                 "currency": currency,
                                 "memo": memo,
-                                "customer": memoid,
-                                "sc_id": sc_id
+                                "customer": memoid
                                 };
                            
                         }                
@@ -1349,7 +1354,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if (index1==-1) {unitrate=1;}
                 else {unitrate=resultsunitm[index1].conversionrate;}
 
-                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+sc_id);
+                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
                 if (indexx==-1) 
                     {ppdpreview=" ";}
                 else
@@ -1382,8 +1387,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 "unitrate": unitrate,
                 //"total": (qtytot-qtytota) * price,
                 "memo": memo,
-                "customer": memoid,
-                "sc_id": sc_id
+                "customer": memoid
                 }
                 
                 i++;
@@ -1406,8 +1410,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "preferredvendorid": preferredvendorid,
                                 "currency": currency,
                                 "memo": memo,
-                                "customer": memoid,
-                                "sc_id": sc_id
+                                "customer": memoid
                                 };
                             
                             h++;
@@ -1436,8 +1439,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                                 "preferredvendorid": preferredvendorid,
                                 "currency": currency,
                                 "memo": memo,
-                                "customer": memoid,
-                                "sc_id": sc_id
+                                "customer": memoid
                                 };
                            
                         }

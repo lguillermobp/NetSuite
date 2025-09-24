@@ -805,6 +805,9 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             var vendors = currentRec.getValue({
                 fieldId: "custpage_vendors"
             });
+            var customers = currentRec.getValue({
+                fieldId: "custpage_customers"
+            });
 
             // Set value for custentity_customerssalected field
             employeeRecord.setValue({
@@ -816,7 +819,10 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 fieldId: "custentity_vendorsselected",
                 value: vendors
             });
-           
+           employeeRecord.setValue({
+                fieldId: "custentity_customerssalected",
+                value: customers
+            });
             employeeRecord.save();
             
            

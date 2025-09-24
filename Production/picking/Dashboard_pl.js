@@ -40,7 +40,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             finishedqtyso= paramWO.data.getValue({fieldId: "quantity"});
 
-            var SOID= paramWO.data.getValue({fieldId: "createdfrom"});
+            var SOID= paramWO.data.getValue({fieldId: "custbody_quote_sc"});
             if (SOID) {
                 paramSO = GENERALTOOLS.get_SO_value(SOID);
                 SONo = paramSO.data.getValue({fieldId: "tranid"});

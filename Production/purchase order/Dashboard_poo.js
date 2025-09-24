@@ -940,7 +940,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         }
         if (vendorsselected.length>0) {
             
-            fsearch.filters.push(search.createFilter({
+            fsearch.filters.push(search.createFilter({ 
                 name: "custrecord_ppd_vendor",
                 operator: "anyof",
                 values: vendorsselected1
