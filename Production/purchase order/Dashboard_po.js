@@ -402,7 +402,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
                 resultspt.forEach(function(result1) {
                 
-                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf('V'+result1.preferredvendorid+"T"+result1.taskids+"C"+result1.customer);
+                    var indexxy = resultppdcode.map(function (img) { return img.ppdcodetask; }).indexOf('V'+result1.preferredvendorid+"T"+result1.taskids+"C"+result1.customer+"I"+result1.itemid);
 
                     log.audit("result1.preferredvendorid",result1.preferredvendorid);
                     log.audit("result1.taskids",result1.taskids);
@@ -1245,7 +1245,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    if (index1==-1) {unitrate=1;}
                     else {unitrate=resultsunitm[index1].conversionrate;}
 
-                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
+                    var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid+'I'+itemid);
                     
                     if (indexx==-1) 
                         {ppdpreview=" ";}
@@ -1354,7 +1354,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 if (index1==-1) {unitrate=1;}
                 else {unitrate=resultsunitm[index1].conversionrate;}
 
-                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid);
+                var indexx = resultppdcodetask.map(function (img) { return img.ppdcodetask; }).indexOf("V"+preferredvendorid+"T"+taskids+'C'+memoid+'I'+itemid);
                 if (indexx==-1) 
                     {ppdpreview=" ";}
                 else
@@ -1852,6 +1852,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                   summary: "GROUP"
                }),
                search.createColumn({
+                  name: "custrecord_ppd_item",
+                  summary: "GROUP"
+               }),
+               search.createColumn({
                   name: "internalid",
                   join: "CUSTRECORD_PPD_CODE",
                   summary: "MAX"
@@ -1874,11 +1878,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             
 			page.data.forEach(function (fresult) {
 
-                ppdcodetask="PPD"+PPDID+"L"+fresult.getValue({name: "custrecord_ppd_productionline", summary: "GROUP"})+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"});
+                ppdcodetask="PPD"+PPDID+"L"+fresult.getValue({name: "custrecord_ppd_productionline", summary: "GROUP"})+fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"})+"I"+fresult.getValue({name: "custrecord_ppd_item", summary: "GROUP"});
                 pagedatasppdcode[h]= 
                 {
                     "ppdcodetask": ppdcodetask,
                     "ppdcode": fresult.getValue({name: "custrecord_ppd_code", summary: "MAX"}),
+                    "item": fresult.getValue({name: "custrecord_ppd_item", summary: "GROUP"}),
                     "ppdid": fresult.getValue({name: "custrecord_ppd_id", summary: "MAX"}),
                     "internalid": fresult.getValue({name: "internalid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"}),
                     "poid": fresult.getValue({name: "custrecord_poid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"})
@@ -1916,6 +1921,10 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                   summary: "GROUP"
                }),
                search.createColumn({
+                  name: "custrecord_ppd_item",
+                  summary: "GROUP"
+               }),
+               search.createColumn({
                   name: "custrecord_poid",
                   join: "CUSTRECORD_PPD_CODE",
                   summary: "MAX"
@@ -1933,10 +1942,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
             
 			page.data.forEach(function (fresult) {
 
+                ppdcodetask=fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"})+"I"+fresult.getValue({name: "custrecord_ppd_item", summary: "GROUP"});
+
                 pagedatasppdcodetask[h]= 
                 {
-                    "ppdcodetask": fresult.getValue({name: "custrecord_ppdcodetask", summary: "GROUP"}),
+                    "ppdcodetask": ppdcodetask,
                     "ppdcode": fresult.getValue({name: "custrecord_ppd_code", summary: "MAX"}),
+                    "item": fresult.getValue({name: "custrecord_ppd_item", summary: "GROUP"}),
                     "ppdid": fresult.getValue({name: "custrecord_ppd_id", summary: "MAX"}),
                     "poid": fresult.getValue({name: "custrecord_poid", join: "CUSTRECORD_PPD_CODE", summary: "MAX"})
                 }

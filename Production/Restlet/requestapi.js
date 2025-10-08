@@ -19,6 +19,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
         }
 
          function post (context) {
+
             log.debug("context", context);
 
                 try {
@@ -31,7 +32,39 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             log.debug("data", data);
             var contextjson = data.data;
             log.debug("contextjson", contextjson);
-            log.debug("contextjson.username", contextjson.username);
+            log.debug("contextjson.username", contextjson.username); 
+
+            var option = data.option;
+            log.debug("option", option);
+
+            if  (option=="AddRequest")
+            {
+
+                var resultid=createrequest(contextjson);
+                log.debug("resultid", resultid);
+
+            }
+            if  (option=="AssignWorkOrder")
+            {
+                var resultid=changeRequest(contextjson);
+                log.debug("resultid", resultid);
+            }
+             if  (option=="E")
+            {
+                var resultid=changeRequest(contextjson);
+                log.debug("resultid", resultid);
+            }
+            if  (option=="D")
+            {
+                var resultid=deleteRequest(contextjson);
+                log.debug("resultid", resultid);
+            }
+
+            return resultid;
+        }
+
+        function createrequest(contextjson)
+        {
 
             var rec = record.create({
                 type: 'customrecord_requestrecords',
@@ -95,6 +128,18 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.user_email
                 });
             }
+            if (contextjson.supervisor_email) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_supervisor_email',
+                    value: contextjson.supervisor_email
+                });
+            }
+            if (contextjson.supervisor_username) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_supervisor_user',
+                    value: contextjson.supervisor_username
+                });
+            }
             if (contextjson.request_id) {
                 rec.setValue({
                     fieldId: 'custrecord_viewecdid',
@@ -105,6 +150,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 rec.setValue({
                     fieldId: 'custrecord_rq_type_vecd',
                     value: contextjson.request_type
+                });
+            }
+            if (contextjson.customer_id_replaced > 0) {
+                rec.setValue({
+                    fieldId: 'custrecord_customerreplaced',
+                    value: contextjson.customer_id_replaced
                 });
             }
             if (contextjson.wo_id!="None") {
@@ -120,10 +171,127 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
             return recId;
         }
 
+        function changeRequest(contextjson)
+        {
 
+            var rec = record.load({
+                type: 'customrecord_requestrecords',
+                id: contextjson.netsuite_id,
+                isDynamic: true
+            });
+
+            // Example: set fields from contextjson
+            // Replace 'custrecord_field1', 'custrecord_field2' with actual field IDs
+            if (contextjson.username) {
+                rec.setValue({
+                    fieldId: 'custrecord_employee',
+                    value: contextjson.username
+                });
+            }
+            
+            if (contextjson.item_id) {
+                rec.setValue({
+                    fieldId: 'custrecord_item',
+                    value: contextjson.item_id
+                });
+            }
+             if (contextjson.request_qty) {
+                rec.setValue({
+                    fieldId: 'custrecord_qty',
+                    value: contextjson.request_qty
+                });
+            }
+            
+            if (contextjson.request_reason) {
+                rec.setValue({
+                    fieldId: 'custrecord_reason',
+                    value: contextjson.request_reason
+                });
+            }
+
+           if (contextjson.customer_id_replaced > 0) {
+                rec.setValue({
+                    fieldId: 'custrecord_customerreplaced',
+                    value: contextjson.customer_id_replaced
+                });
+            }
+            if (contextjson.request_sts_description) {
+                rec.setValue({
+                    fieldId: 'custrecord_requeststs',
+                    value: contextjson.request_sts_description
+                });
+            }
+            if (contextjson.user_email) {
+                rec.setValue({
+                    fieldId: 'custrecord_email',
+                    value: contextjson.user_email
+                });
+            }
+             if (contextjson.supervisor_email) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_supervisor_email',
+                    value: contextjson.supervisor_email
+                });
+            }
+            if (contextjson.supervisor_username) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_supervisor_user',
+                    value: contextjson.supervisor_username
+                });
+            }
+            if (contextjson.request_id) {
+                rec.setValue({
+                    fieldId: 'custrecord_viewecdid',
+                    value: contextjson.request_id
+                });
+            }
+             if (contextjson.request_type) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_type_vecd',
+                    value: contextjson.request_type
+                });
+            }
+            if (contextjson.reason_rejection) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_reason_rejection',
+                    value: contextjson.reason_rejection
+                });
+            }
+            if (contextjson.wo_id!="None") {
+                rec.setValue({
+                    fieldId: 'custrecord_wo',
+                    value: contextjson.wo_id
+                });
+            }
+
+            var recId = rec.save();
+            log.debug('Record Created', 'ID: ' + recId);
+
+            return "OK";
+        }
+
+        function deleteRequest(dataheader)
+        {
+            var requestId=dataheader.netsuite_id;  
+
+            try {
+                record.delete({
+                    type: 'customrecord_requestrecords',
+                    id: requestId
+                });
+                log.debug({ title: 'Record deleted successfully', details: requestId });
+                return "OK";
+
+            } catch (error) {
+                log.error({ title: 'Error deleting record', details: error });
+                return "0";
+            }    
+        }
         return {
             get: get,
-            post: post
+            post: post,
+            createrequest: createrequest,
+            changeRequest: changeRequest
 
         };
     });
