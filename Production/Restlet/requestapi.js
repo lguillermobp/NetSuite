@@ -122,6 +122,18 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_sts_description
                 });
             }
+            if (contextjson.status_netsuiteid) {
+                rec.setValue({
+                    fieldId: 'custrecord_requeststscod',
+                    value: contextjson.status_netsuiteid
+                });
+            }
+            if (contextjson.stsprv_netsuiteid) {
+                rec.setValue({
+                    fieldId: 'custrecord_sts_preview',
+                    value: contextjson.stsprv_netsuiteid
+                });
+            }
             if (contextjson.user_email) {
                 rec.setValue({
                     fieldId: 'custrecord_email',
@@ -158,7 +170,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.customer_id_replaced
                 });
             }
-            if (contextjson.wo_id!="None") {
+            if (contextjson.wo_id!="") {
                 rec.setValue({
                     fieldId: 'custrecord_wo',
                     value: contextjson.wo_id
@@ -221,6 +233,18 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_sts_description
                 });
             }
+             if (contextjson.status_netsuiteid) {
+                rec.setValue({
+                    fieldId: 'custrecord_requeststscod',
+                    value: contextjson.status_netsuiteid
+                });
+            }
+            if (contextjson.stsprv_netsuiteid) {
+                rec.setValue({
+                    fieldId: 'custrecord_sts_preview',
+                    value: contextjson.stsprv_netsuiteid
+                });
+            }
             if (contextjson.user_email) {
                 rec.setValue({
                     fieldId: 'custrecord_email',
@@ -257,15 +281,18 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.reason_rejection
                 });
             }
-            if (contextjson.wo_id!="None") {
+            if (contextjson.wo_id!="") {
                 rec.setValue({
                     fieldId: 'custrecord_wo',
                     value: contextjson.wo_id
                 });
+
+                woline=chgworkorderline(contextjson);
+                log.debug("woline", woline);
             }
 
             var recId = rec.save();
-            log.debug('Record Created', 'ID: ' + recId);
+
 
             return "OK";
         }
@@ -284,6 +311,93 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
 
             } catch (error) {
                 log.error({ title: 'Error deleting record', details: error });
+                return "0";
+            }    
+        }
+        function chgworkorderline(dataheader)
+        {
+            var workorderId=dataheader.wo_id;  
+
+            try {
+                var recordwo = record.load({
+                    type: record.Type.WORK_ORDER,
+                    id: workorderId,
+                    isDynamic: true // Load the record in
+                });
+                log.debug({ title: 'Record loaded successfully', details: workorderId });
+
+                var lineNum = recordwo.findSublistLineWithValue({
+                    sublistId: 'item', // The internal ID of the sublist
+                    fieldId: 'item',   // The internal ID of the field to search within
+                    value: dataheader.item_id // The value to search for
+                });
+                log.debug("lineNum", lineNum);
+                log.debug("dataheader.netsuite_id", dataheader.netsuite_id);
+                log.debug("dataheader.item_id", dataheader.item_id);
+                log.debug("dataheader.quantity", dataheader.quantity);
+                log.debug("dataheader.wo_id", dataheader.wo_id);
+                log.debug("recordwo", recordwo);
+                var processwo="Y";
+                if (lineNum != -1) 
+                    {
+                        isthere=recordwo.getSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'custcol_requestid',
+                            line: lineNum
+                        });
+
+                        if (isthere==dataheader.netsuite_id)
+                        {
+                            processwo="N";
+                        }
+                    }
+              
+
+                if (processwo == "Y") 
+                    {
+
+                        recordwo.selectNewLine({
+                            sublistId: 'item'
+                        });
+
+                        recordwo.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'item',
+                            value: dataheader.item_id
+                        });
+                        recordwo.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'quantity',
+                            value: dataheader.request_qty
+                        });
+                        recordwo.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'bomquantity',
+                            value: dataheader.request_qty
+                        });
+                        recordwo.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'custcol_requestid',
+                            value: dataheader.netsuite_id
+                        });
+                        recordwo.setCurrentSublistValue({
+                            sublistId: 'item',
+                            fieldId: 'componentyield',
+                            value: "100"
+                        });
+                        recordwo.commitLine({
+                            sublistId: 'item'
+                        });
+ 
+                        var recId = recordwo.save();
+                        log.debug('Record Updated', 'ID: ' + recId);
+                        return "OK";
+                    }
+
+                return "IsThere";
+
+            } catch (error) {
+                log.error({ title: 'Error loading record', details: error });
                 return "0";
             }    
         }

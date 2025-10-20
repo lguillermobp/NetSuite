@@ -32,7 +32,7 @@
                 var option= contextjson.option;
                 log.debug("option",option);
                 var customers_db = getcustomers();
-                log.debug("customers_db",customers_db);
+                var tasks_db = gattaskid();
                 
                 carriers= getcarrier();
                 log.debug("carriers",carriers);
@@ -73,11 +73,18 @@
                             customers_ids.push(customers_db[index1].internalid);
                         }
                         many_customer_ids=customers_ids.length;
-                        log.debug("many_customer_ids", many_customer_ids);
-                        log.debug("customers_ids", customers_ids);
+
 
                         for (k=0;k<many_customer_ids;k++)
                         {
+                            var indexx = tasks_db.map(function (img) { return img.key; }).indexOf(customers_ids[k]+'_'+fresult1.getValue({name: "item"}));
+                    
+                            if (indexx==-1) 
+                                {taskid="666";}
+                            else
+                                {   
+                                taskid=tasks_db[indexx].taskid;
+                                }
                            
                             dataf[i] = {
                                 "ppd_id": -100 - i,
@@ -103,7 +110,7 @@
                                 "po_datecreated": fresult1.getValue({name: "datecreated"}),
                                 "po_location": fresult1.getText({name: "location"}),
                                 "po_qty_received": Number(fresult1.getValue({name: "quantityshiprecv"})),
-                                "po_ppd_task_id": 666
+                                "po_ppd_task_id": taskid
                             }
                             i++;
                         }
@@ -147,6 +154,40 @@
 
                 return dataf;
                 }
+                function gattaskid () {
+                
+                    idsearch = "customsearch_lookingfortaskid";
+
+                    var fsearch =search.load({
+                    id: idsearch
+                    });
+                        
+                    var pagedData = fsearch.runPaged({
+                        "pageSize" : 1000
+                    });
+                    var i=0;
+                    var dataf=[];
+                    pagedData.pageRanges.forEach(function (pageRange) {
+                        log.audit(pageRange.index);
+                        var page = pagedData.fetch({index: pageRange.index});
+                        page.data.forEach(function (fresult1) {
+
+                            dataf[i] = {
+                                "key": fresult1.getValue({name: "internalid",  join: "customer"}) + "_" + fresult1.getValue({name: "item"}),
+                                "internalid": Number(fresult1.getValue({name: "internalid"})),
+                                "item": fresult1.getValue({name: "item"}),
+                                "entityid": fresult1.getValue({name: "entityid"}),
+                                "customerid": fresult1.getValue({name: "internalid",  join: "customer"}),
+                                "taskid": fresult1.getValue({name: "custbody_scheduletaskid"}),
+                            }
+                            i++;
+
+                        })
+                    })
+
+                return dataf;
+                }
+
 
                 function getcarrier () {
 
@@ -175,7 +216,7 @@
                             internalid= fresult1.getValue({
                                 name: "internalid"
                             });
-                            log.debug("internalid", internalid);
+
                             namec= fresult1.getValue({
                                 name: "name"
                             });

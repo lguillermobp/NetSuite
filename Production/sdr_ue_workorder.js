@@ -70,7 +70,11 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
-           // context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+             if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
+            {
+                context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+            }
+            context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
 
 
             log.audit({title: "productionline", details: productionline});
@@ -215,9 +219,10 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
-            context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
-
-
+            if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
+            {
+                context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+            }
 
             if (ctc_id) {
                 var opt="GET";

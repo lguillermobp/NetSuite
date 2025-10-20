@@ -482,6 +482,15 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 binidf.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
+                let viewecdid = sublistpm.addField({
+                    id: "custrecordml_viewecdid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'View ECD ID'
+                });
+
+                // viewecdid.updateDisplayType({
+                //     displayType: serverWidget.FieldDisplayType.HIDDEN
+                // });
 
                 sublistpm.addField({
                     id: "custrecordml_binlocation",
@@ -560,6 +569,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         id: 'custrecordml_binlocationid',
                         line: counter,
                         value: result1.binlocationid
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_viewecdid',
+                        line: counter,
+                        value: result1.viewecdid
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binlocation',
@@ -949,6 +963,10 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 summary: "SUM"
             }),
             search.createColumn({
+                name: "custcol_requestid",
+                summary: "GROUP"
+            }),
+            search.createColumn({
                 name: "quantitycommitted",
                 summary: "SUM"
             }),
@@ -993,6 +1011,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
+                "viewecdid":result.getValue({name: "custcol_requestid",summary: "GROUP"}),
                 "binnumberd":" ",
                 "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
@@ -1148,6 +1167,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     "locationPriority": inventoryBalanceLocationPriority,
                     "location": inventoryBalanceLocation,
                     "binnumber": binnt,
+                    "viewecdid": lineNumbers[result.getValue({name: "item"})].viewecdid,
                     "binnumberid": binn,
                     "inventorynumber": result.getText({name: "inventorynumber"}),
                     "expirationdate": result.getValue({name: "expirationDate", join: "inventoryNumber"}),
@@ -1182,6 +1202,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "itemdesc": lineNumbers[result.itemid].itemdesc,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
+                "viewecdid": result.viewecdid,
                 "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,
@@ -1203,6 +1224,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "itemdesc": lineNumbers[result.itemid].itemdesc,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
+                "viewecdid": result.viewecdid,
                 "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,

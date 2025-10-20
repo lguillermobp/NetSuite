@@ -2067,35 +2067,65 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
         }
          function postViewECD(ctc_id, opt,datasending) {
 
-                    var headerObj = {
-                            "Content-Type": "application/json",
-                            "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
-                        };
+            var headerObj = {
+                    "Content-Type": "application/json",
+                    "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
+                };
 
-                    const bodyObj = JSON.stringify({
-                        "items": [
-                            {
-                                "ctc_id": ctc_id,
-                                "opt": opt
-                            }
-                        ],
-                        "send_notification": true
-                    });
+            const bodyObj = JSON.stringify({
+                "items": [
+                    {
+                        "ctc_id": ctc_id,
+                        "opt": opt
+                    }
+                ],
+                "send_notification": true
+            });
 
 
-                    var response = https.get({
-                        url: "https://ecdsystem.pythonanywhere.com/api/ctc/" + ctc_id + "/" + opt + "/" + datasending + "/",
-                        body: bodyObj,
-                        headers: headerObj
-                    });
-                    log.debug("response",  response);
+            var response = https.get({
+                url: "https://ecdsystem.pythonanywhere.com/api/ctc/" + ctc_id + "/" + opt + "/" + datasending + "/",
+                body: bodyObj,
+                headers: headerObj
+            });
+            log.debug("response",  response);
 
-                    return response;
-                }
+            return response;
+        }
+
+        function postViewECD_request_api(id, opt,datasending) {
+
+            var headerObj = {
+                    "Content-Type": "application/json",
+                    "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
+                };
+
+            const bodyObj = JSON.stringify({
+                "data": 
+                    {
+                        "request_id": id,
+                        "opt": opt,
+                        "datasending": datasending
+                    },
+                "send_notification": true
+            });
+
+
+            var response = https.post({
+                url: "https://ecdsystem.pythonanywhere.com/api/request/" + id + "/" + opt + "/Sending in body/",
+                body: bodyObj,
+                headers: headerObj
+            });
+            log.debug("bodyObj",  bodyObj);
+            log.debug("response",  response);
+
+            return response;
+        }
 
         return {
             findassembly: findassembly,
             postViewECD: postViewECD,
+            postViewECD_request_api: postViewECD_request_api,
             delassembly: delassembly,
             set_Balance: set_Balance,
             getScheduleParams: getScheduleParams,
