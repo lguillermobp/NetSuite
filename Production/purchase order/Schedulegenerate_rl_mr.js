@@ -4,9 +4,10 @@
  *@NModuleScope Public
  */
  var totreg;
- define(["N/runtime",'N/log',  'N/record',"N/email", "/SuiteScripts/Modules/generaltoolsv1.js"],
+ var purchaseorderid = [];
+ define(["N/runtime",'N/log',"N/search",  'N/record',"N/email", "/SuiteScripts/Modules/generaltoolsv1.js"],
 
-    function (runtime,log,  record,email, GENERALTOOLS) {
+    function (runtime,log, search, record,email, GENERALTOOLS) {
 
 
         var getInputData = function getInputData(context) {
@@ -64,6 +65,7 @@
                 {
                 if (savingpo) {
                     var idpo=purchaseOrder.save();
+                    purchaseorderid.push(idpo);
 
                     for (const internalId of vinternalIds) 
                     {
@@ -161,6 +163,7 @@
             
                             if (savingpo) {
                                 var idpo = purchaseOrder.save();
+                                purchaseorderid.push(idpo);
 
                                 for (const internalId of vinternalIds) 
                                     {
@@ -308,21 +311,54 @@
                 return newDate;
                 };
 
-           
-
-           
-            context.write(fsearchId, fresult);
+             mapContext.write({
+                key: '001',
+                value: purchaseorderid
+        });
 
         };
         
-        var reduce = function reduce(context) {
+        var reduce = function reduce(reduceContext) {
+            log.debug("reduceContext",reduceContext);
 
-            var fresult = JSON.parse(context.values[0]);
+            var purchaseorderid = JSON.parse(reduceContext.values[0]);
+            log.debug("reduce.purchaseorderid",purchaseorderid);
 
-            context.write(context.key, fresult);
+            reduceContext.write({
+            key: '002',
+            value: purchaseorderid
+        });
         };
 
-        var summarize = function summarize(context) {
+        var summarize = function summarize(summarizeContext) {
+
+           summarizeContext.output.iterator().each(function(key, value) {
+            log.debug('Key', key);
+            log.debug('Value', value);
+  
+            if (key === '001') { // Check for your specific key
+                var receivedParameter = value;
+                // Now you can use receivedParameter in your summarize logic
+                log.debug('Parameter from Map:', receivedParameter);
+            }
+            return true; // Continue iteration
+            });
+
+            try {
+            var lookupResult = search.lookupFields({
+                type: "purchaseorder",
+                id: receivedParameter,
+                columns: ['tranid'] // Example with a joined field
+            });
+
+            var tranid = lookupResult.tranid;
+
+            log.debug('Transaction ID', tranid);
+
+        } catch (e) {
+            log.error('Error in lookupFields', e.toString());
+            return null;
+        }
 
             try { 
 
@@ -333,7 +369,7 @@
 
             log.debug("emaildest",emaildest);
 
-            subject = "The generation of PPD (hhhh) is done";
+            subject = "The generation of Purchase Order ( " + tranid + " ) is done";
 
             email.send({
                 author : userObj.id,

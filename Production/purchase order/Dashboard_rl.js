@@ -114,7 +114,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 
                 var sublistpm = form.addSublist({
                     id: 'custpage_records',
-                    type : serverWidget.SublistType.LIST,
+                    type : serverWidget.SublistType.INLINEEDITOR,
                     label: 'Reactive Order List',
         
                 });
