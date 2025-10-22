@@ -179,7 +179,7 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 var custrecordml_qty = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_qty',line: i });
                 var custrecordml_taskid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskid',line: i });
                 var custrecordml_taskdes = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_taskdes',line: i });
-                var custrecordml_preferredvendor = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendor', line: i});
+                var custrecordml_preferredvendor = currentRec.getSublistText({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid', line: i});
                 var custrecordml_preferredvendorid = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_preferredvendorid',line: i });
                 var custrecordml_baunit = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_baunit',line: i });
                 var custrecordml_unitrate = currentRec.getSublistValue({sublistId: 'custpage_records',fieldId: 'custrecordml_unitrate',line: i });
@@ -275,8 +275,14 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 title: "Process Starting ...",
                 message: "We will be created " + totpo + " Purchase Orders, you will receive a confirmation email when the process is finished",
                 type: message.Type.CONFIRMATION,
-                duration: 10000
+                duration: 30000
             }).show();
+
+            response.then(function(res){
+                setTimeout(function(){ location.reload(); }, 5000);
+            }).catch(function(err){
+                log.error({ title: 'process1 POST error', details: err });
+            });
             
         }
   
@@ -358,6 +364,63 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             newDate.setDate(newDate.getDate() + days);
             return newDate;
           };
+
+       /**
+         * Validation function to be executed when sublist line is inserted.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         *
+         * @returns {boolean} Return true if sublist line is valid
+         *
+         * @since 2015.2
+         */
+        function validateInsert(scriptContext) {
+            return false;
+        }
+         /**
+         * Validation function to be executed when sublist line is inserted.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         *
+         * @returns {boolean} Return true if sublist line is valid
+         *
+         * @since 2015.2
+         */
+        function validateLine(scriptContext) {
+            var currRec = scriptContext.currentRecord;
+            var sublistId = scriptContext.sublistId;
+            var itemVal = currRec.getCurrentSublistValue({
+                sublistId: sublistId,
+                fieldId: 'custrecordml_item'
+            });
+            log.debug('customlrecord_itemid', itemVal);
+
+            // example: require the field to be populated
+            if (!itemVal) {
+                return false;
+            }
+            return true;
+
+        }
+
+        /**
+         * Validation function to be executed when record is deleted.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         *
+         * @returns {boolean} Return true if sublist line is valid
+         *
+         * @since 2015.2
+         */
+        function validateDelete(scriptContext) {
+            return false;
+        }
         return {
             pageInit: pageInit,
             godashboard: godashboard,
@@ -367,6 +430,9 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
             process1: process1,
             fieldChanged: fieldChanged,
             markall: markall,
-            unmarkall: unmarkall
+            unmarkall: unmarkall,
+            validateInsert: validateInsert,
+            validateDelete: validateDelete,
+            validateLine: validateLine
         }
     })

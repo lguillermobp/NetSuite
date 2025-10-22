@@ -333,39 +333,10 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
           function validateLine(currentRecord) {
   
   
-              return true;
+              return false;
           }
   
-          /**
-           * Validation function to be executed when sublist line is inserted.
-           *
-           * @param {Object} scriptContext
-           * @param {Record} scriptContext.currentRecord - Current form record
-           * @param {string} scriptContext.sublistId - Sublist name
-           *
-           * @returns {boolean} Return true if sublist line is valid
-           *
-           * @since 2015.2
-           */
-          function validateInsert(scriptContext) {
-  
-          }
-  
-          /**
-           * Validation function to be executed when record is deleted.
-           *
-           * @param {Object} scriptContext
-           * @param {Record} scriptContext.currentRecord - Current form record
-           * @param {string} scriptContext.sublistId - Sublist name
-           *
-           * @returns {boolean} Return true if sublist line is valid
-           *
-           * @since 2015.2
-           */
-          function validateDelete(scriptContext) {
-  
-          }
-  /**
+        /**
          * Validation function to be executed when sublist line is inserted.
          *
          * @param {Object} scriptContext
@@ -378,6 +349,33 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
          */
         function validateInsert(scriptContext) {
             return false;
+        }
+         /**
+         * Validation function to be executed when sublist line is inserted.
+         *
+         * @param {Object} scriptContext
+         * @param {Record} scriptContext.currentRecord - Current form record
+         * @param {string} scriptContext.sublistId - Sublist name
+         *
+         * @returns {boolean} Return true if sublist line is valid
+         *
+         * @since 2015.2
+         */
+        function validateLine(scriptContext) {
+            var currRec = scriptContext.currentRecord;
+            var sublistId = scriptContext.sublistId;
+            var itemVal = currRec.getCurrentSublistValue({
+                sublistId: sublistId,
+                fieldId: 'custrecordml_item'
+            });
+            log.debug('customlrecord_itemid', itemVal);
+
+            // example: require the field to be populated
+            if (!itemVal) {
+                return false;
+            }
+            return true;
+
         }
 
         /**
@@ -460,6 +458,11 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                         sublistId: 'item',
                         fieldId: 'item'
                     });
+                    var requestvecd = itemReceipt.getCurrentSublistText({
+                        sublistId: 'item',
+                        fieldId: 'custcol_requestid'
+                    });
+
                     var binitem = itemReceipt.getCurrentSublistText({
                         sublistId: 'item',
                         fieldId: 'binitem'
@@ -509,6 +512,11 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                             sublistId: 'item',
                             fieldId: 'quantity',
                             value: qty
+                        });
+                        itemReceipt.setCurrentSublistValue({ // Set qty for line
+                            sublistId: 'item',
+                            fieldId: 'custcol_requestid',
+                            value: requestvecd
                         });
                         console.log(binitem);
                         if (selec && binitem=="T") 
@@ -609,6 +617,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
             saveRecord: saveRecord,
             validateInsert: validateInsert,
             validateDelete: validateDelete,
-            sublistChanged: sublistChanged
+            sublistChanged: sublistChanged,
+            validateLine: validateLine
         }
     })

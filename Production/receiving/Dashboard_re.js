@@ -275,6 +275,15 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 });
 
                
+                let srequestecd =sublistpm.addField({
+                    id: "custrecordml_requestvecd",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Request Vector'
+                });
+                srequestecd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
                 let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
                     type: serverWidget.FieldType.TEXT,
@@ -413,6 +422,11 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                         line: counter,
                         value: result1.project.substring(0, 298)+" "
                     });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_requestvecd',
+                        line: counter,
+                        value: Number(result1.requestvecd)
+                    });
                                       
 
                      if (binloc!="ERROR" && binloc!="No use Bin") {
@@ -493,6 +507,11 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 fieldId: 'custcol_notes',
                 line: i
             });
+            var requestvecd = itemReceipt.getSublistValue({
+                sublistId: 'item',
+                fieldId: 'custcol_requestid',
+                line: i
+            });
             var item = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'itemname',
@@ -544,6 +563,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
             pagedatas[i] = {
                 "item": item,
                 "itemv": vendorcode,
+                "requestvecd": requestvecd,
                 "project": project,
                 "lineid": lineid,
                 "itemid": itemid,

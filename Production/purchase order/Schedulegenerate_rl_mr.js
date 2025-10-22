@@ -77,6 +77,7 @@
                             id: internalId.internalId,
                             values: {
                                 "custrecord_po": idpo,
+                                "custrecord_vendor": internalId.vendorid,
                                 "custrecord_requeststscod": newsts,
                                 "custrecord_sts_preview": internalId.oldsts,
                                 "custrecord_requeststs": newstsedsc
@@ -174,6 +175,7 @@
                                             type: "customrecord_requestrecords",
                                             id: internalId.internalId,
                                             values: {
+                                                "custrecord_vendor": internalId.vendorid,
                                                 "custrecord_po": idpo,
                                                 "custrecord_requeststscod": newsts,
                                                 "custrecord_sts_preview": internalId.oldsts,
@@ -291,7 +293,7 @@
                         purchaseOrder.commitLine({
                             sublistId: 'item'
                         });
-                        const jinternalid = {"internalId": fresult.internalid, "requeststscod": requeststscod, "viewecdid": viewecdid, "oldsts": oldsts};
+                        const jinternalid = {"internalId": fresult.internalid, "requeststscod": requeststscod, "viewecdid": viewecdid, "oldsts": oldsts, "vendorid": vendorid};
                         vinternalIds.push(jinternalid);
 
                 }
@@ -311,75 +313,70 @@
                 return newDate;
                 };
 
-             mapContext.write({
-                key: '001',
-                value: purchaseorderid
-        });
+            purchaseorderid.forEach(function(id) {
+            log.debug("id",id);
+            context.write({
+                key: 'purchaseorderid',
+                value: id
+                });
+            });
+
 
         };
         
         var reduce = function reduce(reduceContext) {
             log.debug("reduceContext",reduceContext);
+            log.debug("reduceContext key",reduceContext.key);
+            log.debug("reduceContext values",reduceContext.values);
 
-            var purchaseorderid = JSON.parse(reduceContext.values[0]);
-            log.debug("reduce.purchaseorderid",purchaseorderid);
+           var purchaseorderid = JSON.parse(reduceContext.values);
+           log.debug("reduce.purchaseorderid",purchaseorderid);
 
-            reduceContext.write({
-            key: '002',
-            value: purchaseorderid
-        });
-        };
+           try {
+                var lookupResult = search.lookupFields({
+                    type: "purchaseorder",
+                    id: purchaseorderid,
+                    columns: ['tranid'] // Example with a joined field
+                });
 
-        var summarize = function summarize(summarizeContext) {
+                var tranid = lookupResult.tranid;
 
-           summarizeContext.output.iterator().each(function(key, value) {
-            log.debug('Key', key);
-            log.debug('Value', value);
-  
-            if (key === '001') { // Check for your specific key
-                var receivedParameter = value;
-                // Now you can use receivedParameter in your summarize logic
-                log.debug('Parameter from Map:', receivedParameter);
+                log.debug('Transaction ID', tranid);
+
+            } catch (e) {
+                log.error('Error in lookupFields', e.toString());
+                return null;
             }
-            return true; // Continue iteration
-            });
-
-            try {
-            var lookupResult = search.lookupFields({
-                type: "purchaseorder",
-                id: receivedParameter,
-                columns: ['tranid'] // Example with a joined field
-            });
-
-            var tranid = lookupResult.tranid;
-
-            log.debug('Transaction ID', tranid);
-
-        } catch (e) {
-            log.error('Error in lookupFields', e.toString());
-            return null;
-        }
 
             try { 
 
-            var userObj = runtime.getCurrentUser();
-            log.debug("userObj",userObj.id);
-            var paramemp = GENERALTOOLS.get_employee_value(userObj.id);
-            var emaildest = paramemp.data.getValue({fieldId: "email"});
+                var userObj = runtime.getCurrentUser();
+                log.debug("userObj",userObj.id);
+                var paramemp = GENERALTOOLS.get_employee_value(userObj.id);
+                var emaildest = paramemp.data.getValue({fieldId: "email"});
 
-            log.debug("emaildest",emaildest);
+                log.debug("emaildest",emaildest);
 
-            subject = "The generation of Purchase Order ( " + tranid + " ) is done";
+                subject = "The generation of Purchase Order ( " + tranid + " ) is done";
 
-            email.send({
-                author : userObj.id,
-                recipients : emaildest,
-                subject : subject,
-                body : subject
-            });
-        } catch (e) {
-            log.error("error",e);
-        }
+                email.send({
+                    author : userObj.id,
+                    recipients : emaildest,
+                    subject : subject,
+                    body : subject
+                });
+            } catch (e) {
+                log.error("error",e);
+            }
+
+           reduceContext.write({
+               key: '002',
+               value: purchaseorderid
+           });
+        };
+
+        var summarize = function summarize(summary) {
+            log.audit('Summary', summary);
 
         };
 

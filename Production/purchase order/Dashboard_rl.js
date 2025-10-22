@@ -46,13 +46,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     title: `Reactive Order List Generating Tool`
                 });
                 form.clientScriptModulePath = '/SuiteScripts/purchase order/DashboardClient_rl.js';
-
-           
-                form.addButton({
-                    id: 'custpage_refresh',
-                    label: 'Refresh records',
-                    functionName: "refresh("+userObj.id+")"
-                });
                      
                 var datepos = form.addField({
                     id: "custpage_date",
@@ -158,6 +151,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                             functionName: 'onButtonClick("'+encodeURI(plantext)+'")'
                         });
                     }
+                    
+                form.addButton({
+                    id: 'custpage_refresh',
+                    label: 'Refresh records',
+                    functionName: "refresh("+userObj.id+")"
+                });
                
                 sublistpm.addField({
                     id: 'custrecordml_omit',
@@ -169,6 +168,9 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
                     label:'Item'
+                });
+                sitem.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                  var sitemid = sublistpm.addField({
                     id: "custrecordml_itemid",
@@ -195,28 +197,40 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Description Item'
                 });
-               
-                sublistpm.addField({
-                    id: "custrecordml_additionalinformation",
-                    type: serverWidget.FieldType.TEXT,
+               sitemd.updateDisplayType({
+                   displayType: serverWidget.FieldDisplayType.DISABLED
+               });
+               var sadditionalinfo = sublistpm.addField({
+                   id: "custrecordml_additionalinformation",
+                   type: serverWidget.FieldType.TEXT,
                     label:'Additional Information'
                 });
-
-                sublistpm.addField({
+                sadditionalinfo.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sreason = sublistpm.addField({
                     id: "custrecordml_reason",
                     type: serverWidget.FieldType.TEXT,
                     label:'Reason'
                 });
-                sublistpm.addField({
+                sreason.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var srqtypevecd = sublistpm.addField({
                     id: "custrecordml_rq_type_vecd",
                     type: serverWidget.FieldType.TEXT,
                     label:'Type of Request'
                 });
-                
-                sublistpm.addField({
+                srqtypevecd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var srequeststs = sublistpm.addField({
                     id: "custrecordml_requeststs",
                     type: serverWidget.FieldType.TEXT,
                     label:'Status'
+                });
+                srequeststs.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 var srequeststscod = sublistpm.addField({
                     id: "custrecordml_requeststscod",
@@ -234,15 +248,21 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 srequeststscodid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                sublistpm.addField({
+                var sdate = sublistpm.addField({
                     id: "custrecordml_date",
                     type: serverWidget.FieldType.TEXT,
                     label:'Date Created'
                 });
-                sublistpm.addField({
+                sdate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sqty = sublistpm.addField({
                     id: "custrecordml_qty",
                     type: serverWidget.FieldType.TEXT,
                     label:'Quantity'
+                });
+                sqty.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 var staskid =sublistpm.addField({
                     id: "custrecordml_taskid",
@@ -252,37 +272,45 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 staskid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                sublistpm.addField({
+                var staskdes = sublistpm.addField({
                     id: "custrecordml_taskdes",
                     type: serverWidget.FieldType.TEXT,
                     label:'Task Description'
                 });
-
-                sublistpm.addField({
-                    id: "custrecordml_preferredvendor",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Preferred Vendor'
+                staskdes.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
-                sublistpm.addField({
+
+                var sleadtime = sublistpm.addField({
                     id: "custrecordml_leadtime",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Lead Time'
                 });
+                sleadtime.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
                 var vendorid = sublistpm.addField({
-                    id: "custrecordml_preferredvendorid",
+                    id: "custrecordml_preferredvendoridold",
                     type: serverWidget.FieldType.INTEGER,
                     label:'Preferred Vendor ID'
                 });
                 vendorid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 }); 
+                let sl_vendor =sublistpm.addField({
+                    id: "custrecordml_preferredvendorid",
+                    type: serverWidget.FieldType.SELECT,
+                    label:'Preferred Vendor',
+                    source: "vendor"
+                });
+
                 tpounit=sublistpm.addField({
                     id: "custrecordml_pounit",
                     type: serverWidget.FieldType.TEXT,
                     label:'unit purchase'
                 });
                 tpounit.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 tbaunit=sublistpm.addField({
                     id: "custrecordml_baunit",
@@ -290,7 +318,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'unit Base'
                 });
                 tbaunit.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 tunitrate=sublistpm.addField({
                     id: "custrecordml_unitrate",
@@ -298,17 +326,23 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label:'unit Rate'
                 });
                 tunitrate.updateDisplayType({
-                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
-                sublistpm.addField({
+                var sprice = sublistpm.addField({
                     id: "custrecordml_price",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Price Vendor'
                 });
-                sublistpm.addField({
+                sprice.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var scurrency = sublistpm.addField({
                     id: "custrecordml_currency",
                     type: serverWidget.FieldType.TEXT,
                     label:'Currency Vendor'
+                });
+                scurrency.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 var icurr= sublistpm.addField({
                     id: "custrecordml_icurrency",
@@ -326,22 +360,31 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 sviewecd.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                sublistpm.addField({
+                var stotal= sublistpm.addField({
                     id: "custrecordml_total",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Total'
                 });
-                sublistpm.addField({
+                stotal.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var scurrencyrate= sublistpm.addField({
                     id: "custrecordml_currencyrate",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Exchange Rate'
                 });
-                sublistpm.addField({
+                scurrencyrate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var stotalusd= sublistpm.addField({
                     id: "custrecordml_totalusd",
                     type: serverWidget.FieldType.FLOAT,
                     label:'Total USD'
                 });
-                
+                stotalusd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+
                 var customerid = sublistpm.addField({
                     id: "custrecordml_customerid",
                     type: serverWidget.FieldType.INTEGER,
@@ -356,12 +399,17 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Customer'
                 });
-                sublistpm.addField({
+                customerid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var semployee = sublistpm.addField({
                     id: "custrecordml_employee",
                     type: serverWidget.FieldType.TEXT,
                     label:'Employee'
                 });
-      
+                semployee.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
                 sublistpm.addButton({
                     id: 'custpage_markmark',
                     label: 'Mark all',
@@ -381,11 +429,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
                 resultspt.forEach(function(result1) {
 
-                    sublistpm.setSublistValue({
-                        id: 'custrecordml_preferredvendor',
-                        line: counter,
-                        value: result1.preferredvendor+" "
-                    });
+                 
                     sublistpm.setSublistValue({
                         id: 'custrecordml_preferredvendorid',
                         line: counter,
@@ -1053,6 +1097,16 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                    if (index1==-1) {unitrate=1;}
                     else {unitrate=resultsunitm[index1].conversionrate;}
 
+                if (fresult.getValue({name: "custrecord_vendor"})) {
+                    vendorname=fresult.getText({name: "custrecord_vendor"});
+                    vendorid=fresult.getValue({name: "custrecord_vendor"});
+                }
+                else {
+                    vendorname=fresult.getText({name: "vendor", join: "CUSTRECORD_ITEM"});
+                    vendorid=fresult.getValue({name: "vendor", join: "CUSTRECORD_ITEM"});
+                }
+
+
 
                  pagedatas[i] = {
                     "internalid": fresult.getValue({name: "internalid"}),
@@ -1071,8 +1125,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "qty": fresult.getValue({name: "custrecord_qty"}),
                     "taskid": fresult.getValue({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
                     "taskdes": fresult.getText({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
-                    "preferredvendor": fresult.getText({name: "vendor", join: "CUSTRECORD_ITEM"}),
-                    "preferredvendorid": fresult.getValue({name: "vendor", join: "CUSTRECORD_ITEM"}),
+                    "preferredvendor": vendorname,
+                    "preferredvendorid": vendorid,
                     "unitpurchase": fresult.getText({name: "purchaseunit", join: "CUSTRECORD_ITEM"}),
                     "unitbase": fresult.getText({name: "unitstype", join: "CUSTRECORD_ITEM"}),
                     "price": fresult.getValue({name: "vendorcost", join: "CUSTRECORD_ITEM"}),
@@ -1131,8 +1185,18 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 			page.data.forEach(function (fresult) {
 
                 var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(fresult.getText({name: "unitstype", join: "CUSTRECORD_ITEM"})+"/"+fresult.getText({name: "purchaseunit", join: "CUSTRECORD_ITEM"})));
-                   if (index1==-1) {unitrate=1;}
-                    else {unitrate=resultsunitm[index1].conversionrate;}
+                if (index1==-1) {unitrate=1;}
+                else {unitrate=resultsunitm[index1].conversionrate;}
+
+                if (fresult.getValue({name: "custrecord_vendor"})) {
+                    vendorname=fresult.getText({name: "custrecord_vendor"});
+                    vendorid=fresult.getValue({name: "custrecord_vendor"});
+                }
+                else {
+                    vendorname=fresult.getText({name: "vendor", join: "CUSTRECORD_ITEM"});
+                    vendorid=fresult.getValue({name: "vendor", join: "CUSTRECORD_ITEM"});
+                }
+
 
 
                  pagedatas[x] = {
@@ -1152,8 +1216,8 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "qty": fresult.getValue({name: "custrecord_qty"}),
                     "taskid": fresult.getValue({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
                     "taskdes": fresult.getText({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
-                    "preferredvendor": fresult.getText({name: "vendor", join: "CUSTRECORD_ITEM"}),
-                    "preferredvendorid": fresult.getValue({name: "vendor", join: "CUSTRECORD_ITEM"}),
+                    "preferredvendor": vendorname,
+                    "preferredvendorid": vendorid,
                     "unitpurchase": fresult.getText({name: "purchaseunit", join: "CUSTRECORD_ITEM"}),
                     "unitbase": fresult.getText({name: "unitstype", join: "CUSTRECORD_ITEM"}),
                     "price": fresult.getValue({name: "vendorcost", join: "CUSTRECORD_ITEM"}),
