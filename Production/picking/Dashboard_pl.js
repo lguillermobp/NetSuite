@@ -482,15 +482,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 binidf.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                let viewecdid = sublistpm.addField({
-                    id: "custrecordml_viewecdid",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'View ECD ID'
-                });
-
-                // viewecdid.updateDisplayType({
-                //     displayType: serverWidget.FieldDisplayType.HIDDEN
-                // });
 
                 sublistpm.addField({
                     id: "custrecordml_binlocation",
@@ -508,6 +499,31 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     id: "custrecordml_binforpicking",
                     type: serverWidget.FieldType.TEXT,
                     label:'Bin for picking'
+                });
+                var sviewecdid = sublistpm.addField({
+                    id: "custrecordml_viewecdid",
+                    type: serverWidget.FieldType.TEXT,
+                    label: 'View ECD ID'
+                });
+                sviewecdid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                var slineuniquekey = sublistpm.addField({
+                    id: "custrecordml_lineuniquekey",
+                    type: serverWidget.FieldType.TEXT,
+                    label: 'Line Unique Key'
+                });
+                slineuniquekey.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var srq_pickable = sublistpm.addField({
+                    id: "custrecordml_rq_pickable",
+                    type: serverWidget.FieldType.TEXT,
+                    label: 'RQ Pickable'
+                });
+                srq_pickable.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
                 });
                 /*
                 let sl_bint =sublistpm.addField({
@@ -534,6 +550,16 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         id: 'custrecordml_item',
                         line: counter,
                         value: result1.item,
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_viewecdid',
+                        line: counter,
+                        value: Number(result1.viewecdid),
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_lineuniquekey',
+                        line: counter,
+                        value: result1.lineuniquekey,
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_itemid',
@@ -571,11 +597,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         value: result1.binlocationid
                     });
                     sublistpm.setSublistValue({
-                        id: 'custrecordml_viewecdid',
-                        line: counter,
-                        value: result1.viewecdid
-                    });
-                    sublistpm.setSublistValue({
                         id: 'custrecordml_binlocation',
                         line: counter,
                         value: result1.binlocation
@@ -591,11 +612,24 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                         value: result1.binforpicking+" "
                     });
                     sublistpm.setSublistValue({
+                        id: 'custrecordml_rq_pickable',
+                        line: counter,
+                        value: result1.rq_pickable
+                    });
+
+                    if (result1.rq_pickable=="N" || result1.rq_pickable=="D") {
+                        sublistpm.setSublistValue({
+                            id: 'custrecordml_selected',
+                            line: counter,
+                            value: "F"
+                    });
+                    } else {
+                    sublistpm.setSublistValue({
                         id: 'custrecordml_selected',
                         line: counter,
                         value: "T" 
-                        
                     });
+                    }
                     
                    
                     counter++;
@@ -963,7 +997,16 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 summary: "SUM"
             }),
             search.createColumn({
+                name: "lineuniquekey",
+                summary: "GROUP"
+            }),
+            search.createColumn({
                 name: "custcol_requestid",
+                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "custrecord_rq_pickable",
+                join: "CUSTCOL_REQUESTID",
                 summary: "GROUP"
             }),
             search.createColumn({
@@ -1002,6 +1045,12 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
 
             if (!transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})]) {qtytrn=0}
             else {qtytrn=transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})].qty}
+
+            if (result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "GROUP"})!="- None -") {
+                pickable = result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "GROUP"});
+            } else {
+                pickable = 'Y';
+            }
    
             lineNumbers[result.getValue({name: "item",summary: "GROUP"})] = {
                 "line":line,
@@ -1012,6 +1061,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
                 "viewecdid":result.getValue({name: "custcol_requestid",summary: "GROUP"}),
+                "lineuniquekey": result.getValue({name: "lineuniquekey",summary: "GROUP"}),
+                "rq_pickable": pickable,
                 "binnumberd":" ",
                 "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
                 //"binnumberd":result.getValue({name: "binnumber", join: "item",summary: "GROUP"})
@@ -1167,7 +1218,6 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     "locationPriority": inventoryBalanceLocationPriority,
                     "location": inventoryBalanceLocation,
                     "binnumber": binnt,
-                    "viewecdid": lineNumbers[result.getValue({name: "item"})].viewecdid,
                     "binnumberid": binn,
                     "inventorynumber": result.getText({name: "inventorynumber"}),
                     "expirationdate": result.getValue({name: "expirationDate", join: "inventoryNumber"}),
@@ -1200,9 +1250,11 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "item": result.item,
                 "itemid": result.itemid,
                 "itemdesc": lineNumbers[result.itemid].itemdesc,
+                "rq_pickable": lineNumbers[result.itemid].rq_pickable,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
-                "viewecdid": result.viewecdid,
+                "viewecdid": lineNumbers[result.itemid].viewecdid,
+                "lineuniquekey": lineNumbers[result.itemid].lineuniquekey,
                 "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,
@@ -1224,7 +1276,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "itemdesc": lineNumbers[result.itemid].itemdesc,
                 "binlocation": result.binnumber,
                 "binlocationid": result.binnumberid,
-                "viewecdid": result.viewecdid,
+                "viewecdid": lineNumbers[result.itemid].viewecdid,
+                "rq_pickable": lineNumbers[result.itemid].rq_pickable,
+                "lineuniquekey": lineNumbers[result.itemid].lineuniquekey,
                 "qty": lineNumbers[result.itemid].qty,
                 "qtyb": Math.ceil(result.qty),
                 "qtycommited": Number(lineNumbers[result.itemid].qtyc) + 0,

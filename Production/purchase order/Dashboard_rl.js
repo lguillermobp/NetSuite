@@ -1029,11 +1029,24 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
         var defaultFilters = fsearch.filters;
             var customFilters = [];
-            statussel= ["4","5","6"];
+            statussel= ["12","5","6",'13'];
                 customFilters = {
                     name: "custrecord_requeststscod",
                     operator: "anyof",
                     values: statussel,
+                    isor: false,
+                    isnot: false,
+                    leftparens: 0,
+                    rightparens: 0
+
+                };
+
+            defaultFilters.push(customFilters);
+
+            customFilters = {
+                    name: "custrecord_po",
+                    operator: "anyof",
+                    values: "@NONE@",
                     isor: false,
                     isnot: false,
                     leftparens: 0,
@@ -1156,7 +1169,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
 
         var defaultFilters = fsearch.filters;
             var customFilters = [];
-            statussel= ["7","8"];
+            statussel= ["7","8","9","10"];
                 customFilters = {
                     name: "custrecord_requeststscod",
                     operator: "anyof",

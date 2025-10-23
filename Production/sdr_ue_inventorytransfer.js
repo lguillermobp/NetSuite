@@ -8,31 +8,6 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
     function beforeLoad(context) {
         log.debug("context",context);
-        const currentRecord = context.newRecord;
-        log.debug("currentRecord",currentRecord.getValue({fieldId: "createdfrom"}) );
-        idpo= currentRecord.getValue({fieldId: "createdfrom"});
-        const currentRecordId = idpo;
-        log.debug("currentRecordId",currentRecordId);
-
-        
-        const printSuitelet = `/app/site/hosting/scriptlet.nl?script=1788&deploy=1&id=${currentRecordId}`
-
-        context.form.addButton({
-            id: "custpage_print", 
-            label: "Print Reception Note",
-            functionName: `printrn('${printSuitelet}');`
-        })
-
-
-            context.form.addButton({
-                id: "custpage_printrn", 
-                label: "Show Bin Locations",
-                functionName: `showbin("${currentRecord}")`
-            })
-            context.form.clientScriptModulePath = "./sdr_cs_itemreceipt.js";
-
-
-            
         
     }
 
@@ -46,26 +21,30 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
         log.debug("context",context);
         log.debug("context.type",context.type);
         const currentRecord = context.newRecord;
-        const itemLineCount = currentRecord.getLineCount({ sublistId: "item" });
+        const itemLineCount = currentRecord.getLineCount({ sublistId: "inventory" });
         log.debug("itemLineCount", itemLineCount);
 
-        var userObj = context.newRecord.getValue({ fieldId: 'employee' });
+        var inventoryTransferRecord = context.newRecord;
+        var userObj = inventoryTransferRecord.getValue({
+            fieldId: 'createdby'
+        });
+
         log.debug('createdFrom', userObj);
 
-        var paramemp = GENERALTOOLS.get_employee_value(userObj);
+        var paramemp = GENERALTOOLS.get_employee_value(3997);
         var VIEWECDUSERID=paramemp.data.getValue({fieldId: "custentity_viewecduserid"});
 
         // If you need to inspect each line:
         for (var i = 0; i < itemLineCount; i++) 
             {
                 const itemId = currentRecord.getSublistValue({
-                    sublistId: "item",
+                    sublistId: "inventory",
                     fieldId: "item",
                     line: i
                 });
                 log.debug("item line " + i, itemId);
                 const custcol_requestid = currentRecord.getSublistValue({
-                    sublistId: "item",
+                    sublistId: "inventory",
                     fieldId: "custcol_requestid",
                     line: i
                 });
@@ -78,14 +57,17 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                             var lookupResult = search.lookupFields({
                                 type: "customrecord_requestrecords",
                                 id: custcol_requestid,
-                                columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable'] // Example with a joined field
+                                columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable','custrecord_po'] // Example with a joined field
                             });
 
                             var custrecord_sts_preview = lookupResult.custrecord_sts_preview;
                             var requeststscod = lookupResult.custrecord_requeststscod;
                             var custrecord_requeststscod = requeststscod[0].value;
+                            var sts_preview = custrecord_sts_preview[0].value;
                             var viewecdid = lookupResult.custrecord_viewecdid;
                             var custrecord_rq_pickable = lookupResult.custrecord_rq_pickable;
+                            var custrecord_po = lookupResult.custrecord_po;
+                            var idpo = Number(custrecord_po[0].value);
                             log.debug('lookupResult', lookupResult);
 
 
@@ -98,15 +80,23 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
                         if (context.type=="create" )
                         {
-                             if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
-                            if (custrecord_requeststscod=="7") {newsts="10"; newstscod="51", newstsedsc="Item Received/Return to WH Stock";}
-                            else {newsts="9"; newstscod="50", newstsedsc="Item Received";}
+                            if (custrecord_rq_pickable=='Y') {pickable='D';} else {pickable=custrecord_rq_pickable;}
+
+                            if (sts_preview=="4" ) {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
+                            else {
+                                if (idpo==0) {newsts="12"; newstscod="61"; newstsedsc="Item Picked to Vehicle";}
+                                else {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
+                            }
                         }
                         if (context.type=="delete" )
                         {
-                             if (custrecord_rq_pickable=='Y') {pickable='N';} else {pickable=custrecord_rq_pickable;}
-                            if (custrecord_requeststscod=="10") {newsts="7"; newstscod="41", newstsedsc="PO Generated/Pending to pick";}
-                            else {newsts="8"; newstscod="42", newstsedsc="PO Generated";}
+                            if (custrecord_rq_pickable=='D') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
+
+                            if (sts_preview=="12" ) {newsts="7"; newstscod="41"; newstsedsc="PO Generated/Pending to pick";}
+                            else {
+                                if (idpo==0) {newsts="4"; newstscod="30"; newstsedsc="Approved by Purchase Department - In Stock (:Do Not Order)";}
+                                else {newsts="9"; newstscod="50"; newstsedsc="Item Received";}
+                            }
                         }
 
                         record.submitFields({

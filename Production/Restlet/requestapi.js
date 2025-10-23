@@ -109,6 +109,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_reason
                 });
             }
+            if (contextjson.request_pickable) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_pickable',
+                    value: contextjson.request_pickable
+                });
+            }
 
             if (contextjson.request_date) {
                 rec.setValue({
@@ -220,6 +226,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_reason
                 });
             }
+            if (contextjson.request_pickable) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_pickable',
+                    value: contextjson.request_pickable
+                });
+            }
 
            if (contextjson.customer_id_replaced > 0) {
                 rec.setValue({
@@ -233,6 +245,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_sts_description
                 });
             }
+            
              if (contextjson.status_netsuiteid) {
                 rec.setValue({
                     fieldId: 'custrecord_requeststscod',

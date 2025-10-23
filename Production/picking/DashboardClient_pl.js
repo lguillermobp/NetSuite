@@ -349,7 +349,18 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     fieldId: 'custrecordml_qtyneeded',
                                     line: i
                                 });
-                                
+                                var lineuniquekey = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_lineuniquekey',
+                                    line: i
+                                });
+                                var viewecdid = currentRec.getSublistValue({
+                                    sublistId: 'custpage_records',
+                                    fieldId: 'custrecordml_viewecdid',
+                                    line: i
+                                });
+                                console.log("lineuniquekey",lineuniquekey);
+                                console.log("viewecdid",viewecdid);
                                 if (qtyneed > qty) {qtyneed = qty;}
 
                                 // Add line items
@@ -363,15 +374,26 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                     value: item // Replace with the internal ID of the item
                                 });
                                 console.log("item",item);
-                                
-                               
+                                                        
                                 invtransf.setCurrentSublistValue({
                                     sublistId: 'inventory',
                                     fieldId: 'adjustqtyby',
                                     value: qtyneed // Set the quantity
                                 });
+                                if (Number(viewecdid)!=0 ) {
+                                    invtransf.setCurrentSublistValue({
+                                        sublistId: 'inventory',
+                                        fieldId: 'custcol_requestid',
+                                        value: Number(viewecdid) // Replace with the internal ID
+                                    });
+                                }
+                                invtransf.setCurrentSublistValue({
+                                    sublistId: 'inventory',
+                                    fieldId: 'custcol_wo_line_id',
+                                    value: lineuniquekey // Replace with the internal ID
+                                });
 
-                                console.log("binlocationid",binlocationid);
+                                console.log("lineuniquekey",lineuniquekey);
                                 // Create the subrecord for that line.
                                 var subrec = invtransf.getCurrentSublistSubrecord({
                                     sublistId: 'inventory',

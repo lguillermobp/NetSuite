@@ -87,6 +87,7 @@
                         datasending= {
                             "po": idpo,
                             "viewecduserid": VIEWECDUSERID,
+                            "pickable": " ",
                             "status": newstscod,
                             "notes": newstsedsc,
                             "oldstatus": internalId.oldsts,
@@ -186,6 +187,7 @@
                                        datasending= {
                                                 "po": idpo,
                                                 "viewecduserid": VIEWECDUSERID,
+                                                "pickable": " ",
                                                 "status": newstscod,
                                                 "notes": newstsedsc,
                                                 "oldstatus": internalId.oldsts,

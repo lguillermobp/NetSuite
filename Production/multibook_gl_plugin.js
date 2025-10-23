@@ -50,18 +50,19 @@ function customizeGlImpact(transactionRecord, standardLines, customLines, book)
         cta4035 = {id: 472, name: "", memo: ""};
         cta2005 = {id: 326, name: name, memo: ""};
         cta5006 = {id: 937, name: "", memo: ""};
+        cta1002 = {id: 739, name: "", memo: "Deposit "+nametext};
         
       
         switch(typep) {
             case "1":
-                firstaccount=cta1001;
+                firstaccount=cta1002;
                 secondaccount=cta2005;
                 thirdaccount="";
                 forthaccount="";
                 memo="Deposit "+nametext;
                 break;
             case "2":
-                firstaccount=cta1001;
+                firstaccount=cta1002;
                 secondaccount=cta2005;
                 thirdaccount="";
                 forthaccount="";
@@ -79,6 +80,20 @@ function customizeGlImpact(transactionRecord, standardLines, customLines, book)
                 thirdaccount=cta2005;
                 forthaccount=cta5006;
                 memo="Trade In "+nametext;
+                break;
+             case "5":
+                firstaccount=cta1001;
+                secondaccount=cta2005;
+                thirdaccount="";
+                forthaccount="";
+                memo="Deposit "+nametext;
+                break;
+             case "6":
+                firstaccount=cta1001;
+                secondaccount=cta2005;
+                thirdaccount="";
+                forthaccount="";
+                memo="Deposit "+nametext;
                 break;
             default:
                 amount=0;
