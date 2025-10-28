@@ -45,11 +45,19 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
         log.debug("context",context);
         log.debug("context.type",context.type);
-        const currentRecord = context.newRecord;
+        if (context.type=="create" )
+            {
+                var currentRecord = context.newRecord;
+            }
+            else
+            {
+                var currentRecord = context.oldRecord;
+            }
+            
         const itemLineCount = currentRecord.getLineCount({ sublistId: "item" });
         log.debug("itemLineCount", itemLineCount);
 
-        var userObj = context.newRecord.getValue({ fieldId: 'employee' });
+        var userObj = currentRecord.getValue({ fieldId: 'employee' });
         log.debug('createdFrom', userObj);
 
         var paramemp = GENERALTOOLS.get_employee_value(userObj);
@@ -122,6 +130,8 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                         var opt="SET";
                         datasending= {
                                 "po": 0,
+                                "po_tracking": "",
+                                "bo_vendor": "",
                                 "pickable": pickable,
                                 "viewecduserid": VIEWECDUSERID,
                                 "status": newstscod,

@@ -64,11 +64,13 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                             var requeststscod = lookupResult.custrecord_requeststscod;
                             var custrecord_requeststscod = requeststscod[0].value;
                             var sts_preview = custrecord_sts_preview[0].value;
+
                             var viewecdid = lookupResult.custrecord_viewecdid;
                             var custrecord_rq_pickable = lookupResult.custrecord_rq_pickable;
                             var custrecord_po = lookupResult.custrecord_po;
                             var idpo = Number(custrecord_po[0].value);
                             log.debug('lookupResult', lookupResult);
+                            log.debug('Status Preview', sts_preview);
 
 
                             log.debug('Transaction ID', custrecord_sts_preview);
@@ -82,7 +84,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                         {
                             if (custrecord_rq_pickable=='Y') {pickable='D';} else {pickable=custrecord_rq_pickable;}
 
-                            if (sts_preview=="4" ) {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
+                            if (custrecord_requeststscod=="4" ) {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
                             else {
                                 if (idpo==0) {newsts="12"; newstscod="61"; newstsedsc="Item Picked to Vehicle";}
                                 else {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
@@ -92,7 +94,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                         {
                             if (custrecord_rq_pickable=='D') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
 
-                            if (sts_preview=="12" ) {newsts="7"; newstscod="41"; newstsedsc="PO Generated/Pending to pick";}
+                            if (custrecord_requeststscod=="12" ) {newsts="7"; newstscod="41"; newstsedsc="PO Generated/Pending to pick";}
                             else {
                                 if (idpo==0) {newsts="4"; newstscod="30"; newstsedsc="Approved by Purchase Department - In Stock (:Do Not Order)";}
                                 else {newsts="9"; newstscod="50"; newstsedsc="Item Received";}
@@ -113,6 +115,8 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                         datasending= {
                                 "po": 0,
                                 "pickable": pickable,
+                                "po_tracking": "",
+                                "bo_vendor": "",
                                 "viewecduserid": VIEWECDUSERID,
                                 "status": newstscod,
                                 "notes": newstsedsc,

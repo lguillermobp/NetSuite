@@ -312,7 +312,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
         }
 
 
-            function editQuote(data)
+        function editQuote(data)
         {
                 
             var dataheader = data.data.dataheader;
@@ -558,7 +558,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
             return quoteId;
 
         }
-        function createSalesContractold(data)
+    function createSalesContractold(data)
         {
                 
             var dataheader = data.data.dataheader;
@@ -685,7 +685,7 @@ define(['N/task', "N/search", "N/record",  "N/log","/SuiteScripts/Modules/genera
 
         }
 
-        function createSalesContract(data)
+    function createSalesContract(data)
         {
                 
             var dataheader = data.data.dataheader;

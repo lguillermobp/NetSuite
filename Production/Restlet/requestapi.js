@@ -232,6 +232,12 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.request_pickable
                 });
             }
+            if (contextjson.request_cleared) {
+                rec.setValue({
+                    fieldId: 'custrecord_rq_cleared',
+                    value: contextjson.request_cleared
+                });
+            }
 
            if (contextjson.customer_id_replaced > 0) {
                 rec.setValue({
