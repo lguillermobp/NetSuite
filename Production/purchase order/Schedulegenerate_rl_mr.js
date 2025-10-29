@@ -87,6 +87,8 @@
                         datasending= {
                             "po": idpo,
                             "viewecduserid": VIEWECDUSERID,
+                            "po_tracking": " ",
+                            "bo_vendor": " ",
                             "pickable": " ",
                             "status": newstscod,
                             "notes": newstsedsc,
@@ -187,6 +189,8 @@
                                        datasending= {
                                                 "po": idpo,
                                                 "viewecduserid": VIEWECDUSERID,
+                                                "po_tracking": " ",
+                                                "bo_vendor": " ",
                                                 "pickable": " ",
                                                 "status": newstscod,
                                                 "notes": newstsedsc,

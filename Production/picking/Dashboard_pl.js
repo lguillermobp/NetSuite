@@ -554,7 +554,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistpm.setSublistValue({
                         id: 'custrecordml_viewecdid',
                         line: counter,
-                        value: Number(result1.viewecdid),
+                        value: result1.viewecdid + " ",
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_lineuniquekey',
@@ -614,7 +614,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistpm.setSublistValue({
                         id: 'custrecordml_rq_pickable',
                         line: counter,
-                        value: result1.rq_pickable
+                        value: result1.rq_pickable + " "
                     });
 
                     if (result1.rq_pickable=="N" || result1.rq_pickable=="D") {
@@ -996,19 +996,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 name: "quantity",
                 summary: "SUM"
             }),
-            search.createColumn({
-                name: "lineuniquekey",
-                summary: "GROUP"
-            }),
-            search.createColumn({
-                name: "custcol_requestid",
-                summary: "GROUP"
-            }),
-            search.createColumn({
-                name: "custrecord_rq_pickable",
-                join: "CUSTCOL_REQUESTID",
-                summary: "GROUP"
-            }),
+            
             search.createColumn({
                 name: "quantitycommitted",
                 summary: "SUM"
@@ -1032,6 +1020,20 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                name: "custitem_binforpicking",
                join: "item",
                summary: "GROUP"
+            }),
+            search.createColumn({
+                name: "lineuniquekey",
+                summary: "MAX"
+            }),
+            search.createColumn({
+                name: "internalid",
+                join: "CUSTCOL_REQUESTID",
+                summary: "MAX"
+            }),
+            search.createColumn({
+                name: "custrecord_rq_pickable",
+                join: "CUSTCOL_REQUESTID",
+                summary: "MAX"
             })
              ]
         }).run().each(function (result) {
@@ -1046,8 +1048,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
             if (!transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})]) {qtytrn=0}
             else {qtytrn=transferred[result.getValue({name: "internalid", join: "item",summary: "GROUP"})].qty}
 
-            if (result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "GROUP"})!="- None -") {
-                pickable = result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "GROUP"});
+            if (result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "MAX"})!="- None -") {
+                pickable = result.getValue({name: "custrecord_rq_pickable", join: "CUSTCOL_REQUESTID",summary: "MAX"});
             } else {
                 pickable = 'Y';
             }
@@ -1060,8 +1062,8 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "qtyc": qtytrn ,
                 "qtybo":result.getValue({name: "formulanumeric",summary: "SUM"}),
                 "itemdesc":result.getValue({name: "formulatext",summary: "GROUP"}),
-                "viewecdid":result.getValue({name: "custcol_requestid",summary: "GROUP"}),
-                "lineuniquekey": result.getValue({name: "lineuniquekey",summary: "GROUP"}),
+                "viewecdid":result.getValue({name: "internalid", join: "CUSTCOL_REQUESTID",summary: "MAX"}),
+                "lineuniquekey": result.getValue({name: "lineuniquekey",summary: "MAX"}),
                 "rq_pickable": pickable,
                 "binnumberd":" ",
                 "binforpicking":result.getText({name: "custitem_binforpicking", join: "item",summary: "GROUP"})
@@ -1329,7 +1331,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 search.createColumn({
                    name: "purchasedescription",
                    join: "item"
-                })
+                }),
+                "custcol_wo_line_id",
+                "custcol_requestid"
             ]
         });
         var pagedData = searchWorkOrderLines.runPaged({
@@ -1354,7 +1358,9 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                 "type": result.getValue({name: "type"}),
                 "date": result.getValue({name: "trandate"}),
                 "dco": result.getValue({name: "tranid"}),
-                "user": result.getText({name: "createdby"})
+                "user": result.getText({name: "createdby"}),
+                "custcol_wo_line_id": result.getValue({name: "custcol_wo_line_id"}),
+                "custcol_requestid": result.getValue({name: "custcol_requestid"})
                 }
                 j++;
 

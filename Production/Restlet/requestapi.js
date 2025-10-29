@@ -85,6 +85,10 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.customer_id
                 });
             }
+            rec.setValue({
+                fieldId: 'name',
+                value: 'ViewECD Request - ' + contextjson.request_id
+            });
             if (contextjson.item_id) {
                 rec.setValue({
                     fieldId: 'custrecord_item',

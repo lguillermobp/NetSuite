@@ -163,7 +163,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     label: 'Include',
                     type: serverWidget.FieldType.CHECKBOX
                 });
-                
+                var customerid = sublistpm.addField({
+                    id: "custrecordml_customer",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Customer'
+                });
                 var sitem = sublistpm.addField({
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
@@ -394,11 +398,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 customerid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                var customerid = sublistpm.addField({
-                    id: "custrecordml_customer",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Customer'
-                });
+
                 customerid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.DISABLED
                 });
@@ -459,7 +459,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistpm.setSublistValue({
                         id: 'custrecordml_additionalinformation',
                         line: counter,
-                        value: result1.additionalinformation + " "
+                        value: result1.additionalinformation.substring(0, 298) + " "
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_sviewecd',
@@ -509,13 +509,13 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistpm.setSublistValue({
                         id: 'custrecordml_taskdes',
                         line: counter,
-                        value: result1.taskdes
+                        value: result1.taskdes + " "
                         
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_taskid',
                         line: counter,
-                        value: result1.taskid
+                        value: Number(result1.taskid)
                         
                     });
                                       
@@ -618,6 +618,12 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
         
                 });
                 var resultsgt= findCases2();
+
+                var customerid = sublistgt.addField({
+                    id: "custrecordgt_customer",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Customer'
+                });
                
                 var sitem = sublistgt.addField({
                     id: "custrecordgt_item",
@@ -813,11 +819,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 customerid.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
-                var customerid = sublistgt.addField({
-                    id: "custrecordgt_customer",
-                    type: serverWidget.FieldType.TEXT,
-                    label:'Customer'
-                });
+ 
                 sublistgt.addField({
                     id: "custrecordgt_employee",
                     type: serverWidget.FieldType.TEXT,
@@ -868,7 +870,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_additionalinformation',
                         line: counter,
-                        value: result1.additionalinformation + " "
+                        value: result1.additionalinformation.substring(0, 298) + " "
                     });
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_sviewecd',
@@ -918,7 +920,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_taskdes',
                         line: counter,
-                        value: result1.taskdes
+                        value: result1.taskdes + " "
                     });
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_purchaseorder',
@@ -928,7 +930,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_taskid',
                         line: counter,
-                        value: result1.taskid
+                        value: Number(result1.taskid)
                         
                     });
                                       
