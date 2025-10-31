@@ -607,6 +607,457 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     counter++;
                 
 				})
+                // ----------------------------------------------GT  ----------------------------------------------
+
+                var sublistpmnov = form.addSublist({
+                    id: 'custpage_records_novendor',
+                    type : serverWidget.SublistType.LIST,
+                    label: 'Records without Preferred Vendor',
+
+                });
+                var resultspt= findCases3();
+                            
+                var customerid = sublistpmnov.addField({
+                    id: "custrecordml_customer",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Customer'
+                });
+                var sitem = sublistpmnov.addField({
+                    id: "custrecordml_item",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Item'
+                });
+                sitem.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                    var sitemid = sublistpmnov.addField({
+                    id: "custrecordml_itemid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Item ID'
+                });
+
+                sitemid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                var sinternalid = sublistpmnov.addField({
+                    id: "custrecordml_internalid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Internal ID'
+                });
+
+                sinternalid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                
+                var sitemd = sublistpmnov.addField({
+                    id: "custrecordml_itemd",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Description Item'
+                });
+                sitemd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sadditionalinfo = sublistpmnov.addField({
+                    id: "custrecordml_additionalinformation",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Additional Information'
+                });
+                sadditionalinfo.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sreason = sublistpmnov.addField({
+                    id: "custrecordml_reason",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Reason'
+                });
+                sreason.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var srqtypevecd = sublistpmnov.addField({
+                    id: "custrecordml_rq_type_vecd",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Type of Request'
+                });
+                srqtypevecd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var srequeststs = sublistpmnov.addField({
+                    id: "custrecordml_requeststs",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Status'
+                });
+                srequeststs.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var srequeststscod = sublistpmnov.addField({
+                    id: "custrecordml_requeststscod",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Status Code'
+                });
+                srequeststscod.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var srequeststscodid = sublistpmnov.addField({
+                    id: "custrecordml_requeststscodid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Status Code ID'
+                });
+                srequeststscodid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var sdate = sublistpmnov.addField({
+                    id: "custrecordml_date",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Date Created'
+                });
+                sdate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sqty = sublistpmnov.addField({
+                    id: "custrecordml_qty",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Quantity'
+                });
+                sqty.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var staskid =sublistpmnov.addField({
+                    id: "custrecordml_taskid",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Id'
+                });
+                staskid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var staskdes = sublistpmnov.addField({
+                    id: "custrecordml_taskdes",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Task Description'
+                });
+                staskdes.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+
+                var sleadtime = sublistpmnov.addField({
+                    id: "custrecordml_leadtime",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'Lead Time'
+                });
+                sleadtime.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var vendorid = sublistpmnov.addField({
+                    id: "custrecordml_preferredvendoridold",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Preferred Vendor ID'
+                });
+                vendorid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                }); 
+                var svendor = sublistpmnov.addField({
+                    id: "custrecordml_preferredvendorid",
+                    type: serverWidget.FieldType.SELECT,
+                    label:'Preferred Vendor',
+                    source: "vendor"
+                });
+                 svendor.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                tpounit=sublistpmnov.addField({
+                    id: "custrecordml_pounit",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'unit purchase'
+                });
+                tpounit.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                tbaunit=sublistpmnov.addField({
+                    id: "custrecordml_baunit",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'unit Base'
+                });
+                tbaunit.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                tunitrate=sublistpmnov.addField({
+                    id: "custrecordml_unitrate",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'unit Rate'
+                });
+                tunitrate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var sprice = sublistpmnov.addField({
+                    id: "custrecordml_price",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'Price Vendor'
+                });
+                sprice.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var scurrency = sublistpmnov.addField({
+                    id: "custrecordml_currency",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Currency Vendor'
+                });
+                scurrency.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var icurr= sublistpmnov.addField({
+                    id: "custrecordml_icurrency",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Currency Internalid'
+                });
+                icurr.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var sviewecd= sublistpmnov.addField({
+                    id: "custrecordml_sviewecd",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'viewecd Request'
+                });
+                sviewecd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var stotal= sublistpmnov.addField({
+                    id: "custrecordml_total",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'Total'
+                });
+                stotal.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var scurrencyrate= sublistpmnov.addField({
+                    id: "custrecordml_currencyrate",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'Exchange Rate'
+                });
+                scurrencyrate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var stotalusd= sublistpmnov.addField({
+                    id: "custrecordml_totalusd",
+                    type: serverWidget.FieldType.FLOAT,
+                    label:'Total USD'
+                });
+                stotalusd.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+
+                var customerid = sublistpmnov.addField({
+                    id: "custrecordml_customerid",
+                    type: serverWidget.FieldType.INTEGER,
+                    label:'Customer ID'
+                });
+
+                customerid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+
+                customerid.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                var semployee = sublistpmnov.addField({
+                    id: "custrecordml_employee",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Employee'
+                });
+                semployee.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
+                sublistpmnov.addButton({
+                    id: 'custpage_markmark',
+                    label: 'Mark all',
+                    functionName: "markall()"
+                });
+                sublistpmnov.addButton({
+                    id: 'custpage_unmarkmark',
+                    label: 'Unmark all',
+                    functionName: "unmarkall()"
+                });
+
+                var resultscurr= currencies();   
+
+                // loop through each line, skipping the header
+                
+                var counter = 0;
+
+                resultspt.forEach(function(result1) {
+
+                    
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_preferredvendorid',
+                        line: counter,
+                        value: 0+result1.preferredvendorid
+                        
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_item',
+                        line: counter,
+                        value: result1.item+" "
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_internalid',
+                        line: counter,
+                        value: result1.internalid
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_itemid',
+                        line: counter,
+                        value: result1.itemid
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_itemd',
+                        line: counter,
+                        value: result1.itemd
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_additionalinformation',
+                        line: counter,
+                        value: result1.additionalinformation.substring(0, 298) + " "
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_sviewecd',
+                        line: counter,
+                        value: result1.sviewecd
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_reason',
+                        line: counter,
+                        value: result1.reason
+                        
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_rq_type_vecd',
+                        line: counter,
+                        value: result1.rq_type_vecd
+                        
+                    });
+                    
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_leadtime',
+                        line: counter,
+                        value: result1.leadtime+0
+                        
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_requeststs',
+                        line: counter,
+                        value: result1.requeststs
+                        
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_requeststscodid',
+                        line: counter,
+                        value: result1.requeststscodid
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_requeststscod',
+                        line: counter,
+                        value: result1.requeststscod
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_date',
+                        line: counter,
+                        value: result1.date
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_taskdes',
+                        line: counter,
+                        value: result1.taskdes + " "
+                        
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_taskid',
+                        line: counter,
+                        value: Number(result1.taskid)
+                        
+                    });
+                                        
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_price',
+                        line: counter,
+                        value: result1.price
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_qty',
+                        line: counter,
+                        value: result1.qty
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_pounit',
+                        line: counter,
+                        value: result1.unitpurchase+" "
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_baunit',
+                        line: counter,
+                        value: result1.unitbase+" "
+                    });
+
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_unitrate',
+                        line: counter,
+                        value: result1.unitrate
+                    });
+                    
+                    
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_total',
+                        line: counter,
+                        value: result1.total.toFixed(2)
+                    });
+                    
+                    if (!result1.currency) {
+                        dcurrency="US Dollar";}
+                    else {dcurrency=result1.currency;}
+
+                    if (!result1.currency) {
+                        icurrency=1}
+                    else {icurrency=resultscurr[dcurrency].internalid;}
+                    
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_currency',
+                        line: counter,
+                        value: dcurrency
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_icurrency',
+                        line: counter,
+                        value: icurrency
+                    });
+                    
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_currencyrate',
+                        line: counter,
+                        value: resultscurr[dcurrency].exchangerate
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_totalusd',
+                        line: counter,
+                        value: (result1.total*resultscurr[dcurrency].exchangerate).toFixed(2)
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_customerid',
+                        line: counter,
+                        value: result1.customerid
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_customer',
+                        line: counter,
+                        value: result1.customer
+                    });
+                    sublistpmnov.setSublistValue({
+                        id: 'custrecordml_employee',
+                        line: counter,
+                        value: result1.employee
+                    });
+                    
+                    counter++;
+                
+                })
 
                 //======================================================================================================
 
@@ -1122,6 +1573,75 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 }
 
 
+
+                 pagedatas[i] = {
+                    "internalid": fresult.getValue({name: "internalid"}),
+                    "requeststscodid": fresult.getValue({name: "custrecord_requeststscod"}),
+                    "requeststscod": fresult.getText({name: "custrecord_requeststscod"}),
+                    "itemd": fresult.getValue({name: "custrecord_itemdescription"}),
+                    "item": fresult.getText({name: "custrecord_item"}),
+                    "itemid": fresult.getValue({name: "custrecord_item"}),
+                    "sviewecd": fresult.getValue({name: "custrecord_viewecdid"}),
+                    "employee": fresult.getValue({name: "custrecord_employee"}),
+                    "additionalinformation": fresult.getValue({name: "custrecord_additionalinformation"}),
+                    "reason": fresult.getValue({name: "custrecord_reason"}),
+                    "rq_type_vecd": fresult.getText({name: "custrecord_rq_type_vecd"}),
+                    "requeststs": fresult.getValue({name: "custrecord_requeststs"}),
+                    "date": fresult.getValue({name: "created"}),
+                    "qty": fresult.getValue({name: "custrecord_qty"}),
+                    "taskid": fresult.getValue({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
+                    "taskdes": fresult.getText({name: "custbody_scheduletaskid", join: "CUSTRECORD_WO"}),
+                    "preferredvendor": vendorname,
+                    "preferredvendorid": vendorid,
+                    "unitpurchase": fresult.getText({name: "purchaseunit", join: "CUSTRECORD_ITEM"}),
+                    "unitbase": fresult.getText({name: "unitstype", join: "CUSTRECORD_ITEM"}),
+                    "price": fresult.getValue({name: "vendorcost", join: "CUSTRECORD_ITEM"}),
+                    "currency": fresult.getText({name: "vendorpricecurrency", join: "CUSTRECORD_ITEM"}),
+                    "customerid": fresult.getValue({name: "custrecord_project"}),
+                    "customer": fresult.getText({name: "custrecord_project"}),
+                    "unitrate": unitrate,
+                    "omit": 'F',
+                    "leadtime": fresult.getValue({name: "leadtime", join: "CUSTRECORD_ITEM"}),
+                    "total": Number(fresult.getValue({name: "custrecord_qty"})) * Number(fresult.getValue({name: "vendorcost", join: "CUSTRECORD_ITEM"}))         
+				    }
+
+                    i++;
+			})
+            
+		});
+      
+            pagedatas = _.orderBy(pagedatas,  ['preferredvendorid', 'customerid'], ['asc', 'asc']);
+		return pagedatas;
+	}
+
+    function findCases3() {
+        var i=0;
+		var pagedatas=[];
+        var resultsunitm= unitm();
+        var fsearch = search.load({ id: 'customsearch_rr_tosuitelet_wo_vendor' });
+  
+		var pagedData = fsearch.runPaged({
+			"pageSize" : 1000
+		});
+
+		pagedData.pageRanges.forEach(function (pageRange) {
+           
+			var page = pagedData.fetch({index: pageRange.index});
+
+			page.data.forEach(function (fresult) {
+
+                var index1 = Number(resultsunitm.map(function (img) { return img.name; }).indexOf(fresult.getText({name: "unitstype", join: "CUSTRECORD_ITEM"})+"/"+fresult.getText({name: "purchaseunit", join: "CUSTRECORD_ITEM"})));
+                   if (index1==-1) {unitrate=1;}
+                    else {unitrate=resultsunitm[index1].conversionrate;}
+
+                if (fresult.getValue({name: "custrecord_vendor"})) {
+                    vendorname=fresult.getText({name: "custrecord_vendor"});
+                    vendorid=fresult.getValue({name: "custrecord_vendor"});
+                }
+                else {
+                    vendorname=fresult.getText({name: "vendor", join: "CUSTRECORD_ITEM"});
+                    vendorid=fresult.getValue({name: "vendor", join: "CUSTRECORD_ITEM"});
+                }
 
                  pagedatas[i] = {
                     "internalid": fresult.getValue({name: "internalid"}),

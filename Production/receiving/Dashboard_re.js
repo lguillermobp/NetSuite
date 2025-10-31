@@ -278,7 +278,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 let srequestecd =sublistpm.addField({
                     id: "custrecordml_requestvecd",
                     type: serverWidget.FieldType.INTEGER,
-                    label:'Request Vector'
+                    label:'Request ViewECD'
                 });
                 srequestecd.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
@@ -519,7 +519,6 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
             });
 
             
-
             var itemid = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'item',

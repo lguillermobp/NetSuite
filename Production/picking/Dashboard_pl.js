@@ -575,7 +575,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qty',
                         line: counter,
-                        value: result1.qty 
+                        value: Number(result1.qty)
                     });
 
                     if (!transferred[result1.itemid]) {qtytrn="0"}
@@ -604,7 +604,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistpm.setSublistValue({
                         id: 'custrecordml_qtyb',
                         line: counter,
-                        value: result1.qtyb 
+                        value: Number(result1.qtyb)
                     });
                     sublistpm.setSublistValue({
                         id: 'custrecordml_binforpicking',
@@ -702,7 +702,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublistbo.setSublistValue({
                         id: 'custrecordbo_qty',
                         line: counter,
-                        value: result1.qty 
+                        value: Number(result1.qty)
                     });
 
                    
@@ -912,7 +912,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublisttr.setSublistValue({
                         id: 'custrecordtr_qty',
                         line: counter,
-                        value: result1.qty 
+                        value: Number(result1.qty) + 0
                     });
                     sublisttr.setSublistValue({
                         id: 'custrecordtr_user',
@@ -937,7 +937,7 @@ define(["N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N
                     sublisttr.setSublistValue({
                         id: 'custrecordtr_bin',
                         line: counter,
-                        value: result1.bin 
+                        value: result1.bin + " "
                     });
 
                 

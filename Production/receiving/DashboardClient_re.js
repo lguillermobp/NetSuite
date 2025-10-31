@@ -458,7 +458,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                         sublistId: 'item',
                         fieldId: 'item'
                     });
-                    var requestvecd = itemReceipt.getCurrentSublistText({
+                    var requestvecd = itemReceipt.getCurrentSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_requestid'
                     });

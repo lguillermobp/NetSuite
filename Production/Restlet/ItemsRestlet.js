@@ -102,7 +102,11 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item_step": item_step,
                         "item_step_id": item_step_id,
                         "item_parent_id": Number(fresult1.getValue({name: "parent"})),
-                        "item_type": fresult1.getText({name: "type"})
+                        "item_type": fresult1.getText({name: "type"}),
+                        "item_cost": Number(fresult1.getValue({name: "averagecost"})),
+                        "item_last_poprice": Number(fresult1.getValue({name: "lastpurchaseprice"})),
+                        "item_vendor_price": Number(fresult1.getValue({name: "vendorcost"})),
+                        "item_vendor_currency": fresult1.getValue({name: "vendorpricecurrency"})
                     }
                     i++;
 
