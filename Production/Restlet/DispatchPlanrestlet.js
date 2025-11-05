@@ -38,6 +38,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 else if (option == "2") {
                     idsearch = "customsearch_dispatchplan_2";
                 }
+                else if (option == "Q") {
+                    idsearch = "customsearch_dispatchplan_qc";
+                }
                 else if (option == "U") {
                     idsearch = "customsearch_dispatchplan_upd";
                 }

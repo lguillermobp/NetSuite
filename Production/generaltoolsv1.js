@@ -787,6 +787,37 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
             return retvar;
         }
 
+    function get_request_sts (value){
+
+
+            var paramrec = r.load({
+                type: "customrecord_requeststatus",
+                id: value,
+                isDynamic: false,
+                defaultValues: null
+            });
+
+
+            if (paramrec)
+            {   var sts="Complated";
+                var records=1;
+            }
+            else
+            {
+                var sts="Error";
+                var records=0;
+            }
+            var retvar= {};
+
+            retvar = {
+                "sts": sts,
+                "date": "",
+                "records": records,
+                "data": paramrec
+            }
+            return retvar;
+        }
+
 
     function get_location_value (value){
 
@@ -2153,7 +2184,8 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
             get_items_listInventory: get_items_listInventory,
             get_PPDID: get_PPDID,
             calcenddate: calcenddate,
-            get_billbalance: get_billbalance
+            get_billbalance: get_billbalance,
+            get_request_sts: get_request_sts
         };
 
 

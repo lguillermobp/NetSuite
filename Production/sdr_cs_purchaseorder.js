@@ -7,6 +7,8 @@
 define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts/Modules/generaltoolsv1.js","N/email"], function(log, record, search, nDialog,runtime, GENERALTOOLS, email) {
     
     var sendemailok = false;
+    var linestoupdate=[];
+
     function pageInit(context) {
         // Code to execute when the page loads
         var currentRecord = context.currentRecord;
@@ -35,10 +37,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
     function fieldChanged(context) {
         // Code to execute when a field value changes
         var currentRecord = context.currentRecord;
-        var sublistId = context.sublistId
+        var sublistId = context.sublistId;
         var fieldId = context.fieldId;
-
+        var line = context.line;
         log.debug("fieldId", fieldId);
+        log.debug('sublistId', sublistId);
+        log.debug('line', line);
 
         var entityname= currentRecord.getValue({ fieldId: 'entityname'});
 
@@ -70,8 +74,51 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 sendemailok=true;
             }
                
-            
         }
+        if (sublistId === "item") 
+            {
+            
+  
+            if (fieldId==="custcol_tracking" || fieldId==="custcol_backorder"  )
+                {
+                    var custcol_requestid = currentRecord.getCurrentSublistValue({
+                        sublistId: sublistId,
+                        fieldId: "custcol_requestid"
+                    });
+                    var custcol_tracking = currentRecord.getCurrentSublistValue({
+                        sublistId: sublistId,
+                        fieldId: "custcol_tracking"
+                    });
+                    var custcol_backorder = currentRecord.getCurrentSublistValue({
+                        sublistId: sublistId,
+                        fieldId: "custcol_backorder"
+                    });
+                    log.debug("custcol_backorder", custcol_backorder);
+                    log.debug("custcol_requestid", custcol_requestid);
+                    log.debug("custcol_tracking", custcol_tracking);
+                    log.debug('validateLine');
+                    var lineuniquekey = currentRecord.getCurrentSublistValue({ sublistId: sublistId, fieldId: "lineuniquekey"}); 
+                    log.debug("lineuniquekey", lineuniquekey);
+
+                    var indexx = linestoupdate.map(function (img) { return img.lineuniquekey; }).indexOf(lineuniquekey);
+                    
+                    if (indexx==-1) 
+                        {
+                            linestoupdate.push({"custcol_requestid":custcol_requestid, "lineuniquekey":lineuniquekey,"mode":"edt", "custcol_tracking":custcol_tracking, "custcol_backorder":custcol_backorder});
+                        }
+                    else
+                        {   
+                            linestoupdate[indexx].custcol_requestid=custcol_requestid;
+                            linestoupdate[indexx].custcol_tracking=custcol_tracking;
+                            linestoupdate[indexx].custcol_backorder=custcol_backorder;
+                        }
+
+                    log.debug("linestoupdate", linestoupdate);
+
+                    
+                }
+ 
+            }
             
 
 }
@@ -80,111 +127,64 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var currentRecord = context.currentRecord;
         var sublistId = context.sublistId;
         var fieldId = context.fieldId;
-        var entity= currentRecord.getValue({ fieldId: 'entity'});
-        var entityname= currentRecord.getText({ fieldId: 'entity'});
-        var currancy= currentRecord.getValue({ fieldId: 'currency'});
-        log.debug('currentRecord', currentRecord);
-        console.log('currentRecord', currentRecord);
-        log.debug('entityname', entityname);
-        log.debug('entity', entity);
         
-        var line = context.line;
-        log.debug('sublistId', sublistId);
-        if (sublistId === "item") {
-            
-            var itemId = currentRecord.getCurrentSublistValue({
-                sublistId: sublistId,
-                fieldId: "item"
-            });
-          
-            var rate = currentRecord.getCurrentSublistValue({
-                sublistId: sublistId,
-                fieldId: "rate"
-            });
-            var vendorcode = currentRecord.getCurrentSublistValue({
-                sublistId: sublistId,
-                fieldId: "custcol_vendorcode"
-            });
-            log.debug('rate1', rate);
-            /*
-            if (itemId && rate) {
-                paramitem = GENERALTOOLS.get_Item_basic(itemId);
-                paramdata = paramitem.data;
-                
-                log.debug('paramdata', paramdata.recordtype);
-                typerecord=paramdata.recordtype;
-                log.debug('typerecord', typerecord);
-
-                try {
-                    var itemBodyFields = record.load({
-                    type: typerecord,
-                    id: itemId,
-                    isDynamic: true,
-                    defaultValues: null
-                });
-                    log.debug("itemId",itemId);
-                }
-                catch(err) {
-                    try {
-                    var itemBodyFields = record.load({
-                        type: "noninventoryitem",
-                        id: itemId,
-                        isDynamic: true,
-                        defaultValues: null
-                    });
-                        log.debug("itemId",itemId);
-                    }
-                    catch(err) {
-                       
-                            log.debug("itemId",itemId);
-                        }
-
-                    }
-                try {
-                var lineNumber = itemBodyFields.findSublistLineWithValue({
-                    sublistId: 'itemvendor',
-                    fieldId: 'vendor_display',
-                    value: entityname
-                });
-                errorv="F";
-                } catch (err) {errorv="V";}
-            if (errorv!="V") {
-                var lineCount = itemBodyFields.getLineCount({
-                    sublistId: 'itemvendor'
-                });
-                log.debug('lineCount', lineCount);
-
-                log.debug("lineNumber", lineNumber);
-
-
-                if (lineNumber == -1) {
-
-                // if (lineNumber != -1) {
-                //     itemBodyFields.removeLine({sublistId: "itemvendor", line: lineNumber});
-                    
-                // }
-                    log.debug("entity", entity);
-                    itemBodyFields.selectNewLine({sublistId: "itemvendor"});
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "preferredvendor", value: true});
-
-                    if (vendorcode) {
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendorcode", value: vendorcode});
-                    }
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "purchaseprice", value: rate});
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendorcurrencyid", value: currancy});
-                    itemBodyFields.setCurrentSublistValue({sublistId: "itemvendor", fieldId: "vendor", value: entity});
-                    itemBodyFields.commitLine({sublistId: "itemvendor"});
-                    itemBodyFields.save({enableSourcing: true});
-                }
-            }
-            
-        }
-           */
-       }
+      
+        
 
     }
 
-    function saveRecord(context) {
+    function validateLine(context) {
+        // Code to execute when a line is being validated
+        
+        var currentRecord = context.currentRecord;
+        var sublistId = context.sublistId;
+        var fieldId = context.fieldId;
+        var fieldId = context.fieldId;
+       
+      
+        return true;
+    }
+
+    function validateDelete(context) {
+        // Code to execute when a line is being deleted
+        var currentRecord = context.currentRecord;
+        var sublistId = context.sublistId;
+        var fieldId = context.fieldId;
+        log.debug("fieldIdl", fieldId);
+        log.debug("sublistIdl", sublistId);
+        var custcol_requestid = currentRecord.getCurrentSublistValue({
+                    sublistId: sublistId,
+                    fieldId: "custcol_requestid"
+                });
+                log.debug("custcol_requestid", custcol_requestid);
+
+        if (custcol_requestid)
+            {
+                var custcol_trackingnumber = currentRecord.getCurrentSublistValue({
+                    sublistId: sublistId,
+                    fieldId: "custcol_trackingnumber"
+                });
+                var custcol_backorder = currentRecord.getCurrentSublistValue({
+                    sublistId: sublistId,
+                    fieldId: "custcol_backorder"
+                });
+                log.debug("custcol_backorder", custcol_backorder);
+                log.debug("custcol_requestid", custcol_requestid);
+                log.debug("custcol_trackingnumber", custcol_trackingnumber);
+                log.debug('validateLine');
+                var lineuniquekey = currentRecord.getCurrentSublistValue({ sublistId: sublistId, fieldId: "lineuniquekey"}); 
+                log.debug("lineuniquekey", lineuniquekey);
+                linestoupdate.push({"custcol_requestid":custcol_requestid, "lineuniquekey":lineuniquekey,"mode":"del", "custcol_trackingnumber":custcol_trackingnumber, "custcol_backorder":custcol_backorder});
+            }
+            
+ 
+
+        return true;
+
+    }
+
+    function saveRecord(context) 
+    {
 
         // Code to execute when the record is saved
         var currentRecord = context.currentRecord;
@@ -196,39 +196,155 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var emailvendor = vendorRecord.getValue({ fieldId: 'email' });
         var sendEmail = vendorRecord.getValue({ fieldId: 'custentity_sendemail' });
 
-        log.debug("sendEmail", sendEmail);
-        log.debug("sendemailok", sendemailok);
-        log.debug("internalid", internalid);
-        log.debug("recordTypeId", recordTypeId);
+        var userObj = currentRecord.getValue({ fieldId: 'employee' });
+        log.debug('createdFrom', userObj);
 
-
-        if (sendEmail && sendemailok) {
+        var paramemp = GENERALTOOLS.get_employee_value(userObj);
+        var VIEWECDUSERID=paramemp.data.getValue({fieldId: "custentity_viewecduserid"});
         
-        // Send email to vendor
-        var subject = "Purchase Order";
-        var body = "Here is our Purchase Order";
-        var userObj = runtime.getCurrentUser();
-        var userID = userObj.id;
 
-        email.send({
-            author: userID, // ID of the user sending the email
-            recipients: vendorid, // ID of the vendor
-            subject: subject,
-            body: body,
-            relatedRecords : {
-                transactionId : internalid
+        if (sendEmail && sendemailok) 
+            {
+        
+            // Send email to vendor
+            var subject = "Purchase Order";
+            var body = "Here is our Purchase Order";
+            var userObj = runtime.getCurrentUser();
+            var userID = userObj.id;
+
+            email.send({
+                author: userID, // ID of the user sending the email
+                recipients: vendorid, // ID of the vendor
+                subject: subject,
+                body: body,
+                relatedRecords : {
+                    transactionId : internalid
+                }
+            });
+
             }
-        });
+        log.debug("linestoupdate", linestoupdate);
+       
+        if (linestoupdate && linestoupdate.length) 
+            {
 
-        }
+                for (var i = 0; i < linestoupdate.length; i++) {
+                    try {
+                        chanageviewecd(linestoupdate[i], VIEWECDUSERID);
+                    } catch (e) {
+                        log.error({
+                            title: 'chanageviewecd error index ' + i,
+                            details: e.toString()
+                        });
+                    }
+                }
+
+            }
+
+
         return true;
     }
+    function chanageviewecd(linestoupdate,VIEWECDUSERID) 
+    {
+        var custcol_backorder= linestoupdate.custcol_backorder;
+        var custcol_requestid= linestoupdate.custcol_requestid;
+        var custcol_tracking= linestoupdate.custcol_tracking;
+        var mode= linestoupdate.mode;
 
+        
+
+        if (custcol_requestid!=null && custcol_requestid!="")
+        {
+
+            try {
+                var lookupResult = search.lookupFields({
+                    type: "customrecord_requestrecords",
+                    id: custcol_requestid,
+                    columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable','custrecord_requeststs'] // Example with a joined field
+                });
+
+                var custrecord_sts_preview = lookupResult.custrecord_sts_preview;
+                var custrecord_requeststscod = lookupResult.custrecord_requeststscod;
+                var custrecord_requeststs = lookupResult.custrecord_requeststs;
+                var oldsts= custrecord_sts_preview[0].value;
+
+                var datanewstscod= GENERALTOOLS.get_request_sts(oldsts);
+                var oldstscod= datanewstscod.data.getValue({fieldId: "custrecord_rqsts_code"});
+                var oldstsdesc= datanewstscod.data.getValue({fieldId: "custrecord_rqsts_description"});
+
+                var newsts=custrecord_requeststscod[0].value;
+                var datanewstscod= GENERALTOOLS.get_request_sts(newsts);
+
+                var newstscod= datanewstscod.data.getValue({fieldId: "custrecord_rqsts_code"});
+                var newstsdesc= custrecord_requeststs;
+
+                var viewecdid = lookupResult.custrecord_viewecdid;
+                var custrecord_rq_pickable = lookupResult.custrecord_rq_pickable;
+
+                log.debug('lookupResult', lookupResult);
+                log.debug('Transaction ID', custrecord_sts_preview);
+
+            } catch (e) {
+                log.error('Error in lookupFields', e.toString());
+                return null;
+            }
+
+            if (mode=="del" )
+            {
+                var temporvar=newsts;
+                newsts=oldsts;
+                oldsts=temporvar;
+
+                temporvar=newstscod;
+                newstscod=oldstscod;
+                oldstscod=temporvar;
+
+                newstsdesc=oldstsdesc;
+
+            }
+            log.audit("custcol_tracking", custcol_tracking);
+            log.audit("custcol_backorder", custcol_backorder);
+            log.audit("newsts", newsts);
+            log.audit("oldsts", oldsts);
+            log.audit("newstscod", newstscod);
+            log.audit("newstsdesc", newstsdesc);
+            record.submitFields({
+                type: "customrecord_requestrecords",
+                id: custcol_requestid,
+                values: {
+                    "custrecord_po_tracking": custcol_tracking,
+                    "custrecord_bo_vendor": custcol_backorder,
+                    "custrecord_requeststscod": newsts,
+                    "custrecord_sts_preview": oldsts,
+                    "custrecord_requeststs": newstsdesc
+                }
+            })
+            var opt="SET";
+            datasending= {
+                    "po": 0,
+                    "po_tracking": custcol_tracking + ' ',
+                    "bo_vendor": custcol_backorder,
+                    "pickable": custrecord_rq_pickable,
+                    "viewecduserid": VIEWECDUSERID,
+                    "status": newstscod,
+                    "notes": newstsdesc,
+                    "oldstatus": oldstscod,
+                    "request_id" : viewecdid
+                }
+                const jsonString = JSON.stringify(datasending);
+                log.debug("jsonString",jsonString);
+                dataall= GENERALTOOLS.postViewECD_request_api(viewecdid, opt, jsonString)
+
+        }
+    }
     return {
         pageInit: pageInit,
         fieldChanged: fieldChanged,
         sublistChanged: sublistChanged,
+        //validateLine: validateLine,
+        validateDelete: validateDelete,
         printrn: printrn,
-        saveRecord: saveRecord
+        saveRecord: saveRecord,
+        chanageviewecd: chanageviewecd
     };
 });
