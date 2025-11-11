@@ -101,32 +101,34 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                             }
                         }
 
-                        record.submitFields({
-                            type: "customrecord_requestrecords",
-                            id: custcol_requestid,
-                            values: {
-                                "custrecord_rq_pickable": pickable,
-                                "custrecord_requeststscod": newsts,
-                                "custrecord_sts_preview": custrecord_requeststscod,
-                                "custrecord_requeststs": newstsedsc
-                            }
-                        })
-                        var opt="SET";
-                        datasending= {
-                                "po": 0,
-                                "pickable": pickable,
-                                "po_tracking": "",
-                                "bo_vendor": "",
-                                "viewecduserid": VIEWECDUSERID,
-                                "status": newstscod,
-                                "notes": newstsedsc,
-                                "oldstatus": custrecord_requeststscod,
-                                "request_id" : viewecdid
-                            }
+                        if (context.type=="create"  || context.type=="delete" )
+                        {
+                            record.submitFields({
+                                type: "customrecord_requestrecords",
+                                id: custcol_requestid,
+                                values: {
+                                    "custrecord_rq_pickable": pickable,
+                                    "custrecord_requeststscod": newsts,
+                                    "custrecord_sts_preview": custrecord_requeststscod,
+                                    "custrecord_requeststs": newstsedsc
+                                }
+                            })
+                            var opt="SET";
+                            datasending= {
+                                    "po": 0,
+                                    "pickable": pickable,
+                                    "po_tracking": "",
+                                    "bo_vendor": "",
+                                    "viewecduserid": VIEWECDUSERID,
+                                    "status": newstscod,
+                                    "notes": newstsedsc,
+                                    "oldstatus": custrecord_requeststscod,
+                                    "request_id" : viewecdid
+                                }
                             const jsonString = JSON.stringify(datasending);
                             log.debug("jsonString",jsonString);
                             dataall= GENERALTOOLS.postViewECD_request_api(viewecdid, opt, jsonString)
-
+                        }
                     }
 
 
