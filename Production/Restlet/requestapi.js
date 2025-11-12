@@ -180,7 +180,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.customer_id_replaced
                 });
             }
-            if (contextjson.wo_id!="") {
+            if (contextjson.wo_id!="" && contextjson.wo_id!=0) {
                 rec.setValue({
                     fieldId: 'custrecord_wo',
                     value: contextjson.wo_id
@@ -304,7 +304,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     value: contextjson.reason_rejection
                 });
             }
-            if (contextjson.wo_id!="") {
+            if (contextjson.wo_id!="" && contextjson.wo_id!=0) {
                 rec.setValue({
                     fieldId: 'custrecord_wo',
                     value: contextjson.wo_id

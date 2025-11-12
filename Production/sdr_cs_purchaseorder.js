@@ -40,9 +40,6 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var sublistId = context.sublistId;
         var fieldId = context.fieldId;
         var line = context.line;
-        log.debug("fieldId", fieldId);
-        log.debug('sublistId', sublistId);
-        log.debug('line', line);
 
         var entityname= currentRecord.getValue({ fieldId: 'entityname'});
 
@@ -93,12 +90,9 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                         sublistId: sublistId,
                         fieldId: "custcol_backorder"
                     });
-                    log.debug("custcol_backorder", custcol_backorder);
-                    log.debug("custcol_requestid", custcol_requestid);
-                    log.debug("custcol_tracking", custcol_tracking);
-                    log.debug('validateLine');
+                  
                     var lineuniquekey = currentRecord.getCurrentSublistValue({ sublistId: sublistId, fieldId: "lineuniquekey"}); 
-                    log.debug("lineuniquekey", lineuniquekey);
+  
 
                     var indexx = linestoupdate.map(function (img) { return img.lineuniquekey; }).indexOf(lineuniquekey);
                     
@@ -112,9 +106,6 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                             linestoupdate[indexx].custcol_tracking=custcol_tracking;
                             linestoupdate[indexx].custcol_backorder=custcol_backorder;
                         }
-
-                    log.debug("linestoupdate", linestoupdate);
-
                     
                 }
  
@@ -150,8 +141,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var currentRecord = context.currentRecord;
         var sublistId = context.sublistId;
         var fieldId = context.fieldId;
-        log.debug("fieldIdl", fieldId);
-        log.debug("sublistIdl", sublistId);
+
         var custcol_requestid = currentRecord.getCurrentSublistValue({
                     sublistId: sublistId,
                     fieldId: "custcol_requestid"
@@ -160,21 +150,18 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
 
         if (custcol_requestid)
             {
-                var custcol_trackingnumber = currentRecord.getCurrentSublistValue({
+                var custcol_tracking = currentRecord.getCurrentSublistValue({
                     sublistId: sublistId,
-                    fieldId: "custcol_trackingnumber"
+                    fieldId: "custcol_tracking"
                 });
                 var custcol_backorder = currentRecord.getCurrentSublistValue({
                     sublistId: sublistId,
                     fieldId: "custcol_backorder"
                 });
-                log.debug("custcol_backorder", custcol_backorder);
-                log.debug("custcol_requestid", custcol_requestid);
-                log.debug("custcol_trackingnumber", custcol_trackingnumber);
-                log.debug('validateLine');
+
                 var lineuniquekey = currentRecord.getCurrentSublistValue({ sublistId: sublistId, fieldId: "lineuniquekey"}); 
-                log.debug("lineuniquekey", lineuniquekey);
-                linestoupdate.push({"custcol_requestid":custcol_requestid, "lineuniquekey":lineuniquekey,"mode":"del", "custcol_trackingnumber":custcol_trackingnumber, "custcol_backorder":custcol_backorder});
+
+                linestoupdate.push({"custcol_requestid":custcol_requestid, "lineuniquekey":lineuniquekey,"mode":"del", "custcol_tracking":custcol_tracking, "custcol_backorder":custcol_backorder});
             }
             
  
@@ -281,9 +268,6 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 var viewecdid = lookupResult.custrecord_viewecdid;
                 var custrecord_rq_pickable = lookupResult.custrecord_rq_pickable;
 
-                log.debug('lookupResult', lookupResult);
-                log.debug('Transaction ID', custrecord_sts_preview);
-
             } catch (e) {
                 log.error('Error in lookupFields', e.toString());
                 return null;
@@ -302,12 +286,7 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 newstsdesc=oldstsdesc;
 
             }
-            log.audit("custcol_tracking", custcol_tracking);
-            log.audit("custcol_backorder", custcol_backorder);
-            log.audit("newsts", newsts);
-            log.audit("oldsts", oldsts);
-            log.audit("newstscod", newstscod);
-            log.audit("newstsdesc", newstsdesc);
+
             record.submitFields({
                 type: "customrecord_requestrecords",
                 id: custcol_requestid,
