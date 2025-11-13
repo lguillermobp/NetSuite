@@ -2152,11 +2152,40 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
 
             return response;
         }
+        function postViewECD_item_api(id, opt,datasending) {
+
+            var headerObj = {
+                    "Content-Type": "application/json",
+                    "as-api-key": "asat_10477bd142bc4e678e169f9897d2eef1"
+                };
+
+            const bodyObj = JSON.stringify({
+                "data": 
+                    {
+                        "item_id": id,
+                        "opt": opt,
+                        "datasending": datasending
+                    },
+                "send_notification": true
+            });
+
+
+            var response = https.post({
+                url: "https://ecdsystem.pythonanywhere.com/api/item/" + id + "/" + opt + "/Sending in body/",
+                body: bodyObj,
+                headers: headerObj
+            });
+            log.debug("bodyObj",  bodyObj);
+            log.debug("response",  response);
+
+            return response;
+        }
 
         return {
             findassembly: findassembly,
             postViewECD: postViewECD,
             postViewECD_request_api: postViewECD_request_api,
+            postViewECD_item_api: postViewECD_item_api,
             delassembly: delassembly,
             set_Balance: set_Balance,
             getScheduleParams: getScheduleParams,

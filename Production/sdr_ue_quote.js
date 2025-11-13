@@ -92,9 +92,6 @@ define(['N/record','N/log','N/ui/serverWidget', "/SuiteScripts/Modules/generalto
 
                 parambal = GENERALTOOLS.set_Balance(id,newamount,oldamount);
             }
-
-            
-
        
     }
     
