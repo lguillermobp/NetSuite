@@ -283,6 +283,14 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 srequestecd.updateDisplayType({
                     displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
+                let srequestecdt =sublistpm.addField({
+                    id: "custrecordml_requestvecdt",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Request ViewECD'
+                });
+                srequestecdt.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.DISABLED
+                });
 
                 let itemidf =sublistpm.addField({
                     id: "custrecordml_itemid",
@@ -427,6 +435,11 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                         line: counter,
                         value: Number(result1.requestvecd)
                     });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_requestvecdt',
+                        line: counter,
+                        value: result1.requestvecdt+" "
+                    });
                                       
 
                      if (binloc!="ERROR" && binloc!="No use Bin") {
@@ -512,6 +525,11 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 fieldId: 'custcol_requestid',
                 line: i
             });
+            var requestvecdt = itemReceipt.getSublistText({
+                sublistId: 'item',
+                fieldId: 'custcol_requestid',
+                line: i
+            });
             var item = itemReceipt.getSublistValue({
                 sublistId: 'item',
                 fieldId: 'itemname',
@@ -563,6 +581,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                 "item": item,
                 "itemv": vendorcode,
                 "requestvecd": requestvecd,
+                "requestvecdt": requestvecdt,
                 "project": project,
                 "lineid": lineid,
                 "itemid": itemid,
