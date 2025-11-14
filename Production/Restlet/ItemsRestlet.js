@@ -88,7 +88,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     }
                     
                     dataf[i] = {
-                        "bin_id": 0,
+                        "bin_id": Number(fresult1.getValue({name: "internalid", join: "binNumber"})),
                         "item_id": Number(fresult1.getValue({name: "internalid"})),
                         "item_name": fresult1.getValue({name: "itemid"}),
                         "item_description": fresult1.getValue({name: "salesdescription"}),

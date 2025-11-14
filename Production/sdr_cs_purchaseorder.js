@@ -247,13 +247,17 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 var lookupResult = search.lookupFields({
                     type: "customrecord_requestrecords",
                     id: custcol_requestid,
-                    columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable','custrecord_requeststs'] // Example with a joined field
+                    columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable','custrecord_requeststs','custrecord_po'] // Example with a joined field
                 });
 
                 var custrecord_sts_preview = lookupResult.custrecord_sts_preview;
+                var po_data = lookupResult.custrecord_po;
                 var custrecord_requeststscod = lookupResult.custrecord_requeststscod;
                 var custrecord_requeststs = lookupResult.custrecord_requeststs;
                 var oldsts= custrecord_sts_preview[0].value;
+                var po_data = lookupResult.custrecord_po;
+                var po_id= Number(po_data[0].value);
+                var po_idn= po_id;
 
                 var datanewstscod= GENERALTOOLS.get_request_sts(oldsts);
                 var oldstscod= datanewstscod.data.getValue({fieldId: "custrecord_rqsts_code"});
@@ -278,7 +282,8 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                 var temporvar=newsts;
                 newsts=oldsts;
                 oldsts=temporvar;
-
+                po_id=-1;
+                po_idn=0;
                 temporvar=newstscod;
                 newstscod=oldstscod;
                 oldstscod=temporvar;
@@ -295,12 +300,13 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
                     "custrecord_bo_vendor": custcol_backorder,
                     "custrecord_requeststscod": newsts,
                     "custrecord_sts_preview": oldsts,
-                    "custrecord_requeststs": newstsdesc
+                    "custrecord_requeststs": newstsdesc,
+                    "custrecord_po": po_id
                 }
             })
             var opt="SET";
             datasending= {
-                    "po": 0,
+                    "po": po_idn,
                     "po_tracking": custcol_tracking + ' ',
                     "bo_vendor": custcol_backorder,
                     "pickable": custrecord_rq_pickable,
