@@ -277,7 +277,7 @@ define([ 'N/url',"N/runtime",'N/redirect',"N/runtime","N/ui/serverWidget", "N/re
                
                 let srequestecd =sublistpm.addField({
                     id: "custrecordml_requestvecd",
-                    type: serverWidget.FieldType.INTEGER,
+                    type: serverWidget.FieldType.FLOAT,
                     label:'Request ViewECD'
                 });
                 srequestecd.updateDisplayType({
