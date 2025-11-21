@@ -138,6 +138,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                     custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
                     custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
 
+                    vstartdate= new Date(custrecord_blockdate);
+                    var y = vstartdate.getFullYear();
+                    var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
+                    var d = ('0'+(vstartdate.getDate())).slice(-2)
+                    custrecord_blockdate = m + "/" + d + "/" + y;
+
                 if (custrecord_recurrent) 
                     {
                         custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);
@@ -202,11 +208,12 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime"], function(log,
                 });
                 
             });
+            log.audit("ecdholydays: " , ecdholydays);
             const td = new Date();
             var newstartdate=new Date(td);
             newstartdate.setDate(td.getDate()-200);
     
-            for (i=1;i<400;i++)
+            for (i=1;i<600;i++)
             {
                 newstartdate.setDate(newstartdate.getDate()+1);
                 if (newstartdate.getDay() == 0) {i--;continue;}

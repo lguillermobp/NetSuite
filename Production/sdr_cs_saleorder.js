@@ -808,6 +808,12 @@ define(['N/search','N/runtime','N/currentRecord','N/log',"N/record","N/ui/dialog
                 custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" }); 
                 custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
 
+                vstartdate= new Date(custrecord_blockdate);
+                var y = vstartdate.getFullYear();
+                var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
+                var d = ('0'+(vstartdate.getDate())).slice(-2)
+                custrecord_blockdate = m + "/" + d + "/" + y;
+
                 if (custrecord_recurrent) 
                     {
                         custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);
@@ -886,7 +892,7 @@ define(['N/search','N/runtime','N/currentRecord','N/log',"N/record","N/ui/dialog
         newstartdate.setDate(td.getDate()-250);
         log.debug("newstartdate",newstartdate);
 
-        for (i=1;i<500;i++)
+        for (i=1;i<600;i++)
         {
             newstartdate.setDate(newstartdate.getDate()+1);
             if (newstartdate.getDay() == 0) {i--;continue;}
@@ -961,124 +967,7 @@ define(['N/search','N/runtime','N/currentRecord','N/log',"N/record","N/ui/dialog
         newenddate=new Date(ecddays[initial+duration-1]);
 
 
-        function pecddays() {
 
-            var ecdholydays=[];
-        
-            var fsearch = s.create({
-                type: "customrecord_blocksofdays",
-                columns:
-                [
-                   "internalid",
-                   s.createColumn({
-                      name: "custrecord_blockdate",
-                      sort: s.Sort.ASC
-                   }),
-                   "custrecord_blockno",
-                   "name",
-                   "custrecord_sequence",
-                   "custrecord_recurrent"
-                ]
-            });
-    
-    
-            var pagedData = fsearch.runPaged({
-                "pageSize" : 1000
-            });
-            var i=1;
-            pagedData.pageRanges.forEach(function (pageRange) {
-                var page = pagedData.fetch({index: pageRange.index});
-                page.data.forEach(function (fresult1) {
-    
-                    custrecord_sequence = fresult1.getValue({ name: "custrecord_sequence" });
-                    custrecord_blockdate = fresult1.getValue({ name: "custrecord_blockdate" });
-                    custrecord_recurrent = fresult1.getValue({ name: "custrecord_recurrent" });
-
-                if (custrecord_recurrent) 
-                    {
-                        custrecord_blockdate=getMonday(custrecord_blockdate,custrecord_recurrent);
-                        vstartdate= new Date(custrecord_blockdate);
-                        var y = vstartdate.getFullYear();
-                        var m = ('0'+(vstartdate.getMonth()+1)).slice(-2)
-                        var d = ('0'+(vstartdate.getDate())).slice(-2)
-                        custrecord_blockdate = m + "/" + d + "/" + y;
-                    }
-                
-                function getMonday(d,tc) 
-                {
-                    //return d;
-                    log.debug("d",d);
-                    log.debug("tc",tc);
-                    const today = new Date();
-                    var montha = today.getMonth() + 1;
-                    const myArray = d.split("/");
-                    
-                    if ((myArray[0]-montha)<-3) {yeara=today.getFullYear()+1;}
-                    else                        {yeara=today.getFullYear();}
-                    log.debug("(myArray[0]-montha",(myArray[0]-montha));
-                    mes = [31,28,31,30,31,30,31,31,30,31,30,31]
-
-                    if (tc==1) 
-                    {
-                    d = myArray[0]+"-01-"+yeara;
-                    d = new Date(d);
-                    var day = d.getDay();
-                    
-                    diff = d.getDate()  +  (day <= 1 ? (1 - day) :  (8 - day)); // adjust when day is sunday
-                    }
-                    if (tc==2) 
-                    {
-                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
-                    d = new Date(d);
-                    var day = (d.getDay() == 0 ? 7 : d.getDay());
-                    
-                    diff = d.getDate()  +  (1 - day); // adjust when day is sunday
-                    }
-                    if (tc==3)
-                    {
-                    d = myArray[0]+"-"+mes[myArray[0]-1]+"-"+yeara;
-                    d = new Date(d);
-                    var day = (d.getDay() < 4 ? 7 + d.getDay(): d.getDay());
-                    
-                    diff = d.getDate()  +  (4 - day); // adjust when day is sunday
-                    }
-                    if (tc==4)
-                        {
-                        d = myArray[0]+"-"+myArray[1]+"-"+yeara;
-                        d = new Date(d);
-                        diff = d.getDate(); // adjust when day is sunday
-                        }
-
-                    return new Date(d.setDate(diff));
-                    
-                }       
-    
-                    ecdholydays[i]=custrecord_blockdate;
-                    i++;
-                    
-                });
-                
-            });
-            const td = new Date();
-            var newstartdate=new Date(td);
-            newstartdate.setDate(td.getDate()-200);
-    
-            for (i=1;i<400;i++)
-            {
-                newstartdate.setDate(newstartdate.getDate()+1);
-                if (newstartdate.getDay() == 0) {i--;continue;}
-                if (newstartdate.getDay() == 6) {i--;continue;}
-    
-                var y = newstartdate.getFullYear();
-                var m = ('0'+(newstartdate.getMonth()+1)).slice(-2)
-                var d = ('0'+(newstartdate.getDate())).slice(-2)
-                datetofind = m + "/" + d + "/" + y;
-                initial = parseInt(ecdholydays.indexOf(datetofind));
-                if (initial!=-1)      {log.debug("holydays",datetofind);i--;continue;}
-                ecddays[i]=datetofind;
-            }
-            
-        }
 
 
         return newenddate;
