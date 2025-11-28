@@ -82,7 +82,8 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
                         if (context.type=="create" )
                         {
-                            if (custrecord_rq_pickable=='Y') {pickable='D';} else {pickable=custrecord_rq_pickable;}
+                           // if (custrecord_rq_pickable=='Y') {pickable='D';} else {pickable=custrecord_rq_pickable;}
+                            pickable='D';
 
                             if (custrecord_requeststscod=="4" ) {newsts="11"; newstscod="60"; newstsedsc="PO Received Item Picked to Vehicle";}
                             else {
