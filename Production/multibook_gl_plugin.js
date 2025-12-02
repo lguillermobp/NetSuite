@@ -204,4 +204,52 @@ function customizeGlImpact(transactionRecord, standardLines, customLines, book)
 
                 }
    }
+
+        if(recordType == 'vendorcredit'){
+            var memo = transactionRecord.getFieldValue('memo');
+            var name = parseInt(transactionRecord.getFieldValue('createdfrom'));
+            var nametext = transactionRecord.getFieldText('createdfrom');
+
+            for (var i = 0; i < standardLines.getCount(); i++) {
+                nlapiLogExecution("DEBUG", "i",i);
+                var line = standardLines.getLine(i);
+
+
+                 // Example condition: reclass lines from account 5678
+                if (line.getAccountId() == 121) {
+                    var memod = line.getMemo();
+                    var entity = line.getEntityId();
+                    // 1. Reverse the original line impact
+                    var reversalLine = customLines.addNewLine();
+                    reversalLine.setAccountId(line.getAccountId());
+                    reversalLine.setMemo(memod);
+                    reversalLine.setEntityId(entity);
+                    if (line.getCreditAmount() > 0) {
+                        reversalLine.setDebitAmount(line.getCreditAmount());
+                    } else {
+                        reversalLine.setCreditAmount(line.getDebitAmount());
+                    }
+                    // Copy other relevant dimensions (department, class, location, etc.)
+                    reversalLine.setDepartmentId(line.getDepartmentId());
+                    // ... other fields
+
+                    // 2. Create a new line with the desired account
+                    var newLine = customLines.addNewLine();
+                    newLine.setAccountId(931); // Set the new account ID
+                    if (line.getCreditAmount() > 0) {
+                        newLine.setCreditAmount(line.getCreditAmount());
+                    } else {
+                        newLine.setDebitAmount(line.getDebitAmount());
+                    }
+                    // Copy other relevant dimensions
+                    newLine.setDepartmentId(line.getDepartmentId());
+                    newLine.setMemo(memod);
+                    newLine.setEntityId(entity);
+                    // ... other fields
+
+                }
+
+            }
+     
+   }
 }

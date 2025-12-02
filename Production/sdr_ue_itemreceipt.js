@@ -60,9 +60,11 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
             const itemLineCount = currentRecord.getLineCount({ sublistId: "item" });
             log.debug("itemLineCount", itemLineCount);
 
-            var userObj = currentRecord.getValue({ fieldId: 'employee' });
+            var userObj = currentRecord.getValue({ fieldId: 'nluser' });
             log.debug('createdFrom', userObj);
-
+            if (userObj == null || userObj == '' || userObj == undefined) {
+                userObj = 839;
+            }
             var paramemp = GENERALTOOLS.get_employee_value(userObj);
             var VIEWECDUSERID=paramemp.data.getValue({fieldId: "custentity_viewecduserid"});
 
@@ -91,6 +93,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                     {
                         log.debug("item line " + i, itemId);
                         log.debug("item line " + i, itemId);
+
                         const custcol_requestid = currentRecord.getSublistValue({
                             sublistId: "item",
                             fieldId: "custcol_requestid",
@@ -125,7 +128,15 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
                                 if (context.type=="create" )
                                 {
-                                    if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
+                                    var paramitem = GENERALTOOLS.get_Item_basic(itemId);
+                                    var recordType= paramitem.data.getValue({fieldId: "recordType"});
+                                    if (recordType=='inventoryitem' )   {
+                                        if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
+                                        }
+                                        else {pickable='N';}
+
+                                    log.debug('itemtype', itemtype);
+                                    
                                     if (custrecord_requeststscod=="7") {newsts="10"; newstscod="51", newstsedsc="Item Received/Return to WH Stock";}
                                     else {newsts="9"; newstscod="50", newstsedsc="Item Received";}
                                 }
