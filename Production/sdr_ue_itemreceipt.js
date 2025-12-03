@@ -129,13 +129,16 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                 if (context.type=="create" )
                                 {
                                     var paramitem = GENERALTOOLS.get_Item_basic(itemId);
-                                    var recordType= paramitem.data.getValue({fieldId: "recordType"});
+                                    log.audit("paramitem", paramitem);
+
+                                    var recordType= paramitem.data.type[0].text;
+                                    log.debug("recordType", recordType);
                                     if (recordType=='inventoryitem' )   {
                                         if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
                                         }
                                         else {pickable='N';}
 
-                                    log.debug('itemtype', itemtype);
+
                                     
                                     if (custrecord_requeststscod=="7") {newsts="10"; newstscod="51", newstsedsc="Item Received/Return to WH Stock";}
                                     else {newsts="9"; newstscod="50", newstsedsc="Item Received";}
