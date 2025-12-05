@@ -49,7 +49,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "email": fresult1.getValue({name: "email"}),
                         "address": fresult1.getText({name: "address"}),
                         "ecd_balance": Number(fresult1.getValue({name: "custentity_ecd_balance"})),
-                        "ecd_amountpaid": Number(fresult1.getValue({name: "custentity_ecd_amountpaid"}))
+                        "ecd_amountpaid": Number(fresult1.getValue({name: "custentity_ecd_amountpaid"})),
+                        "category": fresult1.getText({name: "category"})
                     }
                     i++;
 
