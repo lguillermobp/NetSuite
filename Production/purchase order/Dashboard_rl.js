@@ -903,6 +903,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.internalid
                     });
+                    log.debug('result1', result1);
                     sublistpmnov.setSublistValue({
                         id: 'custrecordml_itemid',
                         line: counter,
