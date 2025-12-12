@@ -21,7 +21,7 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
             const recType = newRecord.type;
 
             const relatedWo = newRecord.getValue('custbody_mo');
-            const location = newRecord.getValue('location');
+            const location = newRecord.getValue('transferlocation');
 
             log.debug('AfterSubmit Triggered', {
                 recordType: recType,
@@ -50,14 +50,14 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
 
             // Load Work Order for SO reference
             const woRec = record.load({ type: 'workorder', id: relatedWo });
-            const soId = woRec.getValue('createdfrom');
+            const woId = relatedWo;
 
-            if (!soId) {
+            if (!woId) {
                 log.error('Missing SO', `WO ${relatedWo} does not have "Created From" value.`);
                 return;
             }
 
-            const allocationData = transformItemData(itemDataMap, soId, location);
+            const allocationData = transformItemData(itemDataMap, woId, location);
             log.debug('Final Allocation Data', allocationData);
 
             // Run allocation per item
@@ -96,9 +96,9 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
         return itemData;
     }
 
-    function transformItemData(itemDataMap, soId, location) {
+    function transformItemData(itemDataMap, woId, location) {
         return Object.keys(itemDataMap).map(key => ({
-            soId: soId,
+            woId: woId,
             item: itemDataMap[key].itemId,
             location: location,
             quantity: itemDataMap[key].quantity
@@ -107,21 +107,15 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
 
     function runAllocationProcess(itemData, qtyToAllocate) {
         try {
-            log.debug('runAllocationProcess', {
-                soId: itemData.soId,
-                itemId: itemData.item,
-                location: itemData.location,
-                qtyToAllocate: qtyToAllocate
-            });
 
             const realloc = record.create({ type: 'reallocateitem', isDynamic: true });
             realloc.setValue('item', itemData.item);
             realloc.setValue('location', itemData.location);
 
-            const uncommitted = uncommitFromOldestSalesOrders(realloc, itemData.soId, qtyToAllocate);
-            log.debug('Uncommitted Total', uncommitted);
+            //const uncommitted = uncommitFromOldestSalesOrders(realloc, itemData.woId, qtyToAllocate);
+            const uncommitted = qtyToAllocate;
 
-            commitToCurrentSalesOrder(realloc, itemData.soId, uncommitted, qtyToAllocate);
+            commitToCurrentSalesOrder(realloc, itemData.woId, uncommitted, qtyToAllocate);
 
             return Math.max(0, qtyToAllocate - uncommitted);
 
@@ -131,7 +125,7 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
         }
     }
 
-    function uncommitFromOldestSalesOrders(realloc, currentSoId, qtyToAllocate) {
+    function uncommitFromOldestSalesOrders(realloc, currentwoId, qtyToAllocate) {
         let total = 0;
         const sublistId = 'order';
         const count = realloc.getLineCount({ sublistId });
@@ -139,10 +133,10 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
         for (let i = 0; i < count && total < qtyToAllocate; i++) {
             realloc.selectLine({ sublistId, line: i });
 
-            const soId = realloc.getCurrentSublistValue({ sublistId, fieldId: 'orderid' });
+            const woId = realloc.getCurrentSublistValue({ sublistId, fieldId: 'orderid' });
             const committed = realloc.getCurrentSublistValue({ sublistId, fieldId: 'quantitycommitted' });
 
-            if (!committed || soId === currentSoId) continue;
+            if (!committed || woId === currentwoId) continue;
 
             const uncommitQty = Math.min(qtyToAllocate - total, committed);
 
@@ -156,7 +150,7 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
         return total;
     }
 
-    function commitToCurrentSalesOrder(realloc, soId, uncommittedQty, qtyToAllocate) {
+    function commitToCurrentSalesOrder(realloc, woId, uncommittedQty, qtyToAllocate) {
         if (uncommittedQty <= 0) return;
 
         const sublistId = 'order';
@@ -165,14 +159,19 @@ define(['N/record', 'N/runtime', 'N/ui/serverWidget'], (record, runtime, serverW
 
         for (let i = 0; i < count && remainingCommit > 0; i++) {
             realloc.selectLine({ sublistId, line: i });
-            const lineSoId = realloc.getCurrentSublistValue({ sublistId, fieldId: 'orderid' });
+            const linewoId = realloc.getCurrentSublistValue({ sublistId, fieldId: 'orderid' });
+            const commiton = realloc.getCurrentSublistValue({ sublistId, fieldId: 'commit' });
 
-            if (lineSoId != soId) continue;
+            if (linewoId != woId) continue;
 
-            const qtyRemaining = realloc.getCurrentSublistValue({ sublistId, fieldId: 'quantityremaining' }) || 0;
+            var qtyRemaining = Number(realloc.getCurrentSublistValue({ sublistId, fieldId: 'quantityremaining' }));
+            var qtCommited = Number(realloc.getCurrentSublistValue({ sublistId, fieldId: 'quantitycommitted' }));
+            if (qtyRemaining <= 0) continue;
+
+            qtyRemaining = Math.min(remainingCommit, qtyRemaining);
 
             realloc.setCurrentSublistValue({ sublistId, fieldId: 'commit', value: true });
-            realloc.setCurrentSublistValue({ sublistId, fieldId: 'quantitycommitted', value: qtyRemaining });
+            realloc.setCurrentSublistValue({ sublistId, fieldId: 'quantitycommitted', value: (qtyRemaining + qtCommited) });
             realloc.commitLine({ sublistId });
 
             remainingCommit -= qtyRemaining;
