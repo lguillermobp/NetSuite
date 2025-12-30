@@ -33,13 +33,13 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
             
 
         }
-        function approveBillScript(billId) {
-            log.debug("approveBillScript", billId);
-            if (confirm('Are you sure you want to approve this Vendor Bill?')) {
+        function approveJournalScript(billId) {
+            log.debug("approveJournalScript", billId);
+            if (confirm('Are you sure you want to approve this Journal Entry?')) {
                 try {
 
                     record.submitFields({
-                    type: record.Type.VENDOR_BILL,
+                    type: record.Type.JOURNAL_ENTRY,
                     id: billId,
                     values: {
                         "approvalstatus": 2,
@@ -49,10 +49,10 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                         ignoreMandatoryFields: true
                     }
                 })
-                log.debug('Vendor Bill Approved', 'Vendor Bill ID ' + billId + ' has been approved.');
+                log.debug('Journal Entry Approved', 'Journal Entry ID ' + billId + ' has been approved.');
                 location.reload();
                 } catch (e) {
-                    console.error('Error approving vendor bill:', e);
+                    console.error('Error approving journal entry:', e);
                 }
             }
         }
@@ -71,104 +71,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          */
         function fieldChanged(context) {
 
-            if (context.sublistId == "item" &&  context.fieldId == "rate") {
-
-                var order = context.currentRecord;
-
-                var tranid=context.currentRecord.tranid;
-
-                var origrate = order.getCurrentSublistText({
-                    sublistId: 'item',
-                    fieldId: 'origrate'
-                });
-                var rate = order.getCurrentSublistText({
-                    sublistId: 'item',
-                    fieldId: 'rate'
-                });
-                if (origrate != rate) {
-
-
-                    var itemcode = order.getCurrentSublistText({
-                        sublistId: 'item',
-                        fieldId: 'item'
-                    });
-
-                    var options = {
-                        title: 'Change of Rate',
-                        message: 'Are you sure change the Original Rate?',
-                        buttons: [
-                            { label: 'Yes', value: 1 },
-                            { label: 'No', value: 2 }
-                        ]
-                    };
-
-                    function success(result) {
-                        if (result == 1) {
-                            console.log("Thank you. You may proceed.");
-                            var userObj = runtime.getCurrentUser();
-                            log.debug("userObj",userObj.id);
-
-                            var orderdoc = order.getCurrentSublistText({
-                                sublistId: 'item',
-                                fieldId: 'orderdoc'
-                            });
-
-
-                            var paramPO = GENERALTOOLS.get_PO_value(orderdoc);
-                            var POnumber= paramPO.data.getValue({fieldId: "tranid"});
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0101');
-
-                            var recipients= paramrec.data.getValue({name: "custrecordparams_value"});
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0102');
-                            var subject= paramrec.data.getValue({name: "custrecordparams_value"});
-                            var paramrec = GENERALTOOLS.get_paramnew_value('0103');
-                            var emailBody= paramrec.data.getValue({name: "custrecordparams_value"});
-
-                            subject = subject.replace("${NEWRATE}", rate);
-                            subject = subject.replace("${PO}", POnumber);
-                            subject = subject.replace("${ITEM}", itemcode);
-
-                            emailBody = emailBody.replace("${NEWRATE}", rate);
-                            emailBody = emailBody.replace("${PO}", POnumber);
-                            emailBody = emailBody.replace("${ITEM}", itemcode);
-
-
-                            email.send({
-                                author : userObj.id,
-                                recipients : recipients,
-                                subject : subject,
-                                body : emailBody,
-                                relatedRecords : {
-                                    transactionId : orderdoc
-                                }
-                            });
-
-
-
-
-
-                        } else if (result == 2) {
-
-                            order.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'rate',
-                                value: origrate,
-                                ignoreFieldChange: true
-                            });
-
-                            console.log("This is not acceptable.");
-                        } else {
-                            console.log("Please try again.");
-                        }
-                    }
-                    function failure(reason) { console.log('Failure: ' + reason) }
-
-                    dialog.create(options).then(success).catch(failure);
-
-
-
-                }
-            }
+            
             return true;
         }
 
@@ -246,21 +149,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
          */
         function validateLine(context) {
 
-            if (context.sublistId == "item") {
-
-                var chgbox = 0;
-                var order = context.currentRecord;
-
-                var itemcode = order.getCurrentSublistText({
-                    sublistId: 'item',
-                    fieldId: 'item'
-                });
-
-
-                log.debug("country", country);
-
-
-            }
+       
             return true;
         }
 
@@ -315,13 +204,13 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
         return {
             pageInit: pageInit,
-            approveBillScript: approveBillScript,
+            approveJournalScript: approveJournalScript,
             //fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
             //lineInit: lineInit,
             //validateField: validateField,
-            validateLine: validateLine,
+            //validateLine: validateLine,
             //validateInsert: validateInsert,
             //validateDelete: validateDelete,
             saveRecord: saveRecord

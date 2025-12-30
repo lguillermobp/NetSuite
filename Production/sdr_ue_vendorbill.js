@@ -58,10 +58,35 @@ define(["N/record", "N/search", "N/runtime","N/log", "/SuiteScripts/Modules/gene
                     fieldId: 'custbody_billbalance',
                     value: balance
                 });
-                //vendorBillRecord.save();
+        //vendorBillRecord.save();
+
+        
 
                 log.audit({title: "balance", details: balance});
 
+            }
+            if (context.type === context.UserEventType.VIEW || context.type === context.UserEventType.EDIT) {
+                // Check if the bill needs approval (e.g., custom 'custbody_approval_status' field is 'Pending')
+                const currentRecord = context.newRecord;
+                const approvalStatus = currentRecord.getValue('statusRef'); // Your Custom Field
+                const nextapproval = currentRecord.getValue('nextapprover'); 
+                const currentUser = runtime.getCurrentUser();
+                const currentUserId = currentUser.id;
+                log.audit({title: "currentUserId", details: currentUserId});
+                log.audit({title: "nextapproval", details: nextapproval});
+
+                if (approvalStatus === 'pendingApproval' && nextapproval==currentUserId) {
+                    // Add the Approve button
+                    const form = context.form;
+                    form.addButton({
+                        id: 'custpage_approve_bill_btn',
+                        label: 'Approve Vendor Bill',
+                        functionName: 'approveBillScript(currentRecord.id)' // Call a Client Script function
+                    });
+
+                    // Add a Client Script to handle the button click and submit changes
+                    form.clientScriptModulePath = './sdr_cs_vendorbill.js'; // Path to your Client Script
+                }
             }
 
    

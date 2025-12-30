@@ -58,6 +58,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "bin_column": fresult1.getValue(fresult1.columns[7]),
                         "location_id": fresult1.getValue({name: "location"}),
                         "location_name": fresult1.getText({name: "location"}),
+                        "aisle": fresult1.getValue(fresult1.columns[8])
                     }
                     i++;
 

@@ -3,7 +3,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/runtime",'N/record','N/log','N/ui/serverWidget'], function(runtime,record, log,serverWidget) {
+define(["N/runtime",'N/record','N/log','N/ui/serverWidget',"/SuiteScripts/Modules/generaltoolsv1.js"], function(runtime,record, log,serverWidget,GENERALTOOLS) {
     
     /**
      * Function triggered before a record is submitted.
@@ -19,24 +19,40 @@ define(["N/runtime",'N/record','N/log','N/ui/serverWidget'], function(runtime,re
 		var userID = userObj.id;
 		var userPermission = userObj.getPermission({	name : 'TRAN_JOURNALAPPRV'	});
 		autAB= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
+        var paramemp = GENERALTOOLS.get_employee_value(userObj.id);
+        var supervisor=paramemp.data.getValue({fieldId: "supervisor"});
+        log.debug({title: "supervisor", details: supervisor});
+
+        if (context.type === "create" || context.type === context.UserEventType.EDIT) {
+            var nextapproval = context.newRecord.getValue('nextapprover');
+            if (nextapproval==-1 || nextapproval==null || nextapproval=='') {
+                context.newRecord.setValue('nextapprover', supervisor);
+                context.newRecord.setValue('memo', supervisor);
+                log.debug({title: "Set nextapprover to supervisor", details: supervisor});
+            }
+        }
         
 
-        if (context.type === context.UserEventType.VIEW) {
-           
-            
+        if (context.type === context.UserEventType.VIEW || context.type === context.UserEventType.EDIT) {
+                // Check if the bill needs approval (e.g., custom 'custbody_approval_status' field is 'Pending')
+                const currentRecord = context.newRecord;
+                const approvalStatus = currentRecord.getValue('statusRef'); // Your Custom Field
+                 nextapproval = currentRecord.getValue('nextapprover'); 
+   
+                log.audit({title: "nextapproval", details: nextapproval});
 
-        }
-        if(context.type == "create") 
-            {
-                log.debug("context.type",context.type);
-                log.debug("autAB",autAB);
-                if (autAB=="FULL") {
-                    context.newRecord.setValue({fieldId: 'approved', value: true});
+                if (approvalStatus === 'pendingApproval' && nextapproval==userID) {
+                    // Add the Approve button
+                    const form = context.form;
+                    form.addButton({
+                        id: 'custpage_approve_bill_btn',
+                        label: 'Approve Journal Entry',
+                        functionName: 'approveJournalScript(currentRecord.id)' // Call a Client Script function
+                    });
+
+                    // Add a Client Script to handle the button click and submit changes
+                    form.clientScriptModulePath = './sdr_cs_journal.js'; // Path to your Client Script
                 }
-                else {
-                    context.newRecord.setValue({fieldId: 'approved', value: false});
-                }
-          
             }
 
 
