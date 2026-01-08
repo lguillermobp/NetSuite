@@ -903,7 +903,7 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         line: counter,
                         value: result1.internalid
                     });
-                    log.debug('result1', result1);
+
                     sublistpmnov.setSublistValue({
                         id: 'custrecordml_itemid',
                         line: counter,
@@ -1286,7 +1286,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                 var counter = 0;
 
                 resultsgt.forEach(function(result1) {
-                    log.debug('result1', result1);
 
                     sublistgt.setSublistValue({
                         id: 'custrecordgt_preferredvendor',
@@ -1765,7 +1764,6 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     "leadtime": fresult.getValue({name: "leadtime", join: "CUSTRECORD_ITEM"}),
                     "total": Number(fresult.getValue({name: "custrecord_qty"})) * Number(fresult.getValue({name: "vendorcost", join: "CUSTRECORD_ITEM"}))         
 				    }
-                    log.debug('pagedatas[i]', pagedatas[i]);
 
                     x++;
 			})

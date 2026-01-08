@@ -4,9 +4,9 @@
  * @NModuleScope SameAccount
  */
 var country;
-define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", "/SuiteScripts/Modules/generaltoolsv1.js"],
+define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record","N/search", "/SuiteScripts/Modules/generaltoolsv1.js"],
 
-    function(runtime,email,dialog,message,log, record, GENERALTOOLS) {
+    function(runtime,email,dialog,message,log, record, search, GENERALTOOLS) {
 
         /**
          * Function to be executed after page is initialized.
@@ -38,7 +38,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
             if (confirm('Are you sure you want to approve this Vendor Bill?')) {
                 try {
 
-                    record.submitFields({
+                    record.submitFields({ 
                     type: record.Type.VENDOR_BILL,
                     id: billId,
                     values: {
@@ -85,7 +85,30 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                     sublistId: 'item',
                     fieldId: 'rate'
                 });
-                if (origrate != rate) {
+                var orderdoc = order.getCurrentSublistText({
+                    sublistId: 'item',
+                    fieldId: 'orderdoc' 
+                });
+                var orderline = order.getCurrentSublistText({
+                    sublistId: 'item',
+                    fieldId: 'orderline'
+                }); 
+
+                if (orderdoc!=0 ){
+
+                    var quantityreceived = lookingqtyreceived( orderdoc, orderline);
+                    }
+                    else {
+                        var quantityreceived = 0;
+                    }
+
+                log.debug("origrate", origrate);
+                log.debug("rate", rate);
+                log.debug("quantityreceived", quantityreceived);
+                log.debug("orderdoc", orderdoc);
+                log.debug("orderline", orderline);
+
+                if (quantityreceived!=0) {
 
 
                     var itemcode = order.getCurrentSublistText({
@@ -95,7 +118,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
 
                     var options = {
                         title: 'Change of Rate',
-                        message: 'Are you sure change the Original Rate?',
+                        message: 'Are you sure you want to change the original rate?',
                         buttons: [
                             { label: 'Yes', value: 1 },
                             { label: 'No', value: 2 }
@@ -107,13 +130,8 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                             console.log("Thank you. You may proceed.");
                             var userObj = runtime.getCurrentUser();
                             log.debug("userObj",userObj.id);
-
-                            var orderdoc = order.getCurrentSublistText({
-                                sublistId: 'item',
-                                fieldId: 'orderdoc'
-                            });
-
-
+                          
+/*
                             var paramPO = GENERALTOOLS.get_PO_value(orderdoc);
                             var POnumber= paramPO.data.getValue({fieldId: "tranid"});
                             var paramrec = GENERALTOOLS.get_paramnew_value('0101');
@@ -143,9 +161,9 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
                                 }
                             });
 
+*/
 
-
-
+                            return true;
 
                         } else if (result == 2) {
 
@@ -264,6 +282,48 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
             return true;
         }
 
+        function lookingqtyreceived( internalidpo, linepo) {
+
+            var purchaseorderSearchObj = search.create({
+                type: "purchaseorder",
+                settings:[{"name":"consolidationtype","value":"ACCTTYPE"}],
+                filters:
+                [
+                    ["type","anyof","PurchOrd"], 
+                    "AND", 
+                    ["internalid","anyof",internalidpo], 
+                    "AND", 
+                    ["line","equalto",linepo]
+                ],
+                columns:
+                [
+                    "item",
+                    "quantityshiprecv",
+                    "quantity",
+                    "statusref"
+                ]
+                });
+            var pagedData = purchaseorderSearchObj.runPaged({
+                "pageSize": 1000
+                });
+
+            var quantityreceived = 0;
+
+            pagedData.pageRanges.forEach(function (pageRange) {
+
+                var page = pagedData.fetch({index: pageRange.index});
+
+                page.data.forEach(function (fresult) {
+
+                    quantityreceived = Number(fresult.getValue({name: "quantityshiprecv"}));
+
+                });
+            });
+            
+            return quantityreceived;
+           
+        }
+
         /**
          * Validation function to be executed when sublist line is inserted.
          *
@@ -316,7 +376,7 @@ define(["N/runtime","N/email","N/ui/dialog", "N/ui/message","N/log","N/record", 
         return {
             pageInit: pageInit,
             approveBillScript: approveBillScript,
-            //fieldChanged: fieldChanged,
+            fieldChanged: fieldChanged,
             //postSourcing: postSourcing,
             //sublistChanged: sublistChanged,
             //lineInit: lineInit,

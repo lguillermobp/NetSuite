@@ -301,24 +301,33 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
 
         function refresh(idemp) {
 
+            console.log("idemp: ",idemp);
+
             var employeeRecord = record.load({
                 type: record.Type.EMPLOYEE,
                 id: idemp,
                 isDynamic: true
             });
 
+            console.log("employeeRecord: ",employeeRecord);
+
             var currentRec = currentRecord.get();  
            
             var vendors = currentRec.getValue({
                 fieldId: "custpage_vendors"
             });
+            log.debug("vendors",vendors);
+            console.log("vendors: ",vendors);
             var customers = currentRec.getValue({
                 fieldId: "custpage_customers"
             });
+            log.debug("customers",customers);
+            console.log("customers: ",customers);
             var requeststatusselected1 = currentRec.getValue({
                 fieldId: "custpage_requeststatus"
             });
-             
+            log.debug("requeststatusselected1",requeststatusselected1);
+            console.log("requeststatusselected1: ",requeststatusselected1);
             employeeRecord.setValue({
                 fieldId: "custentity_vendorsselected",
                 value: vendors
@@ -331,7 +340,13 @@ define(['N/https',"N/runtime","N/currentRecord", "N/error",'N/log', "N/record", 
                 fieldId: "custentity_requeststatusselected",
                 value: requeststatusselected1
             });
-            employeeRecord.save();
+            try {
+                employeeRecord.save();
+            } catch (e) {
+                log.error({ title: 'Error saving employee record', details: e });
+                alert('An error occurred while saving your preferences. Please try again.');
+                return;
+            }
             
            
             location.reload();
