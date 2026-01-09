@@ -69,12 +69,15 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+            custbody_quote_sc = context.newRecord.getValue({fieldId: "custbody_quote_sc"});
+            log.debug("createfrom", createfrom);
+            log.debug("custbody_quote_sc", custbody_quote_sc);
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
              if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
             {
                 context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
             }
-            context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+            //context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
 
 
             log.audit({title: "productionline", details: productionline});
@@ -218,6 +221,9 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
+            custbody_quote_sc = context.newRecord.getValue({fieldId: "custbody_quote_sc"});
+            log.debug("createfrom", createfrom);
+            log.debug("custbody_quote_sc", custbody_quote_sc);
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
             if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
             {
