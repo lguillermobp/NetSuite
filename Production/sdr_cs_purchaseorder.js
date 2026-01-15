@@ -183,15 +183,15 @@ define(["N/log","N/record","N/search", 'N/ui/dialog',"N/runtime", "/SuiteScripts
         var emailvendor = vendorRecord.getValue({ fieldId: 'email' });
         var sendEmail = vendorRecord.getValue({ fieldId: 'custentity_sendemail' });
 
-        var userObj = currentRecord.getValue({ fieldId: 'employee' });
-        log.debug('createdFrom', userObj);
-
-        var paramemp = GENERALTOOLS.get_employee_value(userObj);
-        var VIEWECDUSERID=paramemp.data.getValue({fieldId: "custentity_viewecduserid"});
-        
-
-        if (sendEmail && sendemailok) 
+         if (sendEmail && sendemailok) 
             {
+
+            var userObj = currentRecord.getValue({ fieldId: 'employee' });
+            log.debug('createdFrom', userObj);
+
+            var paramemp = GENERALTOOLS.get_employee_value(userObj);
+            var VIEWECDUSERID=paramemp.data.getValue({fieldId: "custentity_viewecduserid"});
+        
         
             // Send email to vendor
             var subject = "Purchase Order";
