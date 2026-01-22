@@ -77,36 +77,37 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                 var page = pagedData.fetch({index: pageRange.index});
                 page.data.forEach(function (fresult1) {
 
-                    if (fresult1.getValue({name: "type"})=="Discount") {
+                    if (fresult1.getValue({name: "type", summary: "GROUP"})=="Discount") {
                         item_step_id=9;
                         item_step="STEP 99 - Discount";
                     }
                     else
                     {
-                        item_step_id=Number(fresult1.getValue({name: "custitem_steps"}));
-                        item_step=fresult1.getText({name: "custitem_steps"});
+                        item_step_id=Number(fresult1.getValue({name: "custitem_steps", summary: "GROUP"}));
+                        item_step=fresult1.getText({name: "custitem_steps", summary: "GROUP"}) == '- None -' ? '' : fresult1.getText({name: "custitem_steps", summary: "GROUP"});
                     }
                     
                     dataf[i] = {
-                        "bin_id": Number(fresult1.getValue({name: "internalid", join: "binNumber"})),
-                        "item_id": Number(fresult1.getValue({name: "internalid"})),
-                        "item_name": fresult1.getValue({name: "itemid"}),
-                        "item_description": fresult1.getValue({name: "salesdescription"}),
-                        "item_description_po": fresult1.getValue({name: "purchasedescription"}),
-                        "item_unit": fresult1.getText({name: "unitstype"}),
-                        "exclude_projections": fresult1.getValue({name: "custitem_exclude_viewecd"}),
-                        "item_make": fresult1.getText({name: "custitem_make"}),
-                        "item_make_id": Number(fresult1.getValue({name: "custitem_make"})),
-                        "item_model": fresult1.getText({name: "custitem1"}),
-                        "item_price": Number(fresult1.getValue({name: "formulacurrency", formula: "{pricing.unitprice}"})),
+                        "bin_id": Number(fresult1.getValue({name: "internalid",    summary: "GROUP", join: "binNumber"})),
+                        "item_id": Number(fresult1.getValue({name: "internalid", summary: "GROUP"})),
+                        "item_name": fresult1.getValue({name: "itemid", summary: "GROUP"}),
+                        "item_description": fresult1.getValue({name: "salesdescription", summary: "GROUP"}) == '- None -' ? '' : fresult1.getValue({name: "salesdescription", summary: "GROUP"}),
+                        "item_description_po": fresult1.getValue({name: "purchasedescription", summary: "GROUP"}) == '- None -' ? '' : fresult1.getValue({name: "purchasedescription", summary: "GROUP"}),
+                        "item_unit": fresult1.getText({name: "unitstype", summary: "GROUP"}),
+                        "exclude_projections": fresult1.getValue({name: "custitem_exclude_viewecd", summary: "GROUP"}),
+                        "item_make": fresult1.getText({name: "custitem_make", summary: "GROUP"}) == '- None -' ? '' : fresult1.getText({name: "custitem_make", summary: "GROUP"}),
+                        "item_make_id": Number(fresult1.getValue({name: "custitem_make", summary: "GROUP"})),
+                        "item_model": fresult1.getText({name: "custitem1", summary: "GROUP"}) == '- None -' ? '' : fresult1.getText({name: "custitem1", summary: "GROUP"}),
+                        "item_price": Number(fresult1.getValue(fresult1.columns[8])),
+                        "item_price_b2b": Number(fresult1.getValue(fresult1.columns[9])),
                         "item_step": item_step,
                         "item_step_id": item_step_id,
-                        "item_parent_id": Number(fresult1.getValue({name: "parent"})),
-                        "item_type": fresult1.getText({name: "type"}),
-                        "item_cost": Number(fresult1.getValue({name: "averagecost"})),
-                        "item_last_poprice": Number(fresult1.getValue({name: "lastpurchaseprice"})),
-                        "item_vendor_price": Number(fresult1.getValue({name: "vendorcost"})),
-                        "item_vendor_currency": fresult1.getValue({name: "vendorpricecurrency"})
+                        "item_parent_id": Number(fresult1.getValue({name: "parent", summary: "GROUP"})),
+                        "item_type": fresult1.getText({name: "type", summary: "GROUP"}),
+                        "item_cost": Number(fresult1.getValue({name: "averagecost", summary: "GROUP"})),
+                        "item_last_poprice": Number(fresult1.getValue({name: "lastpurchaseprice", summary: "MAX"})),
+                        "item_vendor_price": Number(fresult1.getValue({name: "vendorcost", summary: "MAX"})),
+                        "item_vendor_currency": fresult1.getValue({name: "vendorpricecurrency", summary: "MAX"})
                     }
                     i++;
 

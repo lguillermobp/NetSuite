@@ -19,19 +19,60 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
     function afterSubmit(context) {
 
         log.debug("context.type",context.type);
+       
 
         if (context.type=="create"  || context.type=="edit") {
             var currentRecord = record.load({
                 type: context.newRecord.type,
                 id: context.newRecord.id,
-                isDynamic: true
+                isDynamic: false
             });
+
+            // Check if location configurations is empty
+
+            var lookupResultitem = search.lookupFields({
+                                type: context.newRecord.type,
+                                id: context.newRecord.id,
+                                columns: ['inventorylocation'] // Example with a joined field
+                            });
+
+            var locationid = lookupResultitem.inventorylocation.length;
+            //var locationid = recinventoryloc[0].value;
+
+            var itemname = currentRecord.getValue({ fieldId: 'itemid' });
+            
+            locationConfigCount=1; // temp fix to avoid adding location line multiple times;
+
+            if (locationid === 0 && currentRecord.getValue({ fieldId: 'baserecordtype' })=='inventoryitem') {
+                    var itemLocConfigRec = record.create({
+                        type: record.Type.ITEM_LOCATION_CONFIGURATION,
+                        defaultValues: {
+                            item: context.newRecord.id
+                        }
+                    });
+                    itemLocConfigRec.setValue({
+                        fieldId: 'subsidiary',
+                        value: '1'
+                    });
+                    itemLocConfigRec.setValue({
+                        fieldId: 'location',
+                        value: '1'
+                    });
+                    itemLocConfigRec.setValue({
+                        fieldId: 'itemid',
+                        value: context.newRecord.id
+                    });
+                    itemLocConfigRec.setValue({
+                        fieldId: 'name',
+                        value:  itemname + ' - Kissimmee - Warehouse'
+                    });
+                    var recId = itemLocConfigRec.save();
+                    log.debug("Item Location Configuration created with ID: " + recId);
+            }
         }
         else {
             var currentRecord = context.oldRecord;
         }
-
-         log.debug("currentRecord",currentRecord);
 
         if (context.type=="create"  || context.type=="delete" || context.type=="edit") 
             {   
@@ -58,7 +99,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                 id: item_price_currency,
                                 columns: ['name'] // Example with a joined field
                             });
-                    log.debug("lookupResult", lookupResult);
+
                     item_price_currency = lookupResult.name;
                     
                     //var item_price = Number(currentRecord.getMatrixSublistValue ({    sublistId: 'price',    fieldId: 'price',    column: 0,    line: 0}) );
@@ -124,7 +165,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                             "item_vendor_currency": vendorpricecurrency
                         }
                     const jsonString = JSON.stringify(datasending);
-                    log.debug("jsonString",jsonString);
+
                     dataall= GENERALTOOLS.postViewECD_item_api(item_id, opt, jsonString)
                 
             }

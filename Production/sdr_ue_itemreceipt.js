@@ -133,7 +133,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
                                     var recordType= paramitem.data.type[0].text;
                                     log.debug("recordType", recordType);
-                                    if (recordType=='inventoryitem' )   {
+                                    if (recordType=='Inventory Item' )   {
                                         if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
                                         }
                                         else {pickable='N';}

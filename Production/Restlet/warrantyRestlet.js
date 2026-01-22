@@ -54,8 +54,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "wr_year": fresult1.getValue(fresult1.columns[0]),
                         "wr_month": fresult1.getValue(fresult1.columns[1]),
                         "wr_type": fresult1.getValue(fresult1.columns[2]),
-                        "wr_amount": fresult1.getValue(fresult1.columns[3]),
-                        "wr_count": fresult1.getValue(fresult1.columns[4])
+                        "wr_amount": Number(fresult1.getValue(fresult1.columns[3])),
+                        "wr_count": Number(fresult1.getValue(fresult1.columns[4]))
                     }
                     i++;
 
