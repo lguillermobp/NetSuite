@@ -18,8 +18,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
 		var userID = userObj.id;
 		var userPermission = userObj.getPermission({	name : 'TRAN_PURCHORD'	});
 		autPO= userPermission === runtime.Permission.FULL ? 'FULL' : userPermission;
-        log.audit({title: "autPO", details: autPO});
-      
 
         wostatus = context.newRecord.getValue({fieldId: "status"});
 
@@ -63,27 +61,20 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             
         }
 
-        if (context.type === context.UserEventType.CREATE) {
+        if (context.type === context.UserEventType.CREATE || context.type === context.UserEventType.EDIT) {
 
             itemId = context.newRecord.getValue({fieldId: "assemblyitem"});
             productionline = context.newRecord.getValue({fieldId: "custbody_productionline"});
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
             custbody_quote_sc = context.newRecord.getValue({fieldId: "custbody_quote_sc"});
-            log.debug("createfrom", createfrom);
-            log.debug("custbody_quote_sc", custbody_quote_sc);
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
-             if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
-            {
-                context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
-            }
+            if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
+                {
+                    context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
+                }
             //context.newRecord.setValue({fieldId: "custbody_quote_sc", value: createfrom});
 
-
-            log.audit({title: "productionline", details: productionline});
-            log.audit({title: "section", details: section});
-
-            log.audit({title: "itemId", details: itemId});
 
             if (section)
 
@@ -96,7 +87,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                 });
 
                 var stages = sectionRecord.getValue({ fieldId: 'custrecord_stages' });
-                log.debug("stages", stages);
 
                 createdfrom = context.newRecord.getValue({fieldId: "createdfrom"});
 
@@ -126,6 +116,7 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
 
                             taskdef= fresult1.getValue({name: "custrecord_plst_task"});
                             taskdefd= fresult1.getText({name: "custrecord_plst_task"});
+                            context.newRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
 
                     });
                 });
@@ -134,16 +125,13 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                 if (taskdef && createdfrom)
                     {
                     paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
-                    log.debug("paramschedule",paramschedule);
                     paramdata = paramschedule.data;
                     if (paramdata) 
                         {
                         
-                        log.debug("paramdata",paramdata);
                         internalid = paramdata.getValue({name: "internalid"});
-                        log.debug("internalid",internalid);
                         context.newRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
-                        context.newRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
+                        
                         
                         }
                     }
@@ -154,7 +142,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                 paramitem = GENERALTOOLS.get_item_value_new(itemId);
                 paramdata = paramitem.data;
                 department = paramdata.getValue({fieldId: "department"});
-                log.audit({title: "department", details: department});
 
                 if (department)
                 {
@@ -188,7 +175,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                         body: bodyObj,
                         headers: headerObj
                     });
-                    log.debug("response",  response);
 
                     return response;
                 }
@@ -222,8 +208,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
             section = context.newRecord.getValue({fieldId: "custbody_ecdsection"});
             createfrom = context.newRecord.getValue({fieldId: "createdfrom"});
             custbody_quote_sc = context.newRecord.getValue({fieldId: "custbody_quote_sc"});
-            log.debug("createfrom", createfrom);
-            log.debug("custbody_quote_sc", custbody_quote_sc);
             ctc_id=context.newRecord.getValue({fieldId: "custbody_vecd_ctc_id"});
             if (!context.newRecord.getValue({fieldId: "custbody_quote_sc"}))
             {
@@ -236,9 +220,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                 data = JSON.parse(dataall.body);
                 dataheader = data.data.dataheader;
                 datadetail = data.data.datadetail;
-                log.debug("dataheader", dataheader);
-                log.debug("datadetail", datadetail);
-                log.debug("data", data);
                 var datadetail = data.data.datadetail;
 
                 if (dataheader.ctc_ownerdonor.length > 0) {
@@ -279,8 +260,6 @@ define(["N/record", "N/ui/message", "N/search", "N/runtime","N/log", "/SuiteScri
                     dynamicRecord.commitLine({
                         sublistId: 'item'
                     });            
-
-                    log.debug("Item " + i, item);
                 }
                 var recordId = dynamicRecord.save();
                 dataall= postViewECD(ctc_id, 'SET', context.newRecord.id)

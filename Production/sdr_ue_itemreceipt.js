@@ -108,7 +108,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                     var lookupResult = search.lookupFields({
                                         type: "customrecord_requestrecords",
                                         id: custcol_requestid,
-                                        columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable'] // Example with a joined field
+                                        columns: ['custrecord_sts_preview', 'custrecord_requeststscod', 'custrecord_viewecdid', 'custrecord_rq_pickable','custrecord_rq_cleared'] // Example with a joined field
                                     });
 
                                     var custrecord_sts_preview = lookupResult.custrecord_sts_preview;
@@ -116,6 +116,7 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                     var custrecord_requeststscod = requeststscod[0].value;
                                     var viewecdid = lookupResult.custrecord_viewecdid;
                                     var custrecord_rq_pickable = lookupResult.custrecord_rq_pickable;
+                                    var cleared = lookupResult.custrecord_rq_cleared;
                                     log.debug('lookupResult', lookupResult);
 
 
@@ -133,8 +134,10 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
 
                                     var recordType= paramitem.data.type[0].text;
                                     log.debug("recordType", recordType);
+                                   
                                     if (recordType=='Inventory Item' )   {
                                         if (custrecord_rq_pickable=='N') {pickable='Y';} else {pickable=custrecord_rq_pickable;}
+                                        if (custrecord_rq_pickable=='D') {cleaned='Y';} else {cleaned='N';}
                                         }
                                         else {pickable='N';}
 
@@ -157,7 +160,8 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                         "custrecord_rq_pickable": pickable,
                                         "custrecord_requeststscod": newsts,
                                         "custrecord_sts_preview": custrecord_requeststscod,
-                                        "custrecord_requeststs": newstsedsc
+                                        "custrecord_requeststs": newstsedsc,
+                                        "custrecord_rq_cleared": cleared
                                     }
                                 })
                                 var opt="SET";
@@ -170,7 +174,8 @@ define(["N/record",'N/log', "N/search", "N/runtime", "/SuiteScripts/Modules/gene
                                         "status": newstscod,
                                         "notes": newstsedsc,
                                         "oldstatus": custrecord_requeststscod,
-                                        "request_id" : viewecdid
+                                        "request_id" : viewecdid,
+                                        "cleared": cleared
                                     }
                                     const jsonString = JSON.stringify(datasending);
                                     log.debug("jsonString",jsonString);

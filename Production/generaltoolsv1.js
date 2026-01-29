@@ -534,7 +534,7 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
             isDynamic: false,
             defaultValues: null
         });
-            log.debug("paramrec",paramrec);
+           
         }
         catch(err) {
             try {
@@ -544,7 +544,7 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
                 isDynamic: false,
                 defaultValues: null
             });
-                log.debug("paramrec",paramrec);
+            
             }
             catch(err) {
                 try {
@@ -554,7 +554,7 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
                         isDynamic: false,
                         defaultValues: null
                     });
-                    log.debug("paramrec",paramrec);
+                
                 }
                 catch(err) {
                     try {
@@ -564,7 +564,7 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
                             isDynamic: false,
                             defaultValues: null
                         });
-                        log.debug("paramrec",paramrec);
+                
                     }
                     catch(err) { try {
                         var paramrec = r.load({
@@ -573,7 +573,7 @@ define(['N/search',"N/log","N/record","N/https"], function (s,log, r, https) {
                             isDynamic: false,
                             defaultValues: null
                         });
-                        log.debug("paramrec",paramrec);
+                       
                     }
                     catch(err) {
                         log.debug("err",err);

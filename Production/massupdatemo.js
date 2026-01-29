@@ -74,6 +74,7 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
 
                     taskdef= fresult1.getValue({name: "custrecord_plst_task"});
                     taskdefd= fresult1.getText({name: "custrecord_plst_task"});
+                    currentRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
 
                 });
             });
