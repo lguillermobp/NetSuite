@@ -84,6 +84,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                     else
                     {
                         item_step_id=Number(fresult1.getValue({name: "custitem_steps", summary: "GROUP"}));
+                        item_step_seq=Number(fresult1.getValue({name: "custrecord_steps_sequence",join: "CUSTITEM_STEPS",summary: "GROUP"}));
+                        item_step_group=fresult1.getText({name: "custrecord_group_steps", join: "CUSTITEM_STEPS", summary: "GROUP"});
                         item_step=fresult1.getText({name: "custitem_steps", summary: "GROUP"}) == '- None -' ? '' : fresult1.getText({name: "custitem_steps", summary: "GROUP"});
                     }
                     
@@ -101,7 +103,9 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "item_price": Number(fresult1.getValue(fresult1.columns[8])),
                         "item_price_b2b": Number(fresult1.getValue(fresult1.columns[9])),
                         "item_step": item_step,
+                        "item_step_seq": item_step_seq,
                         "item_step_id": item_step_id,
+                        "item_step_group": item_step_group,
                         "item_parent_id": Number(fresult1.getValue({name: "parent", summary: "GROUP"})),
                         "item_type": fresult1.getText({name: "type", summary: "GROUP"}),
                         "item_cost": Number(fresult1.getValue({name: "averagecost", summary: "GROUP"})),

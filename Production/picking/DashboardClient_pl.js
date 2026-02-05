@@ -309,7 +309,10 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 fieldId: 'transferlocation',
                                 value: locationid // Replace with the internal ID
                             });
+                           
                             console.log("locationid",locationid);
+
+                            var qq = 0;
 
                             for (var i = 0; i < sublistCount; i++) {
 
@@ -367,6 +370,7 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
                                 invtransf.selectNewLine({
                                     sublistId: 'inventory'
                                 });
+                                qq++;
                                 
                                 invtransf.setCurrentSublistValue({
                                     sublistId: 'inventory',
@@ -445,83 +449,89 @@ define(['N/https',"N/file", "N/runtime",'N/url',"N/ui/dialog","N/runtime","N/cur
 
                                 
                             }
+                            if (qq > 20) {
+                                invtransf.setValue({
+                                    fieldId: 'custbody_tobe_committed',
+                                    value: true
+                                });
+                            }
                             invtransf.save();
 
                             // Submit a change status to Released.
                             d= new Date();
                              
-                        try {
-                            var itemrec = record.load({
-                                type: "workorder",
-                                id: workorderid,
-                                isDynamic: false,
-                                defaultValues: null
-                            });
-                            itemrec.setValue({
-                                fieldId: "custbody_pickingdate",
-                                value:  d
-                            });
-                            itemrec.save({
-                                enableSourcing: true,
-                                ignoreMandatoryFields: true
-                            });
-                           
-                        } catch (e) {
-                            log.error({
-                                title: e.name,
-                                details: e.message
-                            });
-                        }
-                            message.create({
-                                title: "Process Completed",
-                                message: "The Picking List has been processed successfully.",
-                                type: message.Type.CONFIRMATION,
-                                duration: 10000
-                            }).show();
-
-
-
-                        try {
-                            var reccom = record.load({
-                                type: "commitorderschedule",
-                                id: 10,
-                                isDynamic: false,
-                                defaultValues: null
-                            });
-                            reccom.setValue({
-                                fieldId: "startdateshadow",
-                                value:  d
-                            });
-                            reccom.setValue({
-                                fieldId: "starttimepicker",
-                                value:  d
-                            });
-
-                            var index = reccom.findSublistLineWithValue({"sublistId": "item", "fieldId": "item", "value": 13871});
-
-                            if (index != -1) {
-                                reccom.setSublistValue({
-                                    "sublistId": "item",
-                                    "fieldId": 'quantity',
-                                    "line": index,
-                                    "value": 0
+                            try {
+                                var itemrec = record.load({
+                                    type: "workorder",
+                                    id: workorderid,
+                                    isDynamic: false,
+                                    defaultValues: null
+                                });
+                                itemrec.setValue({
+                                    fieldId: "custbody_pickingdate",
+                                    value:  d
+                                });
+                                itemrec.save({
+                                    enableSourcing: true,
+                                    ignoreMandatoryFields: true
+                                });
+                            
+                            } catch (e) {
+                                log.error({
+                                    title: e.name,
+                                    details: e.message
                                 });
                             }
+                                message.create({
+                                    title: "Process Completed",
+                                    message: "The Picking List has been processed successfully.",
+                                    type: message.Type.CONFIRMATION,
+                                    duration: 10000
+                                }).show();
 
-                            
 
-                            reccom.save({
-                                enableSourcing: true,
-                                ignoreMandatoryFields: true
-                            });
-                            
-                        } catch (e) {
-                            log.error({
-                                title: e.name,
-                                details: e.message
-                            });
 
-                        }
+                            try {
+                                var reccom = record.load({
+                                    type: "commitorderschedule",
+                                    id: 10,
+                                    isDynamic: false,
+                                    defaultValues: null
+                                });
+                                reccom.setValue({
+                                    fieldId: "startdateshadow",
+                                    value:  d
+                                });
+                                reccom.setValue({
+                                    fieldId: "starttimepicker",
+                                    value:  d
+                                });
+
+                                var index = reccom.findSublistLineWithValue({"sublistId": "item", "fieldId": "item", "value": 13871});
+
+                                if (index != -1) {
+                                    reccom.setSublistValue({
+                                        "sublistId": "item",
+                                        "fieldId": 'quantity',
+                                        "line": index,
+                                        "value": 0
+                                    });
+                                }
+
+                                
+
+                                reccom.save({
+                                    enableSourcing: true,
+                                    ignoreMandatoryFields: true
+                                });
+                                
+                            } catch (e) {
+                                log.error({
+                                    title: e.name,
+                                    details: e.message
+                                });
+
+                            }
 
 
 

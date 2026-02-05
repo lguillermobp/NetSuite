@@ -84,6 +84,7 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "group_by": fresult1.getText({name: "custrecord_sc_tasksgroup",join: "CUSTRECORD_SO_SC_TASK"}),
                         "progress": Number(fresult1.getValue({name: "custrecord_so_sc_progress"})),
                         "lastmodified_by": fresult1.getValue({name: "custrecord_so_sc_user"}),
+                        "sc_bay": fresult1.getText({name: "custbody_bay", join: "CUSTRECORD_SALECONTRACT"})
                     }
                     i++;
 

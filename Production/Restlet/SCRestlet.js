@@ -87,7 +87,8 @@ define(["N/search", "N/record",  "N/log","/SuiteScripts/Modules/generaltoolsv1.j
                         "sc_balance": Number(fresult1.getValue({name: "custbody_ecd_balance"})),
                         "sc_paid": Number(fresult1.getValue({name: "custbody_ecd_amountpaid"})),
                         "sc_enddatebasedwaterfall": enddatebasedwaterfall,
-                        "status_lpr": fresult1.getValue(fresult1.columns[27])
+                        "status_lpr": fresult1.getValue(fresult1.columns[27]),
+                        "sc_bay": fresult1.getText({name: "custbody_bay"})
                     }
                     i++;
 
