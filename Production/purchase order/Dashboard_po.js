@@ -211,20 +211,29 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     type: serverWidget.FieldType.TEXT,
                     label:'Task Schedule'
                 });
-                sublistpm.addField({
+                var podate = sublistpm.addField({
                     id: "custrecordml_podate",
                     type: serverWidget.FieldType.TEXT,
                     label:'Date Earlier'
                 });
-                sublistpm.addField({
+                podate.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var taskds= sublistpm.addField({
                     id: "custrecordml_taskds",
                     type: serverWidget.FieldType.TEXT,
                     label:'Start Date'
                 });
-                sublistpm.addField({
+                taskds.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
+                });
+                var taskde= sublistpm.addField({
                     id: "custrecordml_taskde",
                     type: serverWidget.FieldType.TEXT,
                     label:'End Date'
+                });
+                taskde.updateDisplayType({
+                    displayType: serverWidget.FieldDisplayType.HIDDEN
                 });
                 var sectionidc =sublistpm.addField({
                     id: "custrecordml_sectionid",
@@ -267,6 +276,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                     id: "custrecordml_item",
                     type: serverWidget.FieldType.TEXT,
                     label:'Item'
+                });
+                sublistpm.addField({
+                    id: "custrecordml_itemdescription",
+                    type: serverWidget.FieldType.TEXT,
+                    label:'Item Description'
                 });
                 var itemid = sublistpm.addField({
                     id: "custrecordml_itemid",
@@ -619,6 +633,11 @@ define(['N/file','N/redirect',"N/runtime","N/ui/serverWidget", "N/record", "N/se
                         id: 'custrecordml_memo',
                         line: counter,
                         value: result1.memo.substring(0, 298)
+                    });
+                    sublistpm.setSublistValue({
+                        id: 'custrecordml_itemdescription',
+                        line: counter,
+                        value: result1.itemdescription.substring(0, 298)
                     });
                    
                     counter++;
