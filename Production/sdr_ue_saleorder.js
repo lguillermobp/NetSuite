@@ -79,8 +79,13 @@ define(['N/format', 'N/record', 'N/log', 'N/ui/serverWidget', "N/runtime", "/Sui
             } else {
                 ppaid = Number(Math.abs((paid / total) * 100));
             }
-
-
+            if (ppaid > 100) {
+                ppaid = 100;
+                hcolor =  '#2E8B57' ;
+            }
+            else {
+                hcolor = '#428bca';
+            }
 
             var fpaid = format.format({ value: paid, type: format.Type.CURRENCY });
 
@@ -89,11 +94,12 @@ define(['N/format', 'N/record', 'N/log', 'N/ui/serverWidget', "N/runtime", "/Sui
             var ftotal = format.format({ value: total, type: format.Type.CURRENCY });
 
             var fppaid = format.format({ value: ppaid.toFixed(3), type: format.Type.PERCENT });
+            var pbarr= '<div class="progress"><div class="progress-bar" style="background-color:'  + hcolor + ';width:'  + ppaid.toFixed(3) +  '%;">' + ppaid.toFixed(3) + '%</div></div>'
             // Code to be executed when the page loads
 
-            ecdsummary = ' <style>#ecdsummary table  {  border: 1px solid black;  border-collapse: collapse} #ecdsummary th  {   font-size: 14px;   padding: 5px;   text-align:right;}#ecdsummary thead th {   font-size: 18px;   text-align:center;}#ecdsummary td  {  font-size: 14px;; padding: 5px;  text-align:right;}</style>'
+            ecdsummary = ' <style>#ecdsummary table  {  border: 1px solid black;  border-collapse: collapse} #ecdsummary th  {   font-size: 14px;   padding: 5px;   text-align:right;}#ecdsummary thead th {   font-size: 18px;   text-align:center;}#ecdsummary td  {  font-size: 14px;; padding: 5px;  text-align:right;}.progress{overflow:hidden;height:18px;background-color:#ccc;border-radius:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.1)}.progress-bar{float:left;width:0;height:100%;font-size:11px;line-height:18px;color:#fff;text-align:center;background-color:#428bca;box-shadow:inset 0 -1px 0 rgba(0,0,0,0.15);transition:width .6s ease}</style>'
 
-            ecdsummary += '<table id="ecdsummary"> <thead> <tr> <th colspan="2" align="center" bgcolor="#000000" style="color: #F1E4E4" scope="col">ECD Summary</th> </tr></thead><tbody> <tr> <th width="47%" align="right" scope="row">ECD Total</th> <td width="53%" align="right">[TOTAL]</td> </tr><tr> <th align="right" scope="row">ECD Amount Paid</th> <td align="right">[PAID]</td> </tr> <tr> <th align="right" scope="row">% Paid</th> <td align="left">[PPAID]</td> </tr> <tr> <th align="right" scope="row">Final Balance Due</th> <td align="right">[BALANCE]</td> </tr> </tbody></table>';
+            ecdsummary += '<table id="ecdsummary"> <thead> <tr> <th colspan="2" align="center" bgcolor="#000000" style="color: #F1E4E4" scope="col">ECD Summary</th> </tr></thead><tbody> <tr> <th width="47%" align="right" scope="row">ECD Total</th> <td width="53%" align="right">[TOTAL]</td> </tr><tr> <th align="right" scope="row">ECD Amount Paid</th> <td align="right">[PAID]</td> </tr> <tr> <th align="right" scope="row">% Paid</th> <td align="left">[PPAID]</td> </tr> <tr> <th align="right" scope="row">Final Balance Due</th> <td align="right">[BALANCE]</td> </tr> </tbody><tfoot><tr><td colspan="2" align="center" scope="col">' + pbarr + '</td></tr></tfoot></table>';
             ecdsummary = ecdsummary.replace("[TOTAL]", ftotal);
             ecdsummary = ecdsummary.replace("[PAID]", fpaid);
             ecdsummary = ecdsummary.replace("[BALANCE]", fbalance);

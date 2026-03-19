@@ -46,7 +46,7 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
             log.debug("stages", stages);
 
             assembly= currentRecord.getValue({fieldId: "assemblyitem"});
-            createdfrom = currentRecord.getValue({fieldId: "createdfrom"});
+            createdfrom = currentRecord.getValue({fieldId: "custbody_quote_sc"});
 
             var customrecord_pl_scheduletaskSearchObj = search.create({
                 type: "customrecord_pl_scheduletask",

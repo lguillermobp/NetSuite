@@ -1,3 +1,4 @@
 {
-    "netsuite-auto-upload.enabled": true
+    "netsuite-auto-upload.enabled": true,
+    "suitecloud.developerAssistant.disableWelcomeNotification": true
 }
