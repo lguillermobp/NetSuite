@@ -2,8 +2,8 @@
  * @NApiVersion 2.0
  * @NScriptType MassUpdateScript
  */
-define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
-    function(search,record, log, GENERALTOOLS) {
+define(["N/search", 'N/record', 'N/log', "/SuiteScripts/Modules/generaltoolsv1.js"],
+    function (search, record, log, GENERALTOOLS) {
         var salecontract;
         function each(params) {
             var currentRecord = record.load({
@@ -11,11 +11,10 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
                 id: params.id,
                 isDynamic: true
             });
-            var saveon=false;
-            section = currentRecord.getValue({fieldId: "custbody_ecdsection"});
+            var saveon = false;
+            section = currentRecord.getValue({ fieldId: "custbody_ecdsection" });
 
-            if (!section) 
-            {
+            if (!section) {
                 assemblyrec = record.load({
                     type: 'assemblyitem',
                     id: currentRecord.getValue({ fieldId: 'assemblyitem' }),
@@ -24,17 +23,15 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
                 section = assemblyrec.getValue({ fieldId: 'custitem_sections' });
                 log.debug("section", section);
                 log.debug("assemblyrec", assemblyrec);
-                if (!section)
-                {
+                if (!section) {
                     return;
                 }
-                else
-                {
+                else {
                     currentRecord.setValue({ fieldId: "custbody_ecdsection", value: section });
-                    saveon=true;
+                    saveon = true;
                 }
             }
-            productionline = currentRecord.getValue({fieldId: "custbody_productionline"});
+            productionline = currentRecord.getValue({ fieldId: "custbody_productionline" });
 
             var sectionRecord = record.load({
                 type: 'customrecord_section',
@@ -45,67 +42,64 @@ define(["N/search",'N/record','N/log', "/SuiteScripts/Modules/generaltoolsv1.js"
             var stages = sectionRecord.getValue({ fieldId: 'custrecord_stages' });
             log.debug("stages", stages);
 
-            assembly= currentRecord.getValue({fieldId: "assemblyitem"});
-            createdfrom = currentRecord.getValue({fieldId: "custbody_quote_sc"});
+            assembly = currentRecord.getValue({ fieldId: "assemblyitem" });
+            createdfrom = currentRecord.getValue({ fieldId: "custbody_quote_sc" });
 
             var customrecord_pl_scheduletaskSearchObj = search.create({
                 type: "customrecord_pl_scheduletask",
                 filters:
-                [
-                   ["custrecord158","anyof",stages], 
-                   "AND", 
-                   ["custrecord_plst_productionline","anyof",productionline]
-                ],
+                    [
+                        ["custrecord158", "anyof", stages],
+                        "AND",
+                        ["custrecord_plst_productionline", "anyof", productionline]
+                    ],
                 columns:
-                [
-                   "custrecord158",
-                   "custrecord_plst_productionline",
-                   "custrecord_plst_task"
-                ]
-             });
+                    [
+                        "custrecord158",
+                        "custrecord_plst_productionline",
+                        "custrecord_plst_task"
+                    ]
+            });
             var taskdef;
             var pagedData = customrecord_pl_scheduletaskSearchObj.runPaged({
-                "pageSize" : 1000
+                "pageSize": 1000
             });
 
             pagedData.pageRanges.forEach(function (pageRange) {
-                var page = pagedData.fetch({index: pageRange.index});
+                var page = pagedData.fetch({ index: pageRange.index });
                 page.data.forEach(function (fresult1) {
 
-                    taskdef= fresult1.getValue({name: "custrecord_plst_task"});
-                    taskdefd= fresult1.getText({name: "custrecord_plst_task"});
-                    currentRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
+                    taskdef = fresult1.getValue({ name: "custrecord_plst_task" });
+                    taskdefd = fresult1.getText({ name: "custrecord_plst_task" });
+                    currentRecord.setValue({ fieldId: "custbody_scheduletaskid", value: taskdef });
 
                 });
             });
 
-            if (taskdef && createdfrom)
-            {
-            paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
-            log.debug("paramschedule",paramschedule);
-            paramdata = paramschedule.data;
-            if (paramdata) 
-                {
-                
-                log.debug("paramdata",paramdata);
-                internalid = paramdata.getValue({name: "internalid"});
-                log.debug("internalid",internalid);
-                currentRecord.setValue({fieldId: "custbody_tasksc", value: internalid});
-                currentRecord.setValue({fieldId: "custbody_scheduletaskid", value: taskdef});
-                saveon=true;
-                
+            if (taskdef && createdfrom) {
+                paramschedule = GENERALTOOLS.getScheduleParams(taskdefd, createdfrom);
+                log.debug("paramschedule", paramschedule);
+                paramdata = paramschedule.data;
+                log.debug("params.id", params.id);
+                if (paramdata) {
+
+                    log.debug("paramdata", paramdata);
+                    internalid = paramdata.getValue({ name: "internalid" });
+                    currentRecord.setValue({ fieldId: "custbody_tasksc", value: internalid });
+                    currentRecord.setValue({ fieldId: "custbody_scheduletaskid", value: taskdef });
+                    saveon = true;
+
                 }
-            else 
-            {
-                currentRecord.setValue({fieldId: "custbody_tasksc", value: ''});
-                saveon=true;
+                else {
+                    currentRecord.setValue({ fieldId: "custbody_tasksc", value: '' });
+                    saveon = true;
+                }
+
             }
-            
-            }
-            if (saveon)           {currentRecord.save();}
-            
+            if (saveon) { currentRecord.save(); }
+
         }
-        
+
 
         return {
             each: each

@@ -991,9 +991,7 @@ define(['N/file', 'N/redirect', "N/runtime", "N/ui/serverWidget", "N/record", "N
                         "AND",
                         ["status", "anyof", "WorkOrd:B", "WorkOrd:D"],
                         "AND",
-                        ["sum(formulanumeric: CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END)", "notequalto", "0"],
-                        "AND",
-                        ["custbody_tasksc.custrecord_so_sc_task", "noneof", "@NONE@"]
+                        ["sum(formulanumeric: CASE WHEN {item.vendor}= {item.othervendor}THEN {quantity} ELSE 0 END)", "notequalto", "0"]
 
                     ],
                 columns:
@@ -1104,6 +1102,11 @@ define(['N/file', 'N/redirect', "N/runtime", "N/ui/serverWidget", "N/record", "N
                             name: "unit",
                             summary: "GROUP"
                         }),
+                        search.createColumn({
+                            name: "custbody_dispatchdate",
+                            join: "CUSTBODY_QUOTE_SC",
+                            summary: "MAX"
+                        })
                     ]
             });
 
@@ -1164,6 +1167,8 @@ define(['N/file', 'N/redirect', "N/runtime", "N/ui/serverWidget", "N/record", "N
                 var page = pagedData.fetch({ index: pageRange.index });
 
                 page.data.forEach(function (fresult) {
+                    if (fresult.getValue({ name: "custbody_dispatchdate", join: "CUSTBODY_QUOTE_SC", summary: "MAX" })) { dispatchdate = fresult.getValue({ name: "custbody_dispatchdate", join: "CUSTBODY_QUOTE_SC", summary: "MAX" }); }
+                    else { dispatchdate = " "; }
 
                     productionline = fresult.getText({ name: "custbody_productionline", summary: "GROUP" });
                     productionlineid = fresult.getValue({ name: "custbody_productionline", summary: "GROUP" });
@@ -1176,9 +1181,9 @@ define(['N/file', 'N/redirect', "N/runtime", "N/ui/serverWidget", "N/record", "N
                     if (fresult.getValue({ name: "formulatext", summary: "GROUP" })) { taskd = fresult.getValue({ name: "formulatext", summary: "GROUP" }); }
                     else { taskd = " "; }
                     if (fresult.getValue({ name: "custrecord_so_sc_startdate", join: "CUSTBODY_TASKSC", summary: "MAX" })) { taskds = fresult.getValue({ name: "custrecord_so_sc_startdate", join: "CUSTBODY_TASKSC", summary: "MAX" }); }
-                    else { taskds = " "; }
+                    else { taskds = dispatchdate; }
                     if (fresult.getValue({ name: "custrecord_so_sc_enddate", join: "CUSTBODY_TASKSC", summary: "MAX" })) { taskde = fresult.getValue({ name: "custrecord_so_sc_enddate", join: "CUSTBODY_TASKSC", summary: "MAX" }); }
-                    else { taskde = " "; }
+                    else { taskde = dispatchdate; }
                     if (fresult.getValue({ name: "preferredstockleveldays", join: "item", summary: "GROUP" })) { leadtime = fresult.getValue({ name: "preferredstockleveldays", join: "item", summary: "GROUP" }); }
                     else { leadtime = 0; }
 
